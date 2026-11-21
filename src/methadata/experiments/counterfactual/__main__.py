@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from methadata.fusion_eval.core import load_eval_config
 
@@ -19,7 +20,7 @@ def main(argv=None) -> int:
     r.add_argument("--config", required=True)
     r.add_argument("--out", required=True)
     a = ap.parse_args(argv)
-    base = json.load(open(a.baseline_config, encoding="utf-8"))
+    base = json.loads(Path(a.baseline_config).read_text(encoding="utf-8"))
     res = run_counterfactual(a.store, base, load_eval_config(a.eval_config), load_config(a.config))
     out = write_outputs(res, a.out)
     print(res["markdown"])
