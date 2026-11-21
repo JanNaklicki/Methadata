@@ -1,0 +1,26 @@
+{
+  "evidence_id": "pev-939f4e5676461047",
+  "run_id": "run-demo-0002",
+  "relation": "shared_template",
+  "method_id": "asset-jaccard-v1",
+  "score": null,
+  "explanation": "Porównanie niewykonalne: dla samego adresu URL nie ma grafik ani tekstu do zestawienia.",
+  "available": false,
+  "limitations": [
+    "Dla materiału dodanego jako sam URL nie ma grafik ani tekstu."
+  ],
+  "sides": [
+    {
+      "material_id": "can-8ca346f7c030dbc8",
+      "label": "Drugi adres z listy",
+      "display_url": null,
+      "items": []
+    },
+    {
+      "material_id": "can-934ac3e1b721c8e8",
+      "label": "Adres z listy",
+      "display_url": null,
+      "items": []
+    }
+  ]
+}

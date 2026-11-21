@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "storage_unavailable",
+    "message": "Magazyn danych jest chwilowo niedostępny. Spróbuj ponownie za chwilę.",
+    "retryable": true
+  }
+}

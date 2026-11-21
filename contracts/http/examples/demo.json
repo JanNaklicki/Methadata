@@ -1,0 +1,8 @@
+{
+  "observation_id": "obs-9271e8a859000be5",
+  "dataset_name": "Zestaw demonstracyjny (4 materiały)",
+  "dataset_version": "synthetic-contract-1",
+  "description": "Mały zestaw przykładowy dostarczany z projektem. Analiza materiału p15 odnajduje p2 i p7.",
+  "material_count": 4,
+  "input_kind": "full_capture"
+}
