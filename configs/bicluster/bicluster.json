@@ -1,0 +1,1 @@
+{"feature_version": "VERSION_CECH", "dataset_version": "VERSION_ZBIORU", "relation": "campaign_candidate", "min_materials": 2, "min_traces": 2, "min_kinds": 1, "max_df_fraction": 0.5, "redundancy_jaccard": 0.8, "max_biclusters": 200}
