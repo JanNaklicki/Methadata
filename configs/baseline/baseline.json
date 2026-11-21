@@ -1,0 +1,30 @@
+{
+  "name": "baseline-v1",
+  "dataset_name": "backup-p1-p15",
+  "corpus": {
+    "include_tag": "page_capture",
+    "exclude_tags": ["excluded_from_corpus"],
+    "exclude_source_refs": ["dir:p1"],
+    "label_pattern": "dir:(p\\d+)"
+  },
+  "run": {
+    "seed": 0,
+    "relation": "shared_template",
+    "extractors": ["assets-hash-extractor"],
+    "comparators": ["assets-jaccard-v1"],
+    "clusterer": "components-threshold-v1",
+    "cluster_config": {"threshold": 0.5, "similarity_version": "assets-jaccard-v1", "method_id": "assets-jaccard-v1"}
+  },
+  "frozen_run_config_hash": "82f958d260b9ad3b",
+  "failure_probe_threshold": 0.13,
+  "expected": {
+    "dataset_fingerprint": "b190264f9b6c0841",
+    "materials": 14,
+    "pairs": 91,
+    "pairs_with_shared_images": 11,
+    "threshold": 0.5,
+    "groups": [["p2", "p7", "p15"], ["p8", "p11"]],
+    "scores": {"p2-p7": 1.0, "p2-p15": 1.0, "p7-p15": 1.0, "p8-p11": 0.543, "p3-p4": 0.222},
+    "score_tolerance": 0.0005
+  }
+}
