@@ -1,17 +1,17 @@
 # Stan orkiestracji (2026-11-21)
 
-Lokalny `main` = `31fd7e9` (niepublikowany na origin). Pełny pytest: 282 passed, 2 skipped (brak ffmpeg, brak próbek jQuery).
+Lokalny `main` po scaleniu W02 (niepublikowany na origin). Pełny pytest: 282 passed, 2 skipped (brak ffmpeg, brak próbek jQuery).
 
 ## Scalone do main
 F01, E01, K01, F03, W01, X01, X03, X05, S01, F02 (+ujednolicony DerivedStore), X04 (+kanoniczny DerivedStore),
-E02, E03, F05, F04, E05, R01, E04, E10, K02, E14, E13, X02, K09, E08, E07, poprawki testów (TFIX, TFIX2).
+E02, E03, F05, F04, E05, R01, E04, E10, K02, E14, E13, X02, K09, E08, E07, W02, poprawki testów (TFIX, TFIX2).
 
-## Przerwane
-- **W02** (backend FastAPI) — branch `codex/web-api`, commit WIP `a5861af`, worktree `.claude/worktrees/W02`.
-  Niezweryfikowane. Dokończyć: testy + `python contracts/http/check_conformance.py --base-url http://localhost:8000`.
+## W02 (backend)
+Start: `METHADATA_DATA_DIR=var/methadata-data .venv/bin/python -m methadata_api` (port 8000; METHADATA_HOST/PORT/WORKERS), opis w backend/README.md.
+Walidacja: `python contracts/http/check_conformance.py --base-url http://localhost:8000` → OK. Ograniczenia: jedyny profil analizy `demo` (baseline assets-jaccard, bez fuzji K09); URL bez pobierania (offline); kolejka w jednym procesie.
 
 ## Następne (zależności już w main)
-- Demo: W02 (dokończyć) → W03 (W02, F05) ; F06 (F04, K09, E02, E03) → W04, E18 → R02 → R03.
+- Demo: W03 (W02, F05 — gotowe) ; F06 (F04, K09, E02, E03) → W04, E18 → R02 → R03.
 - Od razu: K03, K04, K05, K07, K13, E06, S04, S05, S10, E09, E11, E16, S02, E15, S06, S07, S09, E12, S03, K08, K15, K12, E17 (po F06), K10/K14 (po F06), K11 (po F06), K06 (po K05), R04.
 
 ## Konwencje (obowiązkowe dla wykonawców)
