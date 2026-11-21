@@ -1,0 +1,4 @@
+# ads.txt wydawcy B: dzieli konto adnet.example.test/1111 z wydawca A
+adnet.example.test, 1111, DIRECT, abc123
+other-ssp.example.test, 5555, DIRECT
+CONTACT=ops@pub-b.example.test

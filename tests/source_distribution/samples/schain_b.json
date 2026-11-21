@@ -1,0 +1,8 @@
+{
+  "ver": "1.0",
+  "complete": 1,
+  "nodes": [
+    {"asi": "exchange-x.example.test", "sid": "88", "hp": 0, "rid": "req-7"},
+    {"asi": "adnet.example.test", "sid": "1111", "hp": 1, "rid": "req-8", "name": "Pub Alpha Inc", "domain": "pub-a.example.test"}
+  ]
+}
