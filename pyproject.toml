@@ -18,6 +18,7 @@ pdf = ["pypdf>=4"]
 [project.entry-points."methadata.adapters"]
 importer-files = "methadata.ingest.importer:get_adapters"
 assets = "methadata.experiments.assets.adapters:get_adapters"
+dom = "methadata.experiments.dom.adapters:get_adapters"
 components = "methadata.clustering.components:ADAPTERS"
 extract-html = "methadata.extractors.html:get_adapters"
 network = "methadata.extractors.network:get_adapters"
