@@ -1,0 +1,15 @@
+{
+  "control": {
+    "dataset_version": "medoids-control-v1",
+    "vector_version": "synthetic-vec-v1",
+    "materials": ["A", "B", "C", "D", "E", "X", "M"],
+    "unobserved": ["M"],
+    "comparisons": {"AB": 0.98, "CD": 0.78, "CE": 0.76, "DE": 0.80, "AC": 0.1, "AD": 0.1, "AE": 0.1,
+                    "BC": 0.1, "BD": 0.1, "BE": 0.1},
+    "vectors": {"A": [1, 0.1, 0], "B": [1, 0, 0.1], "C": [0, 1, 0.1], "D": [0.1, 1, 0], "E": [0, 1, 0],
+                "X": [0, 0, 1]},
+    "truth": {"A": "ab", "B": "ab", "C": "cde", "D": "cde", "E": "cde", "X": "noise"},
+    "ks": [1, 2, 3, 4],
+    "max_distance": 0.5
+  }
+}
