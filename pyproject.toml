@@ -35,12 +35,14 @@ url-har = "methadata.experiments.url_har:get_adapters"
 rare-motifs = "methadata.experiments.rare_motifs:get_adapters"
 funnel = "methadata.experiments.funnel:get_adapters"
 fusion = "methadata.clustering.fusion:get_adapters"
+people-entities = "methadata.experiments.people_entities:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 "methadata.contracts" = ["schemas/v1/*.json"]
+"methadata.experiments.people_entities" = ["data/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

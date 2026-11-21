@@ -1,0 +1,12 @@
+{
+  "version": "people-reference-images-1",
+  "note": "Ręcznie opisany, mały zestaw obrazów referencyjnych. Dopasowanie WYŁĄCZNIE po SHA-256 bajtów (dokładna kopia pliku); to nie jest rozpoznawanie twarzy. Obrazy nie są w repozytorium. Pole verified=false oznacza, że etykieta pochodzi z nazwy pliku w zapisie strony i czeka na potwierdzenie przez człowieka.",
+  "images": [
+    {"sha256": "31a24ebea13afd53ea739e28ac5f7323bcd2ed56fdcc19812adeb4aaaa171ea0", "entity_id": "person:rafal-brzoska",
+     "label_source": "nazwa pliku brzoska-avatar.jpg w zapisie BACKUP/p2 (etykieta z nazwy pliku, nie z rozpoznania twarzy)",
+     "verified": false, "described_by": "wykonawca karty E08"},
+    {"sha256": "77bd3f93a8e61ed3db9d85ceb920505f8aa4a9136582f81df2d187217e2014d7", "entity_id": "person:mateusz-morawiecki",
+     "label_source": "nazwa pliku morawiecki-avatar.jpg w zapisie BACKUP/p2 (etykieta z nazwy pliku, nie z rozpoznania twarzy)",
+     "verified": false, "described_by": "wykonawca karty E08"}
+  ]
+}
