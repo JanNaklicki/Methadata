@@ -43,6 +43,7 @@ class Settings:
             default_profile=os.environ.get("METHADATA_ANALYSIS_PROFILE", "demo"),
             jury_data_dir=Path(jury_dir).expanduser() if jury_dir else None,
             baseline_config=Path(os.environ.get("METHADATA_BASELINE_CONFIG", str(DEFAULT_BASELINE_CONFIG))),
+            max_upload_bytes=int(os.environ.get("METHADATA_MAX_UPLOAD_BYTES", str(MAX_UPLOAD_BYTES))),
         )
 
     # układ katalogu danych

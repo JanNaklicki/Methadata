@@ -286,7 +286,7 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
         return _created(obs, created, label or selected.labels().get(obs.observation_id))
 
     def _too_large() -> ApiError:
-        return ApiError(413, "payload_too_large", "Plik jest za duży. Maksymalny rozmiar to 50 MiB.",
+        return ApiError(413, "payload_too_large", f"Plik jest za duży. Maksymalny rozmiar to {settings.max_upload_bytes / 1048576:g} MiB.",
                         details=[{"field": "file", "message": f"Przekroczono limit {settings.max_upload_bytes} bajtów."}])
 
     # ------------------------------------------------------------ przebiegi
