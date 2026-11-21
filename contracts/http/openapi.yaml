@@ -390,8 +390,8 @@ components:
         observation_id: {$ref: "#/components/schemas/Id"}
         profile:
           type: string
-          default: demo
-          description: Profil konfiguracji backendu (`demo`); nieznany daje 422.
+          enum: [demo, jury]
+          description: Domyślnie profil wybrany na serwerze (standardowo demo). Jury wymaga przygotowanego korpusu.
     RunAccepted:
       type: object
       additionalProperties: false

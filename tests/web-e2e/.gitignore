@@ -5,3 +5,5 @@ test-results-baseline/
 test-results-outage/
 playwright-report-baseline/
 playwright-report-outage/
+test-results-jury*/
+playwright-report-jury*/

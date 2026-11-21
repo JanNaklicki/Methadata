@@ -98,11 +98,16 @@ def _plural(n: int, one: str, few: str, many: str) -> str:
 def build_view(run_id: str, bundle: Bundle, labels: Mapping[str, str], store: Store, previews_dir: Path,
                target_observation_id: Optional[str] = None) -> dict:
     cr = bundle.runs[0]
+    fusion = "fusion" in cr.config
     obs_by_canon = {o.canonical_id: o for o in bundle.observations}
     families: dict[str, set[str]] = {}
+    kinds = {("asset", "image_sha256"): "asset"}
+    if fusion:
+        kinds.update({("dom_struct", "dom_sequence"): "dom", ("lexical", "text_field"): "text"})
     for f in bundle.features:
-        if f.family == "asset" and f.kind == "image_sha256":
-            families.setdefault(f.observation_id, set()).add("asset")
+        family = kinds.get((f.family, f.kind))
+        if family:
+            families.setdefault(f.observation_id, set()).add(family)
 
     materials = []
     for cid in sorted(obs_by_canon):
@@ -113,21 +118,27 @@ def build_view(run_id: str, bundle: Bundle, labels: Mapping[str, str], store: St
         materials.append({"material_id": cid, "observation_id": o.observation_id, "input_kind": o.input_kind.value,
                           "label": label, "display_url": observation_display_url(o), "thumbnail": thumb,
                           "available_evidence": sorted(families.get(o.observation_id, ()))})
-    mat_label = {m["material_id"]: m["label"] for m in materials}
 
     groups: dict[str, list[str]] = {}
     for a in cr.assignments:
         for c in a.cluster_ids:
             groups.setdefault(c, []).append(a.material_id)
-    clusters = [{"cluster_id": cid, "material_ids": sorted(ms), "relation": cr.relation.value,
-                 "summary": f"{len(ms)} {_plural(len(ms), 'materiał ma', 'materiały mają', 'materiałów ma')} wspólne grafiki."}
-                for cid, ms in sorted(groups.items())]
+    clusters = [
+        {"cluster_id": cid, "material_ids": sorted(ms), "relation": cr.relation.value,
+         "summary": ("Hipoteza kampanii na podstawie podobieństwa grafik, tekstu i struktury stron."
+                     if fusion else
+                     f"{len(ms)} {_plural(len(ms), 'materiał ma', 'materiały mają', 'materiałów ma')} wspólne grafiki.")}
+        for cid, ms in sorted(groups.items())
+    ]
 
     counts = {k: sum(1 for a in cr.assignments if a.status.value == k)
               for k in ("grouped", "singleton", "noise", "insufficient_data")}
     target_canon = next((o.canonical_id for o in bundle.observations if o.observation_id == target_observation_id), None)
     target_status = next((a.status.value for a in cr.assignments if a.material_id == target_canon), None)
-    if clusters:
+    if fusion and target_status == "insufficient_data":
+        outcome = "insufficient_evidence"
+        msg = "Za mało dowodów dotyczących analizowanego materiału. Widoczne grupy obejmują materiały z indeksu."
+    elif clusters:
         outcome = "grouped"
         n = len(clusters)
         msg = f"Znaleziono {n} {_plural(n, 'grupę', 'grupy', 'grup')}: {counts['grouped']} powiązanych materiałów."
@@ -142,18 +153,30 @@ def build_view(run_id: str, bundle: Bundle, labels: Mapping[str, str], store: St
         msg = "Za mało dowodów: nie udało się porównać materiału z innymi (brak grafik do zestawienia, np. dodano sam adres URL)."
     else:
         outcome = "no_groups"
-        msg = "Nie znaleziono wspólnych grafik: żaden materiał nie połączył się z innymi."
+        msg = ("Żadne porównanie nie spełniło kryteriów fuzji dowodów." if fusion
+               else "Nie znaleziono wspólnych grafik: żaden materiał nie połączył się z innymi.")
     summary = {"outcome": outcome, "material_count": len(cr.assignments), **counts, "message": msg}
 
-    pairs = sorted(bundle.pairs, key=lambda p: (p.score is None, -(p.score or 0.0), p.pair_evidence_id))
+    def pair_order(p: PairEvidence) -> tuple:
+        # W jury najpierw pokaż porównania zgłoszonego materiału.
+        return (fusion and target_canon not in p.pair, p.score is None, -(p.score or 0.0), p.pair_evidence_id)
+
+    pairs = sorted((p for p in bundle.pairs if p.run_id == run_id), key=pair_order)
     pair_evidence = [{"evidence_id": p.pair_evidence_id, "pair": list(p.pair), "method_id": p.method_id,
-                      "relation": p.relation.value, "score": p.score, "explanation": safe_text(p.explanation),
+                      "relation": p.relation.value, "score": p.score, "explanation": public_explanation(p),
                       "evidence_url": f"/api/v1/runs/{run_id}/evidence/{p.pair_evidence_id}"} for p in pairs]
     return {"cluster_run": cr.model_dump(mode="json"), "summary": summary, "materials": materials,
             "clusters": clusters, "pair_evidence": pair_evidence}
 
 
 # ---------------------------------------------------------------- dowód dla pary
+def public_explanation(pair: PairEvidence) -> str:
+    text = pair.explanation
+    if pair.method_id == "fusion-v1":
+        text = text.split(" Bez rodziny:", 1)[0]
+    return safe_text(text)
+
+
 def _excerpt(store: Store, art: Artifact, loc: Mapping[str, Any]) -> Optional[dict]:
     if loc.get("kind") != "text_span" or art.local_ref is None:
         return None
@@ -174,7 +197,7 @@ def _excerpt(store: Store, art: Artifact, loc: Mapping[str, Any]) -> Optional[di
 
 def build_evidence(run_id: str, bundle: Bundle, view: Mapping[str, Any], evidence_id: str, store: Store,
                    previews_dir: Path) -> Optional[dict]:
-    pair: Optional[PairEvidence] = next((p for p in bundle.pairs if p.pair_evidence_id == evidence_id), None)
+    pair: Optional[PairEvidence] = next((p for p in bundle.pairs if p.run_id == run_id and p.pair_evidence_id == evidence_id), None)
     if pair is None:
         return None
     mats = {m["material_id"]: m for m in view["materials"]}
@@ -199,7 +222,7 @@ def build_evidence(run_id: str, bundle: Bundle, view: Mapping[str, Any], evidenc
                           "preview": ensure_preview(store, art, f"Grafika z materiału {m['label']}", previews_dir)})
         sides.append({"material_id": cid, "label": m["label"], "display_url": m.get("display_url"), "items": items})
     if not available:
-        limitations.append(safe_text(pair.explanation, 500))
+        limitations.append(public_explanation(pair))
     return {"evidence_id": pair.pair_evidence_id, "run_id": run_id, "relation": pair.relation.value,
-            "method_id": pair.method_id, "score": pair.score, "explanation": safe_text(pair.explanation),
+            "method_id": pair.method_id, "score": pair.score, "explanation": public_explanation(pair),
             "available": available, "limitations": limitations, "sides": sides}

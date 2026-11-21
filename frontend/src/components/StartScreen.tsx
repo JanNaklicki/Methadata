@@ -7,12 +7,12 @@ export default function StartScreen({ onRun }: { onRun: (runId: string) => void 
   const [error, setError] = useState<ApiError | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  async function start(createObservationId: () => Promise<string>) {
+  async function start(createObservationId: () => Promise<string>, profile?: 'demo') {
     setBusy(true)
     setError(null)
     try {
       const observationId = await createObservationId()
-      const run = await api.createRun(observationId)
+      const run = await api.createRun(observationId, profile)
       onRun(run.run_id)
     } catch (e) {
       setError(e instanceof ApiError ? e : new ApiError(0, { code: 'internal_error', message: 'Nieoczekiwany błąd.' }))
@@ -47,7 +47,7 @@ export default function StartScreen({ onRun }: { onRun: (runId: string) => void 
         <div className="card">
           <h2>Gotowy przykład</h2>
           <p>Uruchom analizę na małym zestawie dostarczanym z projektem.</p>
-          <button type="button" disabled={busy} onClick={() => void start(async () => (await api.getDemo()).observation_id)}>
+          <button type="button" disabled={busy} onClick={() => void start(async () => (await api.getDemo()).observation_id, 'demo')}>
             Uruchom przykład
           </button>
         </div>

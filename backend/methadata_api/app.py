@@ -22,7 +22,7 @@ from methadata.intake import submit_files, submit_url
 from . import engine as engine_mod
 from .errors import ApiError, safe_text, storage_unavailable, validation
 from .runs import RUN_ID, RunManager
-from .settings import API_VERSION, Settings
+from .settings import API_VERSION, PROFILES, Settings
 from .storage import Storage
 from .views import PREVIEW_NAME, build_evidence, default_label, observation_display_url
 
@@ -142,6 +142,14 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
         if not storage.available():
             raise storage_unavailable()
 
+    def analysis_storage(profile: str) -> Storage:
+        selected = storage.for_profile(profile)
+        if selected is None:
+            raise validation("Profil analizy jest niedostępny.", "profile", "Uruchom usługę z przygotowanym korpusem jury.")
+        if profile == "jury" and (not selected.available() or not selected.index()):
+            raise storage_unavailable()
+        return selected
+
     # ------------------------------------------------------------ system
     @app.get("/api/v1/health")
     def health():
@@ -184,24 +192,27 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
             raise validation("Etykieta jest niepoprawna.", "label", "Tekst do 200 znaków.")
         url = _validate_url(body.get("url"))
 
+        selected = analysis_storage(settings.default_profile)
+
         def work():
-            with storage.lock:
-                rep = submit_url(url, storage.store())
+            with selected.lock:
+                rep = submit_url(url, selected.store())
                 if not rep.entries:
                     raise validation("Podany adres jest niepoprawny.", "url", "Adres nie został przyjęty.")
                 e = rep.entries[0]
                 if label:
-                    storage.set_label(e.observation_id, label)
-                return storage.store().observation(e.observation_id), e.status != "unchanged"
+                    selected.set_label(e.observation_id, label)
+                return selected.store().observation(e.observation_id), e.status != "unchanged"
 
         obs, created = await run_in_threadpool(work)
-        return _created(obs, created, label or storage.labels().get(obs.observation_id))
+        return _created(obs, created, label or selected.labels().get(obs.observation_id))
 
     def _created(obs: Observation, created: bool, label: Optional[str]) -> JSONResponse:
         return _json(201 if created else 200, _observation_body(obs, created, label),
                      {"Location": f"/api/v1/observations/{obs.observation_id}"} if created else None)
 
     async def _observation_from_file(request: Request):
+        selected = analysis_storage(settings.default_profile)
         limit = settings.max_upload_bytes
         cap = limit + (1 << 20)  # nagłówki i pola multipart
         declared = request.headers.get("content-length")
@@ -254,15 +265,15 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
                                    details=[{"field": "file", "message": f"Nieobsługiwany typ: {sniff(head, name, size).media_type}."}])
 
                 def work():
-                    with storage.lock:
-                        store = storage.store()
+                    with selected.lock:
+                        store = selected.store()
                         rep = submit_files([path], store)
                         if not rep.entries:
                             why = "; ".join(i.message for i in rep.issues[:3]) or "plik nie zawiera przyjmowalnych danych"
                             raise validation("Nie udało się przyjąć pliku.", "file", why)
                         e = rep.entries[0]
                         if label:
-                            storage.set_label(e.observation_id, label)
+                            selected.set_label(e.observation_id, label)
                         return store.observation(e.observation_id), e.status != "unchanged"
 
                 obs, created = await run_in_threadpool(work)
@@ -270,7 +281,7 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
                 tmp.cleanup()
         finally:
             await form.close()
-        return _created(obs, created, label or storage.labels().get(obs.observation_id))
+        return _created(obs, created, label or selected.labels().get(obs.observation_id))
 
     def _too_large() -> ApiError:
         return ApiError(413, "payload_too_large", "Plik jest za duży. Maksymalny rozmiar to 50 MiB.",
@@ -289,11 +300,12 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
         oid = body.get("observation_id")
         if not isinstance(oid, str) or not ID_RE.match(oid):
             raise validation("Podaj poprawny identyfikator materiału.", "observation_id", "Brak lub niepoprawne ID.")
-        profile = body.get("profile", "demo")
-        if profile not in engine_mod.PROFILES:
-            raise validation("Nieznany profil analizy.", "profile", f"Dostępne profile: {', '.join(engine_mod.PROFILES)}.")
+        profile = body.get("profile", settings.default_profile)
+        if profile not in PROFILES:
+            raise validation("Nieznany profil analizy.", "profile", f"Dostępne profile: {', '.join(PROFILES)}.")
+        selected = analysis_storage(profile)
         try:
-            known = bool(storage.store().versions(oid))
+            known = bool(selected.store().versions(oid))
         except OSError:
             raise storage_unavailable()
         if not known:
@@ -323,8 +335,9 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
                            retryable=st["status"] in ("queued", "running"))
         bundle, view = manager.bundle(run_id), manager.result(run_id)
         ev = None
-        if bundle is not None and view is not None and ID_RE.match(evidence_id):
-            ev = build_evidence(run_id, bundle, view, evidence_id, storage.store(), settings.previews_dir)
+        selected = storage.for_profile(st.get("profile", "demo"))
+        if selected is not None and bundle is not None and view is not None and ID_RE.match(evidence_id):
+            ev = build_evidence(run_id, bundle, view, evidence_id, selected.store(), settings.previews_dir)
         if ev is None:
             raise ApiError(404, "evidence_not_found", "Nie znaleziono takiego dowodu w tej analizie.")
         return _json(200, ev)

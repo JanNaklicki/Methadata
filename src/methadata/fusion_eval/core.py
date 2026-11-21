@@ -134,6 +134,24 @@ def _cause(a, b):
     return f"status {a['status']} -> {b['status']}"
 
 
+def collect_corpus_evidence(observations, store, adapters, *, extractors, methods, dataset_version, seed, threshold):
+    """Ekstrakcja i porównania rodzin ze statystykami całego korpusu (F06 i profil jury)."""
+    base = {"dataset_version": dataset_version, "seed": seed, "extractors": list(extractors), "comparators": [],
+            "clusterer": "components-threshold-v1", "relation": "campaign_candidate",
+            "cluster_config": {"threshold": threshold, "similarity_version": "fusion-eval-inputs",
+                               "method_id": "fusion-v1", "dataset_version": dataset_version,
+                               "relation": "campaign_candidate"}}
+    ext = run_experiment(base, observations, adapters, reader=store)   # tylko cechy, pary liczymy niżej
+    obs = ext["bundle"].observations
+    by_obs: dict[str, list] = {}
+    for f in ext["bundle"].features:
+        by_obs.setdefault(f.observation_id, []).append(f)
+    comps = [adapters[m] for m in sorted(methods)]
+    raw = collect_pairs(obs, by_obs, comps, run_id="fusion-eval-inputs")
+
+    return ext, raw
+
+
 def run_eval(store_dir: str | Path, baseline_cfg: Mapping[str, Any], cfg: Mapping[str, Any], *,
              adapters: Optional[Mapping[str, Any]] = None) -> dict:
     store = Store(store_dir)
@@ -162,18 +180,10 @@ def run_eval(store_dir: str | Path, baseline_cfg: Mapping[str, Any], cfg: Mappin
         url_info[f"url-{i}"] = {"source_ref_sha256": hashlib.sha256(o.source_ref.encode()).hexdigest()[:12],
                                 "observation_id": o.observation_id}
 
-    base = {"dataset_version": dataset_version, "seed": seed, "extractors": list(cfg["extractors"]), "comparators": [],
-            "clusterer": "components-threshold-v1", "relation": "campaign_candidate",
-            "cluster_config": {"threshold": cfg["threshold"], "similarity_version": "fusion-eval-inputs",
-                               "method_id": "fusion-v1", "dataset_version": dataset_version,
-                               "relation": "campaign_candidate"}}
-    ext = run_experiment(base, [*corpus, *urls], adapters, reader=store)   # tylko cechy, pary liczymy niżej
+    ext, raw = collect_corpus_evidence([*corpus, *urls], store, adapters, extractors=cfg["extractors"],
+                                       methods={f["method_id"] for f in cfg["families"].values()},
+                                       dataset_version=dataset_version, seed=seed, threshold=cfg["threshold"])
     obs = ext["bundle"].observations
-    by_obs: dict[str, list] = {}
-    for f in ext["bundle"].features:
-        by_obs.setdefault(f.observation_id, []).append(f)
-    comps = [adapters[m] for m in sorted({f["method_id"] for f in cfg["families"].values()})]
-    raw = collect_pairs(obs, by_obs, comps, run_id="fusion-eval-inputs")
 
     ref_units = [sorted(g, key=_natural) for g in cfg["reference"]["families"]]
     conf_units = [sorted(g, key=_natural) for g in cfg["reference"].get("campaign_confirmed", cfg["reference"]["families"])]
