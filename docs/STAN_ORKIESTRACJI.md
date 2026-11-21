@@ -22,7 +22,7 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 
 ## W toku — koordynator Claude (nie wydawać ponownie)
 - Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14.
-- W toku: K11 `codex/cluster-consensus`, R04 `codex/source-monitor`, K15 `codex/cluster-graph-walk`.
+- W toku: K10 `codex/cluster-network-fusion`, E17 `codex/exp-learned-pairs`, K11 `codex/cluster-consensus`, R04 `codex/source-monitor`, K15 `codex/cluster-graph-walk`.
 
 ## Następne (zależności już w main)
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
