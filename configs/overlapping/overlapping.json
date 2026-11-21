@@ -1,0 +1,2 @@
+{"similarity_version": "VERSION_PODOBIENSTW", "dataset_version": "VERSION_ZBIORU", "relation": "shared_template",
+ "relations": ["shared_template", "shared_narrative"], "threshold": 0.5, "k": 3}
