@@ -10,6 +10,7 @@ from methadata.contracts.interfaces import AdapterKind, AdapterSpec
 from methadata.contracts.models import (ArtifactRef, ArtifactRole, ExtractionState, ExtractionStatus, Feature,
                                         Observation, PairEvidence, Relation, TextSpan, ValueType)
 
+from . import normalize as N
 from .scan import Hit, load_config, parse_html, scan
 
 ADAPTERS_VERSION = "1.0.0"
@@ -40,8 +41,15 @@ class ContactExtractor:
     spec = AdapterSpec(id="source-contact-extractor", kind=AdapterKind.extractor, version=ADAPTERS_VERSION,
                        description="Kontakt handlowy: telefon (E.164), e-mail, konto komunikatora, rola; wartości maskowane")
 
-    def __init__(self, config: Optional[Mapping[str, Any]] = None):
+    def __init__(self, config: Optional[Mapping[str, Any]] = None, key: "bytes | str | None" = None, key_dir=None):
         self.cfg = dict(config) if config else load_config()
+        self._key_arg, self._key_dir, self._k = key, key_dir, None
+
+    @property
+    def pii_key(self) -> bytes:
+        if self._k is None:
+            self._k = N.resolve_key(self._key_arg, self._key_dir)
+        return self._k
 
     def extract(self, observation: Observation, *, reader, optional: Mapping[str, Any] | None = None):
         oid = observation.observation_id
@@ -86,13 +94,12 @@ class ContactExtractor:
         return feats, sts
 
     def _key(self, h: Hit) -> str:
-        from .normalize import digest
-        return digest(h.kind, h.key, self.cfg["salt"])
+        return N.digest(h.kind, h.key, self.pii_key)
 
     def _feature(self, obs: Observation, art, raw: str, h: Hit) -> Feature:
         i = raw.find(h.raw)
         loc = TextSpan(start=i, end=i + len(h.raw)) if i >= 0 and h.raw else None
-        value = {"key": self._key(h), "masked": h.masked, "role": h.role, "country": h.country, "platform": h.platform,
+        value = {"key": self._key(h), "key_id": N.key_id(self.pii_key), "masked": h.masked, "role": h.role, "country": h.country, "platform": h.platform,
                  "source": h.source, "captured_at": obs.capture_time, "free_mail": h.free_mail,
                  "status": "low_confidence" if h.low_confidence else "ok",
                  "provenance": {"extractor": EXTRACTOR_VERSION, "artifact_id": art.artifact_id}}
@@ -162,6 +169,10 @@ class ContactComparator:
         if not A or not B:
             return make(None, "brak podstaw: co najmniej jedna strona nie ujawnia publicznego kontaktu "
                               "(brak kontaktu to nie dowód różnych podmiotów)")
+        ka = {f.value.get("key_id") for f in A.values()}
+        kb = {f.value.get("key_id") for f in B.values()}
+        if len(ka | kb) > 1:
+            return make(None, "brak podstaw: cechy zbudowane różnymi kluczami PII (key_id) nie są porównywalne")
         shared = sorted(set(A) & set(B))
         if not shared:
             refs = {ca: [r for f in A.values() for r in f.evidence_refs], cb: [r for f in B.values() for r in f.evidence_refs]}

@@ -34,8 +34,8 @@ def page(brand, footer):
     return f"<html><head><title>Oferta | {brand}</title><script>var x='600 000 000'</script></head><body><footer>{footer}</footer></body></html>"
 
 
-def run(*bodies):
-    mem, ex = Mem(), ContactExtractor()
+def run(*bodies, key="test-key-1"):
+    mem, ex = Mem(), ContactExtractor(key=key)
     os_, feats = [], {}
     for n, b in enumerate(bodies):
         o = obs(f"s{n}", b, mem)
@@ -118,7 +118,7 @@ def test_ocr_text_and_obfuscation():
     mem = Mem()
     o = obs("ocr", "ZAMOW TELEFONICZNIE\n tel. 5OO 123 456\n biuro [at] firma [dot] pl\nWhatsApp +48 601 602 603",
             mem, role=ArtifactRole.document, media="text/plain", ext=".txt")
-    f, s = ContactExtractor().extract(o, reader=mem)
+    f, s = ContactExtractor(key="test-key-1").extract(o, reader=mem)
     assert s[0].state is ExtractionState.ok
     ph = vals(f, "contact_phone")[0]
     assert ph["source"] == "ocr" and ph["status"] == "low_confidence" and ph["role"] == "order"
@@ -192,3 +192,28 @@ def test_real_data_no_false_positives():
     for p in pages:
         hits = scan(parse_html(p.read_bytes().decode("utf-8", "replace")), cfg, "html")
         assert not hits, f"fałszywe trafienie w {p.parent.name} (pole formularza/skrypt?)"
+
+
+def test_hmac_key_id_and_different_keys_do_not_match(tmp_path, monkeypatch):
+    b = page("A", "Zamówienia: 500 123 456")
+    o1, f1 = run(b, key="klucz-A")
+    o2, f2 = run(b.replace("A", "B"), key="klucz-A")
+    o3, f3 = run(b.replace("A", "C"), key="klucz-B")
+    p1, p2, p3 = (vals(f[o[0].observation_id], "contact_phone")[0] for o, f in ((o1, f1), (o2, f2), (o3, f3)))
+    assert p1["key"] == p2["key"] and p1["key_id"] == p2["key_id"]       # deterministycznie przy tym samym kluczu
+    assert p1["key"] != p3["key"] and p1["key_id"] != p3["key_id"]
+    assert len(p1["key_id"]) == 8 and "klucz-A" not in json.dumps(p1)
+    mem = Mem()
+    o4 = obs("other", b.replace("A", "D"), mem)
+    f4, _ = ContactExtractor(key="klucz-B").extract(o4, reader=mem)
+    feats = {**f2, o4.observation_id: f4}
+    [pe] = ContactComparator().compare(o2[0], o4, feats, run_id="r")
+    assert pe.score is None and "kluczami" in pe.explanation
+
+
+def test_key_from_env_and_generated_file(tmp_path, monkeypatch):
+    monkeypatch.setenv("METHADATA_PII_KEY", "z-env")
+    assert N.resolve_key() == b"z-env"
+    monkeypatch.delenv("METHADATA_PII_KEY")
+    k1 = N.resolve_key(key_dir=tmp_path)
+    assert (tmp_path / "pii.key").exists() and N.resolve_key(key_dir=tmp_path) == k1 and len(k1) >= 32
