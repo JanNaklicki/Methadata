@@ -1,0 +1,78 @@
+{
+  "run_id": "run-demo-0002",
+  "observation_id": "obs-774c843b1ddf9558",
+  "status": "succeeded",
+  "created_at": "2026-11-21T10:00:00Z",
+  "updated_at": "2026-11-21T10:00:05Z",
+  "result": {
+    "cluster_run": {
+      "schema_version": "1",
+      "run_id": "run-demo-0002",
+      "dataset_version": "synthetic-contract-1",
+      "method_id": "threshold-components",
+      "method_version": "1",
+      "config": {
+        "threshold": 0.5
+      },
+      "seed": 0,
+      "relation": "shared_template",
+      "assignments": [
+        {
+          "material_id": "can-934ac3e1b721c8e8",
+          "cluster_ids": [],
+          "status": "insufficient_data"
+        },
+        {
+          "material_id": "can-8ca346f7c030dbc8",
+          "cluster_ids": [],
+          "status": "insufficient_data"
+        }
+      ],
+      "edges": []
+    },
+    "summary": {
+      "outcome": "insufficient_evidence",
+      "material_count": 2,
+      "grouped": 0,
+      "singleton": 0,
+      "noise": 0,
+      "insufficient_data": 2,
+      "message": "Za mało dowodów: dodano sam adres URL, bez zapisu strony. Dodaj plik z zapisem strony, aby porównać treść."
+    },
+    "materials": [
+      {
+        "material_id": "can-934ac3e1b721c8e8",
+        "observation_id": "obs-774c843b1ddf9558",
+        "input_kind": "url_only",
+        "label": "Adres z listy",
+        "display_url": "https://example.invalid/reklama/12345?gclid=%2A%2A%2A",
+        "thumbnail": null,
+        "available_evidence": []
+      },
+      {
+        "material_id": "can-8ca346f7c030dbc8",
+        "observation_id": "obs-f8fb76a98b38bc8a",
+        "input_kind": "url_only",
+        "label": "Drugi adres z listy",
+        "display_url": "https://example.invalid/reklama/67890",
+        "thumbnail": null,
+        "available_evidence": []
+      }
+    ],
+    "clusters": [],
+    "pair_evidence": [
+      {
+        "evidence_id": "pev-939f4e5676461047",
+        "pair": [
+          "can-8ca346f7c030dbc8",
+          "can-934ac3e1b721c8e8"
+        ],
+        "method_id": "asset-jaccard-v1",
+        "relation": "shared_template",
+        "score": null,
+        "explanation": "Porównanie niewykonalne: dla samego adresu URL nie ma grafik ani tekstu do zestawienia.",
+        "evidence_url": "/api/v1/runs/run-demo-0002/evidence/pev-939f4e5676461047"
+      }
+    ]
+  }
+}

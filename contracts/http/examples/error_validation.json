@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": "validation_failed",
+    "message": "Podany adres jest niepoprawny. Wpisz pełny adres zaczynający się od http:// lub https://.",
+    "details": [
+      {
+        "field": "url",
+        "message": "Adres musi zaczynać się od http:// lub https://."
+      }
+    ],
+    "retryable": false
+  }
+}

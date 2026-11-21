@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": "unsupported_media_type",
+    "message": "Ten typ pliku nie jest obsługiwany. Dodaj ZIP, HAR, HTML, obraz, film lub plik audio.",
+    "details": [
+      {
+        "field": "file",
+        "message": "Nieobsługiwany typ: application/x-msdownload."
+      }
+    ],
+    "retryable": false
+  }
+}

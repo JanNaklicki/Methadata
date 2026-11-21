@@ -1,0 +1,96 @@
+{
+  "evidence_id": "pev-89be6f276d83bdae",
+  "run_id": "run-demo-0001",
+  "relation": "shared_template",
+  "method_id": "asset-jaccard-v1",
+  "score": 1.0,
+  "explanation": "1 z 1 zbadanych grafik ma identyczną zawartość.",
+  "available": true,
+  "limitations": [],
+  "sides": [
+    {
+      "material_id": "can-4e2b580a4837ff9e",
+      "label": "Reklama p15 (zapis strony)",
+      "display_url": null,
+      "items": [
+        {
+          "artifact_id": "art-a0966d5886c475ac",
+          "role": "resource",
+          "media_type": "image/webp",
+          "display_url": null,
+          "locator": null,
+          "text_excerpts": [],
+          "preview": {
+            "href": "/static/previews/c4d42b36d41f49b6-hero.webp",
+            "media_type": "image/webp",
+            "width": 800,
+            "height": 450,
+            "alt": "Wspólna ilustracja otwierająca"
+          }
+        },
+        {
+          "artifact_id": "art-33257b411a149550",
+          "role": "landing_html",
+          "media_type": "text/html",
+          "display_url": null,
+          "locator": {
+            "kind": "text_span",
+            "start": 120,
+            "end": 190
+          },
+          "text_excerpts": [
+            {
+              "text": "Fragment szablonu: ilustracja otwierająca artykuł",
+              "highlight_start": 0,
+              "highlight_end": 17,
+              "source_label": "treść strony"
+            }
+          ],
+          "preview": null
+        }
+      ]
+    },
+    {
+      "material_id": "can-fb89fc89dbc10fa6",
+      "label": "Reklama p2 (zapis strony)",
+      "display_url": null,
+      "items": [
+        {
+          "artifact_id": "art-98e558d2879fa4d5",
+          "role": "resource",
+          "media_type": "image/webp",
+          "display_url": null,
+          "locator": null,
+          "text_excerpts": [],
+          "preview": {
+            "href": "/static/previews/c4d42b36d41f49b6-hero.webp",
+            "media_type": "image/webp",
+            "width": 800,
+            "height": 450,
+            "alt": "Wspólna ilustracja otwierająca"
+          }
+        },
+        {
+          "artifact_id": "art-b237f0a20395ccd5",
+          "role": "landing_html",
+          "media_type": "text/html",
+          "display_url": null,
+          "locator": {
+            "kind": "text_span",
+            "start": 120,
+            "end": 190
+          },
+          "text_excerpts": [
+            {
+              "text": "Fragment szablonu: ilustracja otwierająca artykuł",
+              "highlight_start": 0,
+              "highlight_end": 17,
+              "source_label": "treść strony"
+            }
+          ],
+          "preview": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "run_id": "run-demo-0003",
+  "observation_id": "obs-9271e8a859000be5",
+  "status": "failed",
+  "created_at": "2026-11-21T10:00:00Z",
+  "updated_at": "2026-11-21T10:00:02Z",
+  "error": {
+    "code": "run_failed",
+    "message": "Analiza nie powiodła się. Spróbuj uruchomić ją ponownie; jeśli problem wraca, sprawdź plik wejściowy.",
+    "retryable": true
+  }
+}

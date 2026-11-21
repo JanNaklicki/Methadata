@@ -9,7 +9,7 @@ import shutil
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import BinaryIO, Iterator, Optional, Sequence
+from typing import BinaryIO, Iterator, Optional, Protocol, Sequence
 
 from ..contracts import ids
 from ..contracts.models import Artifact, ArtifactRef, ArtifactRole, Observation, ParentRelation
@@ -32,6 +32,13 @@ def _atomic_write(path: Path, data: bytes) -> None:
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)
+
+
+class DerivedStore(Protocol):
+    """Jedyny interfejs zapisu artefaktów pochodnych dla ekstraktorów (implementuje Store)."""
+    def put_derived(self, *, observation_id: str, role: ArtifactRole, data: bytes, media_type: Optional[str] = None,
+                    url: Optional[str] = None, parent: ArtifactRef, parent_relation: ParentRelation,
+                    origin: str) -> Artifact: ...
 
 
 class LimitExceeded(Exception):
@@ -179,56 +186,44 @@ class Store:
         return kids
 
     # ---------------------------------------------------------------- artefakty pochodne
-    def _derived_dir(self, parent_id: str, producer: str) -> Path:
-        return self.root / "derived" / _SAFE.sub("_", parent_id) / _SAFE.sub("_", producer)
+    def _derived_dir(self, parent_id: str) -> Path:
+        return self.root / "derived" / _SAFE.sub("_", parent_id)
 
-    def put_derived(self, parent_id: str, producer: str, name: str, data: bytes | str | dict | list, *,
-                    media_type: str | None = None, role: ArtifactRole = ArtifactRole.other) -> Artifact:
-        """Zapis artefaktu pochodnego (np. wynik OCR) dla artefaktu `parent_id`; idempotentny dla tych samych bajtów.
-        Nie zmienia obserwacji ani canonical_id. `producer` = np. wersja ekstraktora."""
-        parent = self.artifact(parent_id)
-        if isinstance(data, (dict, list)):
-            data = json.dumps(data, ensure_ascii=False, sort_keys=True).encode("utf-8")
-            media_type = media_type or "application/json"
-        elif isinstance(data, str):
+    def put_derived(self, *, observation_id: str, role: ArtifactRole, data: bytes, media_type: Optional[str] = None,
+                    url: Optional[str] = None, parent: ArtifactRef, parent_relation: ParentRelation,
+                    origin: str) -> Artifact:
+        """Kanoniczny DerivedStore: utrwala bajty (SHA-256) i zwraca Artifact z rodzicem i pochodzeniem.
+        Idempotentny (te same argumenty -> ten sam artifact_id). Nie zmienia obserwacji ani canonical_id;
+        odczyt: artifact(), open_bytes(), children(), list_derived()."""
+        role = ArtifactRole(role)
+        if isinstance(data, str):
             data = data.encode("utf-8")
-            media_type = media_type or "text/plain"
-        if not name or "/" in name or name.startswith("."):
-            raise ValueError(f"niepoprawna nazwa artefaktu pochodnego: {name!r}")
         sha, size, _ = self.put_bytes(data)
-        origin = f"derived:{producer}/{name}"
         art = Artifact(
-            artifact_id=ids.artifact_id(parent.observation_id, role.value, sha, origin + "<" + parent_id),
-            observation_id=parent.observation_id, role=role, local_ref=self.blob_ref(sha), sha256=sha, size=size,
-            media_type=media_type or "application/octet-stream",
-            parent=ArtifactRef(artifact_id=parent_id), parent_relation=ParentRelation.derived_from, origin=origin)
-        meta = self._derived_dir(parent_id, producer) / (_SAFE.sub("_", name) + ".json")
-        _atomic_write(meta, json.dumps({"name": name, "producer": producer, "created_at": now_iso(),
-                                        "artifact": art.model_dump(mode="json")},
-                                       ensure_ascii=False, sort_keys=True, indent=1).encode("utf-8"))
+            artifact_id=ids.artifact_id(observation_id, role.value, sha, f"{origin}<{parent.artifact_id}"),
+            observation_id=observation_id, role=role, local_ref=self.blob_ref(sha), sha256=sha, size=size,
+            media_type=media_type or "application/octet-stream", url=url, parent=parent,
+            parent_relation=ParentRelation(parent_relation), origin=origin)
+        _atomic_write(self._derived_dir(parent.artifact_id) / (art.artifact_id + ".json"),
+                      json.dumps({"created_at": now_iso(), "artifact": art.model_dump(mode="json")},
+                                 ensure_ascii=False, sort_keys=True, indent=1).encode("utf-8"))
         return art
 
-    def get_derived(self, parent_id: str, producer: str, name: str) -> Optional[Artifact]:
-        meta = self._derived_dir(parent_id, producer) / (_SAFE.sub("_", name) + ".json")
-        if not meta.is_file():
-            return None
-        return Artifact.model_validate(json.loads(meta.read_text(encoding="utf-8"))["artifact"])
+    def get_derived(self, parent_id: str, origin: str) -> Optional[Artifact]:
+        for a in self.list_derived(parent_id):
+            if a.origin == origin:
+                return a
+        return None
 
-    def read_derived(self, parent_id: str, producer: str, name: str) -> Optional[bytes]:
-        a = self.get_derived(parent_id, producer, name)
+    def read_derived(self, parent_id: str, origin: str) -> Optional[bytes]:
+        a = self.get_derived(parent_id, origin)
         return None if a is None else (self.root / a.local_ref).read_bytes()
 
-    def list_derived(self, parent_id: str, producer: str | None = None) -> list[Artifact]:
-        base = self.root / "derived" / _SAFE.sub("_", parent_id)
-        if not base.is_dir():
-            return []
-        dirs = [base / _SAFE.sub("_", producer)] if producer else sorted(p for p in base.iterdir() if p.is_dir())
-        out = []
-        for d in dirs:
-            for m in sorted(d.glob("*.json")):
-                out.append(Artifact.model_validate(json.loads(m.read_text(encoding="utf-8"))["artifact"]))
-        return out
+    def list_derived(self, parent_id: str) -> list[Artifact]:
+        base = self._derived_dir(parent_id)
+        return [Artifact.model_validate(json.loads(m.read_text(encoding="utf-8"))["artifact"])
+                for m in sorted(base.glob("*.json"))] if base.is_dir() else []
 
     def _all_derived(self) -> Iterator[Artifact]:
-        for m in sorted((self.root / "derived").glob("*/*/*.json")):
+        for m in sorted((self.root / "derived").glob("*/*.json")):
             yield Artifact.model_validate(json.loads(m.read_text(encoding="utf-8"))["artifact"])

@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": "payload_too_large",
+    "message": "Plik jest za duży. Maksymalny rozmiar to 50 MiB.",
+    "details": [
+      {
+        "field": "file",
+        "message": "Przekroczono limit 52428800 bajtów."
+      }
+    ],
+    "retryable": false
+  }
+}

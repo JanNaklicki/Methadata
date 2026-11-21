@@ -1,0 +1,22 @@
+{
+  "observation_id": "obs-774c843b1ddf9558",
+  "canonical_id": "can-934ac3e1b721c8e8",
+  "input_kind": "url_only",
+  "created": true,
+  "label": "Adres z listy",
+  "display_url": "https://example.invalid/reklama/12345?gclid=%2A%2A%2A",
+  "artifacts": [
+    {
+      "artifact_id": "art-6fe06c0ef245f14e",
+      "role": "input_url",
+      "media_type": null,
+      "size": null,
+      "sha256": null,
+      "display_url": "https://example.invalid/reklama/12345?gclid=%2A%2A%2A"
+    }
+  ],
+  "analysis": {
+    "mode": "offline",
+    "note": "Adres nie jest pobierany. Analiza obejmie tylko sam URL, więc część porównań może być niewykonalna."
+  }
+}

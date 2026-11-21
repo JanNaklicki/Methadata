@@ -1,0 +1,671 @@
+openapi: 3.1.0
+info:
+  title: Methadata API
+  version: 1.0.0
+  description: |
+    Kontrakt HTTP między frontendem (F05) a backendem (W02). Reprezentacje publiczne opierają się na rekordach F01
+    (`docs/KONTRAKT.md`, `schema_version` "1"). Każda odpowiedź ma przykład w `examples/` (pole `externalValue`);
+    frontend może powstać na samych przykładach. Zgodność implementacji: `contracts/http/check_conformance.py`.
+
+    Zasady publicznych odpowiedzi:
+    * brak ścieżek systemu plików (`local_ref` nigdy nie jest publikowane), adresy zasobów są względne wobec API,
+    * teksty są zwykłym tekstem (`text/plain`), nigdy HTML; klient wstawia je jako tekst, nie jako znaczniki,
+    * brak surowych wartości sesyjnych (ciasteczka, tokeny, identyfikatory sesji); URL-e mają postać `display_url`
+      z zamaskowanymi identyfikatorami kliknięcia,
+    * każdy błąd ma ten sam kształt `ErrorResponse` (stabilny `code`, komunikat `message` dla użytkownika po polsku).
+servers:
+  - url: http://localhost:8000
+    description: Lokalny backend (docker compose)
+tags:
+  - name: system
+  - name: observations
+  - name: runs
+paths:
+  /api/v1/health:
+    get:
+      tags: [system]
+      operationId: getHealth
+      summary: Gotowość API i magazynu
+      responses:
+        "200":
+          description: API i magazyn gotowe.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Health"}
+              examples:
+                ready: {summary: Gotowe, externalValue: examples/health_ok.json}
+        "503":
+          description: Magazyn niedostępny; pozostałe operacje mogą zwracać `storage_unavailable`.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Health"}
+              examples:
+                storage_down: {summary: Magazyn niedostępny, externalValue: examples/health_unavailable.json}
+  /api/v1/observations:
+    post:
+      tags: [observations]
+      operationId: createObservation
+      summary: Dodaj materiał (URL lub plik)
+      description: |
+        Dwa typy treści żądania:
+        * `application/json` – `{"url": "...", "mode": "offline"}`; domyślnie `mode=offline` (adres nie jest pobierany,
+          analiza obejmuje tylko sam URL, `input_kind=url_only`),
+        * `multipart/form-data` – pole `file` (plik: ZIP, HAR, HTML, PNG, JPEG, WebP, GIF, MP4, MP3) i opcjonalne `label`.
+        Limit rozmiaru pliku: 52428800 bajtów (50 MiB), po przekroczeniu `413 payload_too_large`.
+        To samo źródło daje to samo `observation_id` (ponowne dodanie: 200 zamiast 201, `created=false`).
+      x-max-upload-bytes: 52428800
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/CreateObservationUrl"}
+            examples:
+              url: {summary: Sam URL, externalValue: examples/observation_create_url_request.json}
+          multipart/form-data:
+            schema: {$ref: "#/components/schemas/CreateObservationFile"}
+            encoding:
+              file:
+                contentType: application/zip, application/json, text/html, image/png, image/jpeg, image/webp, image/gif, video/mp4, audio/mpeg
+      responses:
+        "201":
+          description: Materiał przyjęty.
+          headers:
+            Location: {schema: {type: string}, description: "/api/v1/observations/{observation_id} (zasób informacyjny, bez operacji GET w v1)."}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ObservationCreated"}
+              examples:
+                url: {summary: URL (analiza offline), externalValue: examples/observation_created_url.json}
+                file: {summary: Plik, externalValue: examples/observation_created_file.json}
+        "200":
+          description: Materiał już istniał (to samo `observation_id`).
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ObservationCreated"}
+              examples:
+                existing: {externalValue: examples/observation_created_existing.json}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "413": {$ref: "#/components/responses/PayloadTooLarge"}
+        "415": {$ref: "#/components/responses/UnsupportedMediaType"}
+        "422": {$ref: "#/components/responses/ValidationFailed"}
+        "503": {$ref: "#/components/responses/StorageUnavailable"}
+  /api/v1/demo:
+    get:
+      tags: [system]
+      operationId: getDemo
+      summary: Przygotowana obserwacja do analizy i nazwa zbioru przykładowego
+      responses:
+        "200":
+          description: Dane scenariusza „Uruchom przykład”.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Demo"}
+              examples:
+                demo: {externalValue: examples/demo.json}
+        "503": {$ref: "#/components/responses/StorageUnavailable"}
+  /api/v1/runs:
+    post:
+      tags: [runs]
+      operationId: createRun
+      summary: Uruchom analizę obserwacji
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/CreateRun"}
+            examples:
+              run: {externalValue: examples/run_create_request.json}
+      responses:
+        "202":
+          description: Analiza zakolejkowana.
+          headers:
+            Location: {schema: {type: string}, description: "/api/v1/runs/{run_id}"}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/RunAccepted"}
+              examples:
+                accepted: {externalValue: examples/run_accepted.json}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "415": {$ref: "#/components/responses/UnsupportedMediaType"}
+        "422": {$ref: "#/components/responses/ValidationFailed"}
+        "503": {$ref: "#/components/responses/StorageUnavailable"}
+  /api/v1/runs/{run_id}:
+    get:
+      tags: [runs]
+      operationId: getRun
+      summary: Stan analizy i, po sukcesie, wynik
+      description: |
+        Stan: `queued` -> `running` -> `succeeded` | `failed`. Zapytanie o stan odpytuje się co 1-2 s do stanu końcowego.
+        `succeeded` zawsze zawiera `result` (ClusterRunView), także gdy dowodów jest za mało
+        (`result.summary.outcome=insufficient_evidence`) – to poprawny wynik, nie błąd.
+        `failed` zawiera `error` (ten sam kształt co błędy HTTP); odpowiedź HTTP to nadal 200.
+      parameters:
+        - {$ref: "#/components/parameters/RunId"}
+      responses:
+        "200":
+          description: Stan przebiegu.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Run"}
+              examples:
+                queued: {externalValue: examples/run_queued.json}
+                running: {externalValue: examples/run_running.json}
+                succeeded_complete: {summary: Wynik z grupą i dowodami, externalValue: examples/run_succeeded_complete.json}
+                succeeded_no_evidence: {summary: Za mało dowodów, externalValue: examples/run_succeeded_no_evidence.json}
+                failed: {summary: Błąd przebiegu, externalValue: examples/run_failed.json}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "503": {$ref: "#/components/responses/StorageUnavailable"}
+  /api/v1/runs/{run_id}/evidence/{evidence_id}:
+    get:
+      tags: [runs]
+      operationId: getEvidence
+      summary: Dowód dla pary materiałów (obie strony)
+      description: |
+        `evidence_id` to `pair_evidence_id` z `result.pair_evidence`. Odpowiedź zawiera opis dowodu i, dla każdej strony pary,
+        bezpieczne fragmenty tekstu (`text_excerpts`, zwykły tekst) oraz odwołania do statycznych podglądów (`preview.href`,
+        obraz serwowany przez backend jako plik statyczny). Para bez wykonanego porównania zwraca 200 z `available=false`.
+        Gdy przebieg nie jest zakończony sukcesem: `409 run_not_ready`.
+      parameters:
+        - {$ref: "#/components/parameters/RunId"}
+        - name: evidence_id
+          in: path
+          required: true
+          schema: {$ref: "#/components/schemas/Id"}
+      responses:
+        "200":
+          description: Dowód.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Evidence"}
+              examples:
+                text_and_image: {summary: Wspólna grafika i fragment szablonu, externalValue: examples/evidence_full.json}
+                unavailable: {summary: Porównanie niewykonalne, externalValue: examples/evidence_unavailable.json}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/RunNotReady"}
+        "503": {$ref: "#/components/responses/StorageUnavailable"}
+components:
+  parameters:
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema: {$ref: "#/components/schemas/Id"}
+  responses:
+    BadRequest:
+      description: Nieczytelne żądanie (np. niepoprawny JSON).
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+          examples:
+            bad_json: {externalValue: examples/error_bad_request.json}
+    ValidationFailed:
+      description: Żądanie poprawne składniowo, ale dane odrzucone (np. zły URL, brak pola, pusty plik).
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+          examples:
+            invalid_url: {externalValue: examples/error_validation.json}
+    PayloadTooLarge:
+      description: Plik większy niż limit.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+          examples:
+            too_large: {externalValue: examples/error_payload_too_large.json}
+    UnsupportedMediaType:
+      description: Nieobsługiwany typ treści żądania lub pliku.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+          examples:
+            unsupported: {externalValue: examples/error_unsupported_media_type.json}
+    NotFound:
+      description: Nieznane ID (obserwacji, przebiegu lub dowodu).
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+          examples:
+            run: {summary: Nieznany przebieg, externalValue: examples/error_run_not_found.json}
+            observation: {summary: Nieznana obserwacja, externalValue: examples/error_observation_not_found.json}
+            evidence: {summary: Nieznany dowód, externalValue: examples/error_evidence_not_found.json}
+    RunNotReady:
+      description: Przebieg nie jest w stanie `succeeded`, dowody niedostępne.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+          examples:
+            not_ready: {externalValue: examples/error_run_not_ready.json}
+    StorageUnavailable:
+      description: Magazyn niedostępny.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ErrorResponse"}
+          examples:
+            down: {externalValue: examples/error_storage_unavailable.json}
+  schemas:
+    Id:
+      type: string
+      pattern: "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$"
+      description: Stabilne ID z F01 (obs-, can-, art-, pev-, ...) lub run_id.
+    Timestamp:
+      type: string
+      pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+    Score:
+      type: number
+      minimum: 0
+      maximum: 1
+    SafeText:
+      type: string
+      description: Zwykły tekst. Brak HTML; klient wstawia go jako tekst (np. textContent).
+      not:
+        pattern: "(?i)<\\s*/?\\s*(script|html|iframe|object|embed|style|svg|img|a|body|link|meta)\\b"
+    PublicUrl:
+      type: string
+      description: Adres do prezentacji z zamaskowanymi identyfikatorami (`display_url` z F01); nigdy surowy adres z sesją.
+      maxLength: 2048
+    Relation:
+      type: string
+      enum: [duplicate_capture, shared_template, shared_narrative, campaign_candidate]
+    InputKind:
+      type: string
+      enum: [full_capture, url_only, creative_only]
+    ErrorCode:
+      type: string
+      description: Stabilny kod maszynowy; nowe kody mogą być dodawane, klient traktuje nieznany jak `internal_error`.
+      enum:
+        - bad_request
+        - validation_failed
+        - payload_too_large
+        - unsupported_media_type
+        - observation_not_found
+        - run_not_found
+        - evidence_not_found
+        - run_not_ready
+        - run_failed
+        - storage_unavailable
+        - internal_error
+    ErrorBody:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: {$ref: "#/components/schemas/ErrorCode"}
+        message: {$ref: "#/components/schemas/SafeText"}
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [field, message]
+            properties:
+              field: {type: string, description: "Nazwa pola, np. url, file, observation_id."}
+              message: {$ref: "#/components/schemas/SafeText"}
+        retryable: {type: boolean, description: "Czy ponowienie tego samego żądania ma sens."}
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error: {$ref: "#/components/schemas/ErrorBody"}
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status, api, storage, version]
+      properties:
+        status: {type: string, enum: [ok, unavailable]}
+        api: {type: string, enum: [ok]}
+        storage: {type: string, enum: [ok, unavailable]}
+        version: {type: string}
+        schema_version: {type: string, const: "1"}
+    CreateObservationUrl:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url: {type: string, format: uri, maxLength: 2048, pattern: "^https?://", description: "http lub https."}
+        mode:
+          type: string
+          enum: [offline]
+          default: offline
+          description: "Tylko `offline` w v1: adres nie jest pobierany, analizowany jest sam URL."
+        label: {type: string, maxLength: 200}
+    CreateObservationFile:
+      type: object
+      required: [file]
+      properties:
+        file: {type: string, format: binary}
+        label: {type: string, maxLength: 200}
+    ObservationCreated:
+      type: object
+      additionalProperties: false
+      required: [observation_id, canonical_id, input_kind, created, analysis]
+      properties:
+        observation_id: {$ref: "#/components/schemas/Id"}
+        canonical_id: {$ref: "#/components/schemas/Id"}
+        input_kind: {$ref: "#/components/schemas/InputKind"}
+        created: {type: boolean, description: "false gdy to samo źródło już istniało (HTTP 200)."}
+        label: {type: [string, "null"]}
+        display_url: {oneOf: [{$ref: "#/components/schemas/PublicUrl"}, {type: "null"}]}
+        artifacts:
+          type: array
+          items: {$ref: "#/components/schemas/ArtifactSummary"}
+        analysis:
+          type: object
+          additionalProperties: false
+          required: [mode, note]
+          properties:
+            mode: {type: string, enum: [offline]}
+            note: {$ref: "#/components/schemas/SafeText"}
+    ArtifactSummary:
+      type: object
+      additionalProperties: false
+      required: [artifact_id, role]
+      description: Publiczny widok Artifact z F01 bez `local_ref`.
+      properties:
+        artifact_id: {$ref: "#/components/schemas/Id"}
+        role:
+          type: string
+          enum: [landing_html, landing_dom, landing_screenshot, creative_image, resource, har, input_url, archive, document, video, audio, vector_store, graph_edges, other]
+        media_type: {type: [string, "null"]}
+        size: {type: [integer, "null"], minimum: 0}
+        sha256: {type: [string, "null"], pattern: "^[0-9a-f]{64}$"}
+        display_url: {oneOf: [{$ref: "#/components/schemas/PublicUrl"}, {type: "null"}]}
+    Demo:
+      type: object
+      additionalProperties: false
+      required: [observation_id, dataset_name, dataset_version, description, material_count]
+      properties:
+        observation_id: {$ref: "#/components/schemas/Id"}
+        dataset_name: {type: string, description: "Nazwa przykładowego zbioru (do wyświetlenia)."}
+        dataset_version: {type: string}
+        description: {$ref: "#/components/schemas/SafeText"}
+        material_count: {type: integer, minimum: 1}
+        input_kind: {$ref: "#/components/schemas/InputKind"}
+    CreateRun:
+      type: object
+      additionalProperties: false
+      required: [observation_id]
+      properties:
+        observation_id: {$ref: "#/components/schemas/Id"}
+        profile:
+          type: string
+          default: demo
+          description: Profil konfiguracji backendu (`demo`); nieznany daje 422.
+    RunAccepted:
+      type: object
+      additionalProperties: false
+      required: [run_id, observation_id, status, status_url]
+      properties:
+        run_id: {$ref: "#/components/schemas/Id"}
+        observation_id: {$ref: "#/components/schemas/Id"}
+        status: {type: string, const: queued}
+        status_url: {type: string, pattern: "^/api/v1/runs/[^/]+$"}
+    RunBase:
+      type: object
+      required: [run_id, observation_id, status, created_at, updated_at]
+      properties:
+        run_id: {$ref: "#/components/schemas/Id"}
+        observation_id: {$ref: "#/components/schemas/Id"}
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+        updated_at: {$ref: "#/components/schemas/Timestamp"}
+    Run:
+      oneOf:
+        - {$ref: "#/components/schemas/RunQueued"}
+        - {$ref: "#/components/schemas/RunRunning"}
+        - {$ref: "#/components/schemas/RunSucceeded"}
+        - {$ref: "#/components/schemas/RunFailed"}
+      discriminator:
+        propertyName: status
+        mapping:
+          queued: "#/components/schemas/RunQueued"
+          running: "#/components/schemas/RunRunning"
+          succeeded: "#/components/schemas/RunSucceeded"
+          failed: "#/components/schemas/RunFailed"
+    RunQueued:
+      allOf:
+        - {$ref: "#/components/schemas/RunBase"}
+        - type: object
+          unevaluatedProperties: false
+          required: [status]
+          properties:
+            status: {type: string, const: queued}
+            run_id: {}
+            observation_id: {}
+            created_at: {}
+            updated_at: {}
+    RunRunning:
+      allOf:
+        - {$ref: "#/components/schemas/RunBase"}
+        - type: object
+          unevaluatedProperties: false
+          required: [status, progress]
+          properties:
+            status: {type: string, const: running}
+            progress:
+              type: object
+              additionalProperties: false
+              required: [stage]
+              properties:
+                stage: {type: string, description: "Krótka nazwa etapu do wyświetlenia."}
+                fraction: {$ref: "#/components/schemas/Score"}
+            run_id: {}
+            observation_id: {}
+            created_at: {}
+            updated_at: {}
+    RunSucceeded:
+      allOf:
+        - {$ref: "#/components/schemas/RunBase"}
+        - type: object
+          unevaluatedProperties: false
+          required: [status, result]
+          properties:
+            status: {type: string, const: succeeded}
+            result: {$ref: "#/components/schemas/ClusterRunView"}
+            run_id: {}
+            observation_id: {}
+            created_at: {}
+            updated_at: {}
+    RunFailed:
+      allOf:
+        - {$ref: "#/components/schemas/RunBase"}
+        - type: object
+          unevaluatedProperties: false
+          required: [status, error]
+          properties:
+            status: {type: string, const: failed}
+            error: {$ref: "#/components/schemas/ErrorBody"}
+            run_id: {}
+            observation_id: {}
+            created_at: {}
+            updated_at: {}
+    ClusterRunView:
+      type: object
+      additionalProperties: false
+      required: [cluster_run, summary, materials, clusters, pair_evidence]
+      description: |
+        Publiczny widok wyniku. `cluster_run` to rekord ClusterRun z F01 (bez zmian), reszta to dane do wyświetlenia.
+        Każda krawędź `cluster_run.edges[].pair_evidence_id` ma wpis w `pair_evidence`.
+      properties:
+        cluster_run: {$ref: "#/components/schemas/ClusterRun"}
+        summary:
+          type: object
+          additionalProperties: false
+          required: [outcome, material_count, grouped, singleton, noise, insufficient_data]
+          properties:
+            outcome:
+              type: string
+              enum: [grouped, no_groups, insufficient_evidence]
+              description: "grouped: jest co najmniej jedna grupa; no_groups: dane wystarczyły, nic nie połączono; insufficient_evidence: za mało dowodów do rozstrzygnięcia."
+            material_count: {type: integer, minimum: 0}
+            grouped: {type: integer, minimum: 0}
+            singleton: {type: integer, minimum: 0}
+            noise: {type: integer, minimum: 0}
+            insufficient_data: {type: integer, minimum: 0}
+            message: {$ref: "#/components/schemas/SafeText"}
+        materials:
+          type: array
+          items: {$ref: "#/components/schemas/Material"}
+        clusters:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [cluster_id, material_ids, relation]
+            properties:
+              cluster_id: {$ref: "#/components/schemas/Id"}
+              material_ids:
+                type: array
+                items: {$ref: "#/components/schemas/Id"}
+              relation: {$ref: "#/components/schemas/Relation"}
+              summary: {$ref: "#/components/schemas/SafeText"}
+        pair_evidence:
+          type: array
+          items: {$ref: "#/components/schemas/PairEvidenceView"}
+    Material:
+      type: object
+      additionalProperties: false
+      required: [material_id, observation_id, input_kind, label]
+      properties:
+        material_id: {$ref: "#/components/schemas/Id"}
+        observation_id: {$ref: "#/components/schemas/Id"}
+        input_kind: {$ref: "#/components/schemas/InputKind"}
+        label: {type: string}
+        display_url: {oneOf: [{$ref: "#/components/schemas/PublicUrl"}, {type: "null"}]}
+        thumbnail: {oneOf: [{$ref: "#/components/schemas/Preview"}, {type: "null"}]}
+        available_evidence:
+          type: array
+          description: Rodziny dowodów, które dało się zbadać (np. asset, text, url); pusta = tylko URL.
+          items: {type: string}
+    PairEvidenceView:
+      type: object
+      additionalProperties: false
+      required: [evidence_id, pair, method_id, relation, score, explanation, evidence_url]
+      description: Rekord PairEvidence z F01 w postaci publicznej; `evidence_id` = `pair_evidence_id`.
+      properties:
+        evidence_id: {$ref: "#/components/schemas/Id"}
+        pair:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items: {$ref: "#/components/schemas/Id"}
+        method_id: {$ref: "#/components/schemas/Id"}
+        relation: {$ref: "#/components/schemas/Relation"}
+        score: {oneOf: [{$ref: "#/components/schemas/Score"}, {type: "null"}], description: "null = porównanie niewykonalne"}
+        explanation: {$ref: "#/components/schemas/SafeText"}
+        evidence_url: {type: string, pattern: "^/api/v1/runs/[^/]+/evidence/[^/]+$"}
+    Preview:
+      type: object
+      additionalProperties: false
+      required: [href, media_type]
+      description: Statyczny podgląd (obraz) serwowany przez backend; `href` względny, bez ścieżek systemu plików.
+      properties:
+        href: {type: string, pattern: "^/static/previews/[A-Za-z0-9_.\\-]+\\.(png|jpg|jpeg|webp|gif)$"}
+        media_type: {type: string, enum: [image/png, image/jpeg, image/webp, image/gif]}
+        width: {type: integer, minimum: 1}
+        height: {type: integer, minimum: 1}
+        alt: {$ref: "#/components/schemas/SafeText"}
+    TextExcerpt:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text: {$ref: "#/components/schemas/SafeText"}
+        highlight_start: {type: integer, minimum: 0, description: "Początek dopasowania w `text` (znaki Unicode)."}
+        highlight_end: {type: integer, minimum: 0, description: "Koniec wyłącznie."}
+        source_label: {type: string, description: "Skąd fragment, np. „treść strony”."}
+    EvidenceItem:
+      type: object
+      additionalProperties: false
+      required: [artifact_id, role]
+      properties:
+        artifact_id: {$ref: "#/components/schemas/Id"}
+        role: {$ref: "#/components/schemas/ArtifactSummary/properties/role"}
+        media_type: {type: [string, "null"]}
+        display_url: {oneOf: [{$ref: "#/components/schemas/PublicUrl"}, {type: "null"}]}
+        locator:
+          oneOf:
+            - {type: "null"}
+            - {$ref: "#/components/schemas/Locator"}
+        text_excerpts:
+          type: array
+          items: {$ref: "#/components/schemas/TextExcerpt"}
+        preview: {oneOf: [{$ref: "#/components/schemas/Preview"}, {type: "null"}]}
+    Locator:
+      type: object
+      description: Locator z F01 (text_span, image_rect, har_entry, byte_range).
+      required: [kind]
+      properties:
+        kind: {type: string, enum: [text_span, image_rect, har_entry, byte_range]}
+      additionalProperties: true
+    EvidenceSide:
+      type: object
+      additionalProperties: false
+      required: [material_id, label, items]
+      properties:
+        material_id: {$ref: "#/components/schemas/Id"}
+        label: {type: string}
+        display_url: {oneOf: [{$ref: "#/components/schemas/PublicUrl"}, {type: "null"}]}
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/EvidenceItem"}
+    Evidence:
+      type: object
+      additionalProperties: false
+      required: [evidence_id, run_id, relation, method_id, score, explanation, available, sides]
+      properties:
+        evidence_id: {$ref: "#/components/schemas/Id"}
+        run_id: {$ref: "#/components/schemas/Id"}
+        relation: {$ref: "#/components/schemas/Relation"}
+        method_id: {$ref: "#/components/schemas/Id"}
+        score: {oneOf: [{$ref: "#/components/schemas/Score"}, {type: "null"}]}
+        explanation: {$ref: "#/components/schemas/SafeText"}
+        available:
+          type: boolean
+          description: "false gdy porównanie niewykonalne (score=null); `sides[].items` mogą być puste, a `limitations` mówi dlaczego."
+        limitations:
+          type: array
+          items: {$ref: "#/components/schemas/SafeText"}
+        sides:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items: {$ref: "#/components/schemas/EvidenceSide"}
+    ClusterRun:
+      type: object
+      description: Rekord ClusterRun z F01 (`src/methadata/contracts/schemas/v1/cluster_run.json`); test zgodności waliduje go modelem F01.
+      required: [schema_version, run_id, dataset_version, method_id, method_version, seed, relation, assignments]
+      properties:
+        schema_version: {type: string, const: "1"}
+        run_id: {$ref: "#/components/schemas/Id"}
+        dataset_version: {type: string, minLength: 1}
+        method_id: {$ref: "#/components/schemas/Id"}
+        method_version: {type: string, minLength: 1}
+        config: {type: object}
+        seed: {type: integer}
+        relation: {$ref: "#/components/schemas/Relation"}
+        assignments:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [material_id, cluster_ids, status]
+            properties:
+              material_id: {$ref: "#/components/schemas/Id"}
+              cluster_ids:
+                type: array
+                items: {$ref: "#/components/schemas/Id"}
+              status: {type: string, enum: [grouped, singleton, noise, insufficient_data]}
+        edges:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [source, target, relation, pair_evidence_id]
+            properties:
+              source: {$ref: "#/components/schemas/Id"}
+              target: {$ref: "#/components/schemas/Id"}
+              relation: {$ref: "#/components/schemas/Relation"}
+              pair_evidence_id: {$ref: "#/components/schemas/Id"}
+              weight: {oneOf: [{$ref: "#/components/schemas/Score"}, {type: "null"}]}
+      additionalProperties: false

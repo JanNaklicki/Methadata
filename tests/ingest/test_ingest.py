@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from methadata.contracts import discover
+from methadata.contracts import ArtifactRef, ArtifactRole, ParentRelation, discover
 from methadata.contracts.interfaces import AdapterKind
 from methadata.ingest import FileImporter, Limits, Store, verify_blobs
 from methadata.ingest.detect import sniff
@@ -166,13 +166,16 @@ def test_derived_artifacts_roundtrip(tmp_path):
     obs = store.observation(rep.entries[0].observation_id)
     shot = next(a for a in obs.artifacts if a.role.value == "landing_screenshot")
     before = (tmp_path / "s" / "manifest.json").read_bytes()
-    d = store.put_derived(shot.artifact_id, "ocr-v1", "text.json", {"text": "abc"})
-    assert store.put_derived(shot.artifact_id, "ocr-v1", "text.json", {"text": "abc"}).artifact_id == d.artifact_id
-    assert json.loads(store.read_derived(shot.artifact_id, "ocr-v1", "text.json")) == {"text": "abc"}
+    kw = dict(observation_id=obs.observation_id, role=ArtifactRole.other, data=b'{"text":"abc"}',
+              media_type="application/json", parent=ArtifactRef(artifact_id=shot.artifact_id),
+              parent_relation=ParentRelation.derived_from, origin="ocr-v1:text")
+    d = store.put_derived(**kw)
+    assert store.put_derived(**kw).artifact_id == d.artifact_id
+    assert json.loads(store.read_derived(shot.artifact_id, "ocr-v1:text")) == {"text": "abc"}
     fresh = Store(tmp_path / "s")  # nowa instancja = brak ponownego importu
     assert fresh.artifact(d.artifact_id).parent.artifact_id == shot.artifact_id
     assert d.artifact_id in [c.artifact_id for c in fresh.children(shot.artifact_id)]
-    assert fresh.open_bytes(d.artifact_id) if False else fresh.open_bytes(__import__("methadata.contracts.models", fromlist=["ArtifactRef"]).ArtifactRef(artifact_id=d.artifact_id))
+    assert fresh.open_bytes(ArtifactRef(artifact_id=d.artifact_id)) == b'{"text":"abc"}'
     assert run(tmp_path / "s", tmp_path / "in").count("unchanged") == 1
     assert (tmp_path / "s" / "manifest.json").read_bytes() == before
 
@@ -218,3 +221,17 @@ def test_real_renamed_copy(tmp_path):
     shutil.copytree(DATA / "p15", tmp_path / "inne_imie")
     rep = run(tmp_path / "s", tmp_path / "inne_imie")
     assert rep.count("new") == 1 and not rep.errors
+
+
+def test_extractors_use_canonical_store(tmp_path):
+    from methadata.extractors.html import HtmlExtractor
+    d = tmp_path / "in"
+    make_page(d / "a", html="<html><body><script>var a=1;</script></body></html>")
+    store = Store(tmp_path / "s")
+    rep = FileImporter().import_sources([d], store)
+    obs = store.observation(rep.entries[0].observation_id)
+    feats, sts = HtmlExtractor(store=store).extract(obs, reader=store)
+    html = next(a for a in obs.artifacts if a.role.value == "landing_html")
+    kids = store.list_derived(html.artifact_id)
+    assert feats and any(k.parent_relation.value == "inline_in" for k in kids)
+    assert store.open_bytes(kids[0].artifact_id).startswith(b"var a")
