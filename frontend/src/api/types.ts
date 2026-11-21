@@ -3,7 +3,7 @@ export type Relation = 'duplicate_capture' | 'shared_template' | 'shared_narrati
 export type InputKind = 'full_capture' | 'url_only' | 'creative_only'
 export type ErrorCode =
   | 'bad_request' | 'validation_failed' | 'payload_too_large' | 'unsupported_media_type'
-  | 'observation_not_found' | 'run_not_found' | 'evidence_not_found' | 'run_not_ready'
+  | 'observation_not_found' | 'run_not_found' | 'evidence_not_found' | 'scenario_not_available' | 'run_not_ready'
   | 'run_failed' | 'storage_unavailable' | 'internal_error'
 
 export interface ErrorBody {

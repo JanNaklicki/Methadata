@@ -100,6 +100,9 @@ def build_view(run_id: str, bundle: Bundle, labels: Mapping[str, str], store: St
     cr = bundle.runs[0]
     fusion = "fusion" in cr.config
     obs_by_canon = {o.canonical_id: o for o in bundle.observations}
+    target = next((o for o in bundle.observations if o.observation_id == target_observation_id), None)
+    if fusion and target is not None:
+        obs_by_canon[target.canonical_id] = target
     families: dict[str, set[str]] = {}
     kinds = {("asset", "image_sha256"): "asset"}
     if fusion:
@@ -133,7 +136,7 @@ def build_view(run_id: str, bundle: Bundle, labels: Mapping[str, str], store: St
 
     counts = {k: sum(1 for a in cr.assignments if a.status.value == k)
               for k in ("grouped", "singleton", "noise", "insufficient_data")}
-    target_canon = next((o.canonical_id for o in bundle.observations if o.observation_id == target_observation_id), None)
+    target_canon = target.canonical_id if target is not None else None
     target_status = next((a.status.value for a in cr.assignments if a.material_id == target_canon), None)
     if fusion and target_status == "insufficient_data":
         outcome = "insufficient_evidence"

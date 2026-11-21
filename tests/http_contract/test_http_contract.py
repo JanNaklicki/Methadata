@@ -26,7 +26,8 @@ def test_operations_documented():
     spec = cc.load_spec()
     ops = {(m.upper(), p) for p, i in spec["paths"].items() for m in i}
     assert ops == {("GET", "/api/v1/health"), ("POST", "/api/v1/observations"), ("GET", "/api/v1/demo"), ("POST", "/api/v1/runs"),
-                   ("GET", "/api/v1/runs/{run_id}"), ("GET", "/api/v1/runs/{run_id}/evidence/{evidence_id}")}
+                   ("GET", "/api/v1/runs/{run_id}"), ("GET", "/api/v1/runs/{run_id}/evidence/{evidence_id}"),
+                   ("GET", "/api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios")}
 
 
 def test_required_example_scenarios_present():

@@ -1,3 +1,4 @@
+import type { ScenarioComparison } from '../counterfactual/types'
 import type { Demo, ErrorBody, Evidence, ObservationCreated, Run, RunAccepted } from './types'
 
 export const API_BASE = '/api/v1'
@@ -20,7 +21,7 @@ export class ApiError extends Error {
 
 const KNOWN = new Set([
   'bad_request', 'validation_failed', 'payload_too_large', 'unsupported_media_type', 'observation_not_found',
-  'run_not_found', 'evidence_not_found', 'run_not_ready', 'run_failed', 'storage_unavailable', 'internal_error',
+  'run_not_found', 'evidence_not_found', 'scenario_not_available', 'run_not_ready', 'run_failed', 'storage_unavailable', 'internal_error',
 ])
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -72,4 +73,13 @@ export const api = {
   getRun: (runId: string, signal?: AbortSignal) => request<Run>(`/runs/${encodeURIComponent(runId)}`, { signal }),
   getEvidence: (runId: string, evidenceId: string, signal?: AbortSignal) =>
     request<Evidence>(`/runs/${encodeURIComponent(runId)}/evidence/${encodeURIComponent(evidenceId)}`, { signal }),
+  getScenario: (runId: string, evidenceId: string, disabled: string[], materialId?: string, signal?: AbortSignal) => {
+    const query = new URLSearchParams()
+    disabled.forEach((family) => query.append('disabled', family))
+    if (materialId) query.set('material_id', materialId)
+    return request<ScenarioComparison>(
+      `/runs/${encodeURIComponent(runId)}/evidence/${encodeURIComponent(evidenceId)}/scenarios${query.size ? `?${query}` : ''}`,
+      { signal },
+    )
+  },
 }
