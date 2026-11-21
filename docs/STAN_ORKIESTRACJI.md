@@ -21,7 +21,7 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - K03 (`1be5c51`). DBSCAN odtworzył grupy F04, OPTICS dodał p3/p4, a HDBSCAN utworzył m.in. trójkę z zerowym podobieństwem we wszystkich parach. Na próbce kontrolnej wszystkie trzy metody odtworzyły oczekiwaną parę i trójkę oraz rozdzieliły szum od braku danych. [Konfiguracja i pomiary](../configs/density/README.md)
 
 ## W toku — koordynator Claude (nie wydawać ponownie)
-- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14, E17, E17, K11, R04, K15, K10, E06, E11, E16.
+- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14, E17, K11, R04, K15, K10, E06, E11, E16.
 - W toku: R03 `codex/demo-explain` (dokończenie niezacommitowanej pracy poprzedniego wykonawcy), S08 `codex/source-history`.
 
 ## Następne (zależności już w main)
