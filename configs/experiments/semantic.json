@@ -1,0 +1,9 @@
+{
+  "method_id": "semantic-minilm-v1",
+  "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "revision": "unpinned",
+  "weights": {"title": 0.2, "body": 0.6, "cta": 0.2},
+  "top_k": 3,
+  "cache": "klucz sha256(model|rewizja|tekst); katalog poza repo",
+  "extra": "pip install -e '.[semantic]' (sentence-transformers); wagi do cache poza repo"
+}

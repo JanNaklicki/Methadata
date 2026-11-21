@@ -1,0 +1,10 @@
+{
+  "contact_email": "sellers@adnet.example.test",
+  "version": "1.0",
+  "identifiers": [],
+  "sellers": [
+    {"seller_id": "1111", "name": "Pub Alpha Inc", "domain": "pub-a.example.test", "seller_type": "PUBLISHER", "is_confidential": 0},
+    {"seller_id": "2222", "name": "Reseller Two", "domain": "reseller.example.test", "seller_type": "INTERMEDIARY", "is_confidential": 0},
+    {"seller_id": "7777", "name": "Confidential Corp", "domain": "secret.example.test", "seller_type": "BOTH", "is_confidential": 1}
+  ]
+}

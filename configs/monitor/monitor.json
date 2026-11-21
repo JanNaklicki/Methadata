@@ -1,0 +1,10 @@
+{
+  "page_size": 100,
+  "max_pages": 10,
+  "retries": 2,
+  "backoff_s": 2.0,
+  "run": {
+    "relation": "campaign_candidate",
+    "cluster_config": {"threshold": 0.5, "similarity_version": "source-payer-compare", "method_id": "source-payer-compare", "relation": "campaign_candidate"}
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "default_region": "PL",
+  "salt": "methadata-contact-v1",
+  "order_keywords": ["zamów", "zamow", "zamówienia", "zamówień", "zamowienia", "złóż zamówienie", "order", "buy now", "kup ", "sprzedaż", "sprzedaz", "sales", "doradca", "konsultant", "consultant"],
+  "hotline_keywords": ["infolinia", "infolinii", "infolinię", "hotline", "call center", "callcenter", "centrum obsługi", "biuro obsługi", "pośrednik", "posrednik", "intermediary"],
+  "support_keywords": ["reklamacj", "pomoc techniczna", "obsługa klienta", "obsluga klienta", "support", "serwis", "zwrot"],
+  "negative_context": ["nip", "regon", "krs", "konto", "iban", "sku", "kod ", "nr zam", "id:", "ean"],
+  "email_order_locals": ["zamowienia", "zamówienia", "order", "orders", "sklep", "shop", "sales", "sprzedaz", "handlowy", "biuro"],
+  "email_support_locals": ["support", "pomoc", "reklamacje", "serwis", "help", "obsluga"],
+  "free_mail_domains": ["gmail.com", "wp.pl", "o2.pl", "onet.pl", "interia.pl", "yahoo.com", "outlook.com", "hotmail.com", "proton.me", "protonmail.com", "icloud.com"],
+  "known_intermediary_keys": [],
+  "scores": {"order_distinct_brands": 0.9, "same_brand": 0.8, "shared_hotline": 0.35, "messenger": 0.85, "free_mail_factor": 0.7}
+}

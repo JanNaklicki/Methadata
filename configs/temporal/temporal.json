@@ -1,0 +1,21 @@
+{
+  "timezone": "Europe/Warsaw",
+  "pattern_kinds": [
+    [
+      "asset",
+      "image_sha256"
+    ]
+  ],
+  "domain_kinds": [
+    [
+      "url_har",
+      "url_parts"
+    ]
+  ],
+  "max_gap_days": 14.0,
+  "min_domains": 3,
+  "coactivity_cap": 0.2,
+  "pattern_base": 0.5,
+  "version": "1",
+  "note": "Progi i wagi sa parametrami, nie byly dopasowywane do danych."
+}
