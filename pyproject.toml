@@ -39,6 +39,7 @@ source-mobile-app = "methadata.sources.mobile_app:get_adapters"
 source-contact = "methadata.sources.contact:get_adapters"
 source-affiliate = "methadata.sources.affiliate:get_adapters"
 source-offer-id = "methadata.sources.offer_id:get_adapters"
+source-qr = "methadata.sources.qr:get_adapters"
 extract-documents = "methadata.extractors.documents:get_adapters"
 lexical = "methadata.experiments.lexical:get_adapters"
 production-kit = "methadata.experiments.production_kit:get_adapters"
@@ -59,6 +60,7 @@ where = ["src", "backend"]
 "methadata.contracts" = ["schemas/v1/*.json"]
 "methadata.experiments.people_entities" = ["data/*.json"]
 "methadata.sources.offer_id" = ["config.json"]
+"methadata.sources.qr" = ["config.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,11 @@
+{
+  "scores": {"same_target": 0.95, "same_path_other_query": 0.7, "same_host_other_target": 0.2,
+             "same_shortener_other_target": 0.03, "no_shared_target": 0.0},
+  "video": {"interval_ms": 1000, "max_frames": 16},
+  "decode": {"scales": [1.0, 2.0, 0.5], "max_side": 4000},
+  "shorteners": ["bit.ly", "t.ly", "tinyurl.com", "cutt.ly", "rb.gy", "is.gd", "goo.gl", "ow.ly", "buff.ly", "t.co",
+                 "shorturl.at", "rebrand.ly", "qr.io", "qrco.de", "l.ead.me", "linktr.ee", "lnk.bio", "s.id", "v.gd",
+                 "tiny.cc", "urlz.fr", "clck.ru", "vk.cc", "wa.me", "m.me", "forms.gle", "zpr.io"],
+  "tracking_params": ["fbclid", "gclid", "dclid", "msclkid", "igshid", "mc_cid", "mc_eid", "yclid", "_ga", "ref_src", "si"],
+  "tracking_prefixes": ["utm_"]
+}
