@@ -21,9 +21,6 @@ import math
 from dataclasses import dataclass
 from typing import Any, Mapping, Optional, Sequence
 
-import igraph
-import leidenalg
-
 from methadata.contracts import (AdapterKind, AdapterSpec, Assignment, AssignmentStatus, ClusterRun, Edge,
                                  Observation, PairEvidence, Relation)
 
@@ -169,7 +166,17 @@ def build_graph(observations: Sequence[Observation], pair_evidence: Sequence[Pai
 
 # ------------------------------------------------------------------ podział
 
+def _libs():
+    try:
+        import igraph
+        import leidenalg
+    except ImportError as exc:  # brak extra `graph`
+        raise RuntimeError("Leiden wymaga extra `graph`: pip install 'methadata[graph]' (leidenalg, igraph)") from exc
+    return igraph, leidenalg
+
+
 def _partition(nodes: Sequence[str], edges: Sequence[EdgeEvidence], cfg: Mapping[str, Any], seed: int):
+    igraph, leidenalg = _libs()
     idx = {m: i for i, m in enumerate(nodes)}
     g = igraph.Graph(n=len(nodes), edges=[(idx[e.source], idx[e.target]) for e in edges])
     g.es["weight"] = [e.adjusted for e in edges]
