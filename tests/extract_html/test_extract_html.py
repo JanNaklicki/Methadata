@@ -31,9 +31,15 @@ class Mem:
     def children(self, i):
         return [a for a in self.extra if a.parent and a.parent.artifact_id == i]
 
-    def put_derived(self, a, data):
+    def put_derived(self, **kw):
+        from methadata.ingest import Store
+        import tempfile
+        if not hasattr(self, "_st"):
+            self._st = Store(tempfile.mkdtemp())
+        a = self._st.put_derived(**kw)
         self.extra.append(a)
-        self.add(a, data)
+        self.add(a, self._st.open_bytes(a.artifact_id) if False else (self._st.root / a.local_ref).read_bytes())
+        return a
 
 
 def make(data: bytes, role=ArtifactRole.landing_html, name="page.html", mt="text/html", base="https://ex.invalid/p", extra=()):

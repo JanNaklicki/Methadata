@@ -15,6 +15,7 @@ media = ["Pillow>=10"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
 [project.entry-points."methadata.adapters"]
+importer-files = "methadata.ingest.importer:get_adapters"
 assets = "methadata.experiments.assets.adapters:get_adapters"
 components = "methadata.clustering.components:ADAPTERS"
 extract-html = "methadata.extractors.html:get_adapters"

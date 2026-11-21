@@ -1,17 +1,11 @@
 """Interfejs zapisu artefaktów pochodnych (zgodny z F01/F02) i magazyn pamięciowy do testów."""
 from __future__ import annotations
 
-from typing import Optional, Protocol
+from typing import Optional
 
 from methadata.contracts import Artifact, ArtifactRef, ids
+from methadata.ingest.store import DerivedStore  # noqa: F401  (kanoniczny interfejs)
 from methadata.contracts.models import ArtifactRole, ParentRelation
-
-
-class DerivedStore(Protocol):
-    def put_derived(self, *, observation_id: str, role: ArtifactRole, data: bytes, media_type: Optional[str],
-                    url: Optional[str], parent: ArtifactRef, parent_relation: ParentRelation,
-                    origin: str) -> Artifact:
-        """Utrwala bajty raz (adresowanie SHA-256) i zwraca Artifact z parent/origin. Idempotentne."""
 
 
 class MemoryDerivedStore:

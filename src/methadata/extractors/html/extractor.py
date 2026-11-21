@@ -33,10 +33,7 @@ _RESOURCE_ATTRS = {  # (tag, attr) -> relacja; link rel rozstrzygane osobno
 }
 
 
-class DerivedStore(Protocol):
-    """Interfejs zapisu artefaktów pochodnych (F01/F02): dodaje `artifact` do obserwacji i zapisuje bajty
-    pod `artifact.local_ref`. Idempotentny (ten sam artifact_id = ta sama treść)."""
-    def put_derived(self, artifact: Artifact, data: bytes) -> None: ...
+from methadata.ingest.store import DerivedStore  # noqa: E402,F401  (kanoniczny interfejs)
 
 
 def _decode(data: bytes, hint: Optional[str]) -> tuple[str, str]:
@@ -316,30 +313,21 @@ class HtmlExtractor:
 
     # ------------------------------------------------------------------ artefakty pochodne
     def _persist_part(self, obs: Observation, container: Artifact, p: Part) -> Artifact:
-        sha = ids.sha256_bytes(p.data)
         origin = f"mhtml-part:{p.index}:{p.location or p.content_id or ''}"[:500]
-        a = Artifact(artifact_id=ids.artifact_id(obs.observation_id, "resource", sha, f"{container.artifact_id}|{origin}"),
-                     observation_id=obs.observation_id, role=ArtifactRole.resource,
-                     local_ref=f"derived/{sha[:2]}/{sha}", sha256=sha, size=len(p.data), media_type=p.content_type,
-                     url=p.location if p.location and re.match(r"^https?://", p.location) else None,
-                     parent=ArtifactRef(artifact_id=container.artifact_id, locator=ByteRange(start=p.byte_start, end=p.byte_end)),
-                     parent_relation=ParentRelation.archive_member, origin=origin)
-        self.store.put_derived(a, p.data)
-        return a
+        return self.store.put_derived(
+            observation_id=obs.observation_id, role=ArtifactRole.resource, data=p.data, media_type=p.content_type,
+            url=p.location if p.location and re.match(r"^https?://", p.location) else None,
+            parent=ArtifactRef(artifact_id=container.artifact_id, locator=ByteRange(start=p.byte_start, end=p.byte_end)),
+            parent_relation=ParentRelation.archive_member, origin=origin)
 
     def _link_part(self, pa: Artifact, host_id: str, node: Node):
         """Zasób osadzony jest 'referenced_by' dokumentu: nie zmieniamy rodzica (archiwum), relację niesie krawędź."""
 
     def _persist_inline(self, obs, art, host_id, node: Node, code: str, n: int, mt: str):
-        data = code.encode("utf-8")
-        sha = ids.sha256_bytes(data)
-        origin = f"inline-script:{n}"
-        a = Artifact(artifact_id=ids.artifact_id(obs.observation_id, "resource", sha, f"{host_id}|{origin}"),
-                     observation_id=obs.observation_id, role=ArtifactRole.resource, local_ref=f"derived/{sha[:2]}/{sha}",
-                     sha256=sha, size=len(data), media_type=mt,
-                     parent=ArtifactRef(artifact_id=host_id, locator=TextSpan(start=node.raw_start, end=max(node.raw_end, node.raw_start + 1))),
-                     parent_relation=ParentRelation.inline_in, origin=origin)
-        self.store.put_derived(a, data)
+        self.store.put_derived(
+            observation_id=obs.observation_id, role=ArtifactRole.resource, data=code.encode("utf-8"), media_type=mt,
+            parent=ArtifactRef(artifact_id=host_id, locator=TextSpan(start=node.raw_start, end=max(node.raw_end, node.raw_start + 1))),
+            parent_relation=ParentRelation.inline_in, origin=f"inline-script:{n}")
 
 
 def _descend(n: Node):

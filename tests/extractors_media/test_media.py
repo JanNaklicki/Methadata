@@ -137,13 +137,14 @@ class Store:
     def __init__(self, oid):
         self.oid, self.n = oid, 0
 
-    def put_derived(self, *, parent, data, role, media_type, origin):
+    def put_derived(self, *, observation_id, role, data, media_type, parent, parent_relation, origin, url=None):
+        role = role.value
         self.n += 1
         assert data.startswith(b"\x89PNG")
         sha = ids.sha256_bytes(data)
         return Artifact(artifact_id=ids.artifact_id(self.oid, role, sha, origin), observation_id=self.oid, role=role,
-                        local_ref=f"d/{self.n}.png", sha256=sha, parent={"artifact_id": parent.artifact_id},
-                        parent_relation="derived_from", origin=origin)
+                        local_ref=f"d/{self.n}.png", sha256=sha, parent=parent,
+                        parent_relation=parent_relation, origin=origin)
 
 
 @pytest.mark.skipif(not P.ffmpeg_available(), reason="brak ffmpeg")

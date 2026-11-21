@@ -5,19 +5,16 @@ import io
 from typing import Any, Mapping, Optional, Protocol, Sequence
 
 from methadata.contracts import (AdapterKind, AdapterSpec, ArtifactRef, ExtractionState, ExtractionStatus, Feature, ids)
-from methadata.contracts.models import Artifact, ArtifactRole, ImageRect, ValueType
+from methadata.contracts.models import Artifact, ArtifactRole, ImageRect, ParentRelation, ValueType
 
 from . import probe as P
+
+from methadata.ingest.store import DerivedStore  # noqa: E402,F401  (kanoniczny interfejs)
 
 EXTRACTOR_VERSION = "media-1"
 FAMILY = "media"
 ICON_MAX_SIDE = 128
 DHASH_SIZE = 8
-
-
-class DerivedStore(Protocol):
-    """Zapis artefaktów pochodnych (F01/F02). Zwraca utrwalony Artifact z nadanym artifact_id."""
-    def put_derived(self, *, parent: Artifact, data: bytes, role: str, media_type: str, origin: str) -> Artifact: ...
 
 
 def _is_media(a: Artifact) -> bool:
@@ -142,8 +139,9 @@ class MediaExtractor:
                 if png is None:
                     failed += 1
                 else:
-                    d = store.put_derived(parent=art, data=png, role="other", media_type="image/png",
-                                          origin=f"frame@{t}ms")
+                    d = store.put_derived(observation_id=oid, role=ArtifactRole.other, data=png, media_type="image/png",
+                                          parent=ArtifactRef(artifact_id=art.artifact_id),
+                                          parent_relation=ParentRelation.derived_from, origin=f"frame@{t}ms")
                     fr["artifact_id"] = d.artifact_id
                     decoded += 1
             frames.append(fr)
