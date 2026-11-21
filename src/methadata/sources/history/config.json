@@ -1,0 +1,6 @@
+{
+  "scores": {"unchanged_same_url": 1.0, "recipient_change": 0.15, "product_swap": 0.2, "cta_change": 0.5,
+             "shared_signal": 0.8, "no_shared_signal": 0.0},
+  "title_swap_jaccard": 0.5,
+  "generic_cta_hosts": []
+}
