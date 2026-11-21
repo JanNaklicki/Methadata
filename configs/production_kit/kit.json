@@ -1,0 +1,12 @@
+{
+  "experiment_id": "e12-production-kit",
+  "dataset_version": "SET-ME",
+  "seed": 0,
+  "relation": "shared_template",
+  "extractors": ["extract-html", "extract-code", "kit-extractor"],
+  "comparators": ["production-kit-v1", "production-kit-nolib-v1"],
+  "clusterer": "components",
+  "cluster_config": {},
+  "kit": {"rare_frac": 0.2, "min_shared": 2, "min_form_fields": 2, "kinds": ["css_sheet", "class", "script", "form"]},
+  "note": "Komparatory wymagają korpusu: zbuduj przez ProductionKitComparator.fit(observations, feature_map) i przekaż runnerowi w mapie adapterów."
+}
