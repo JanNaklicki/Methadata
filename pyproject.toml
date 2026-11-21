@@ -36,6 +36,7 @@ rare-motifs = "methadata.experiments.rare_motifs:get_adapters"
 funnel = "methadata.experiments.funnel:get_adapters"
 fusion = "methadata.clustering.fusion:get_adapters"
 people-entities = "methadata.experiments.people_entities:get_adapters"
+narrative-slots = "methadata.experiments.narrative_slots:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src"]
