@@ -173,9 +173,7 @@ def test_default_config_matches_file():
 
 # ------------------------------------------------------------ rzeczywisty korpus (pomijany bez BACKUP)
 
-BACKUP = Path(os.environ.get("METHADATA_BACKUP", ROOT.parents[2] / "BACKUP"))
-if not BACKUP.is_dir():
-    BACKUP = next((p / "BACKUP" for p in ROOT.parents if (p / "BACKUP").is_dir()), BACKUP)
+from methadata.devtools.realdata import BACKUP
 
 
 @pytest.mark.skipif(not BACKUP.is_dir(), reason="brak katalogu BACKUP")
