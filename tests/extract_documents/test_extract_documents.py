@@ -29,9 +29,14 @@ class Mem:
     def children(self, i):
         return [a for a in self.extra if a.parent and a.parent.artifact_id == i]
 
-    def put_derived(self, a, data):
+    def put_derived(self, *, observation_id, role, data, media_type=None, url=None, parent, parent_relation, origin):
+        sha = ids.sha256_bytes(data)
+        a = Artifact(artifact_id=ids.artifact_id(observation_id, role.value, sha, f"{origin}<{parent.artifact_id}"),
+                     observation_id=observation_id, role=role, local_ref=f"derived/{sha}", sha256=sha, size=len(data),
+                     media_type=media_type, parent=parent, parent_relation=parent_relation, origin=origin)
         self.extra.append(a)
         self.add(a, data)
+        return a
 
 
 def make(files, declared=None, role=ArtifactRole.document, load=True):
@@ -182,3 +187,43 @@ def test_real_p1():
     assert chk["mismatched"] == [] and chk["verdict"] in ("ok", "partial") and chk["matched"]
     assert by(feats, "manifest_consistent")[0].value is True
     assert any("502" in f.value["title"] for f in by(feats, "download_title"))
+
+
+def _text_pdf(text="Hello Methadata"):
+    objs = [b"<< /Type /Catalog /Pages 2 0 R >>", b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+            b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] /Contents 4 0 R "
+            b"/Resources << /Font << /F1 5 0 R >> >> >>", None,
+            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"]
+    stream = f"BT /F1 12 Tf 20 100 Td ({text}) Tj ET".encode()
+    objs[3] = b"<< /Length %d >>\nstream\n" % len(stream) + stream + b"\nendstream"
+    out, offs = b"%PDF-1.4\n", []
+    for i, o in enumerate(objs, 1):
+        offs.append(len(out))
+        out += b"%d 0 obj\n" % i + o + b"\nendobj\n"
+    x = len(out)
+    out += b"xref\n0 %d\n0000000000 65535 f \n" % (len(objs) + 1)
+    out += b"".join(b"%010d 00000 n \n" % o for o in offs)
+    out += b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (len(objs) + 1, x)
+    return out
+
+
+def test_pdf_text_persisted_via_real_store(tmp_path):
+    pytest.importorskip("pypdf")
+    from methadata.contracts.models import ParentRelation
+    from methadata.ingest import Store
+    st = Store(tmp_path / "s")
+    data = _text_pdf()
+    sha, size, _ = st.put_bytes(data)
+    oid = ids.observation_id("synthetic://pdf", "full_capture")
+    a = Artifact(artifact_id=ids.artifact_id(oid, "document", sha, "page.pdf"), observation_id=oid,
+                 role=ArtifactRole.document, local_ref=st.blob_ref(sha), sha256=sha, size=size,
+                 media_type="application/pdf", origin="page.pdf")
+    obs = Observation(observation_id=oid, canonical_id=ids.canonical_id([("document", sha)]),
+                      source_ref="synthetic://pdf", input_kind=InputKind.full_capture, artifacts=[a])
+    st.save_observation(obs, "imp1")
+    feats, sts = DocumentsExtractor().extract(obs, reader=st, optional={"store": st})
+    assert sts[0].state is ExtractionState.ok
+    assert "Hello Methadata" in by(feats, "pdf_page_text")[0].value["text"]
+    kids = st.list_derived(a.artifact_id)
+    assert len(kids) == 1 and kids[0].parent_relation is ParentRelation.derived_from
+    assert st.open_bytes(kids[0].artifact_id).decode().strip() == "Hello Methadata"

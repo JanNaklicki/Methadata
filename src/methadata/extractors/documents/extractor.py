@@ -11,13 +11,14 @@ import io
 import json
 import re
 from datetime import datetime, timezone
-from typing import Any, Mapping, Optional, Protocol
+from typing import Any, Mapping, Optional
 
 from methadata.contracts import ids
 from methadata.contracts.interfaces import AdapterKind, AdapterSpec, ArtifactReader
 from methadata.contracts.models import (Artifact, ArtifactRef, ArtifactRole, ByteRange, ExtractionState,
                                         ExtractionStatus, Feature, Observation, ParentRelation, TextSpan, ValueType)
 from methadata.contracts.urls import mask_url
+from methadata.ingest.store import DerivedStore  # noqa: F401  (kanoniczny interfejs F02)
 
 VERSION = "1.0.0"
 EXTRACTOR_VERSION = f"x04-documents/{VERSION}"
@@ -25,10 +26,6 @@ ROLES = {ArtifactRole.document, ArtifactRole.other, ArtifactRole.resource}
 STORAGE_FILES = {"cookies.json": "cookies", "localstorage.json": "localStorage", "sessionstorage.json": "sessionStorage"}
 _TS_TXT = re.compile(r"(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})(?:\.\d+)?\s*(UTC|Z)\b")
 _HEX64 = re.compile(r"\b[0-9a-fA-F]{64}\b")
-
-
-class DerivedStore(Protocol):
-    def put_derived(self, artifact: Artifact, data: bytes) -> None: ...
 
 
 def _base(a: Artifact) -> str:
@@ -90,7 +87,7 @@ class DocumentsExtractor:
             if kind == "json_or_pdf_sniff":
                 kind = "pdf" if raw.lstrip()[:5] == b"%PDF-" else "json"
             try:
-                f, s = getattr(self, "_" + kind)(observation, art, raw, reader)
+                f, s = getattr(self, "_" + kind)(observation, art, raw, reader, optional)
                 feats += f
                 sts += s
             except Exception as e:
@@ -160,7 +157,7 @@ class DocumentsExtractor:
         return raw.decode("utf-8", "replace")
 
     # ------------------------------------------------------------ TXT
-    def _txt(self, obs, art, raw, reader):
+    def _txt(self, obs, art, raw, reader, optional=None):
         feats, add = self._mk(obs, art, "document")
         text = self._decode(raw)
         norm = "\n".join(l.rstrip() for l in text.splitlines()).strip()
@@ -176,7 +173,7 @@ class DocumentsExtractor:
         return feats, [self._st(obs.observation_id, art, ExtractionState.ok, f"txt; znaków={len(text)}")]
 
     # ------------------------------------------------------------ PDF
-    def _pdf(self, obs, art, raw, reader):
+    def _pdf(self, obs, art, raw, reader, optional=None):
         try:
             from pypdf import PdfReader
         except ImportError:
@@ -216,22 +213,18 @@ class DocumentsExtractor:
                 add("pdf_page_text", ValueType.json, {"page": i, "text": t.strip()[:5000]}, whole)
         add("pdf_text_sha256", ValueType.string, ids.sha256_bytes(full.encode("utf-8")), whole)
         add("pdf_has_text", ValueType.boolean, bool(full), whole)
-        if self.store is not None and full:
-            data = full.encode("utf-8")
-            sha = ids.sha256_bytes(data)
-            d = Artifact(artifact_id=ids.artifact_id(obs.observation_id, "document", sha, f"{art.artifact_id}|pdf-text"),
-                         observation_id=obs.observation_id, role=ArtifactRole.document,
-                         local_ref=f"derived/{sha[:2]}/{sha}", sha256=sha, size=len(data), media_type="text/plain",
-                         parent=ArtifactRef(artifact_id=art.artifact_id), parent_relation=ParentRelation.derived_from,
-                         origin="pdf-text")
-            self.store.put_derived(d, data)
+        store = self.store or (optional or {}).get("store")
+        if store is not None and full:
+            store.put_derived(observation_id=obs.observation_id, role=ArtifactRole.document, data=full.encode("utf-8"),
+                              media_type="text/plain", parent=ArtifactRef(artifact_id=art.artifact_id),
+                              parent_relation=ParentRelation.derived_from, origin="pdf-text")
         return feats, [self._st(obs.observation_id, art, ExtractionState.ok, f"pdf; stron={npages}; znaków={len(full)}")]
 
     # ------------------------------------------------------------ JSON ogólny
     def _load_json(self, raw):
         return json.loads(self._decode(raw))
 
-    def _json(self, obs, art, raw, reader):
+    def _json(self, obs, art, raw, reader, optional=None):
         data = self._load_json(raw)
         feats, add = self._mk(obs, art, "document")
         whole = self._whole(art)
@@ -252,7 +245,7 @@ class DocumentsExtractor:
         return feats, [self._st(obs.observation_id, art, ExtractionState.ok, "json")]
 
     # ------------------------------------------------------------ czas i tytuł pobrania
-    def _download_info(self, obs, art, raw, reader):
+    def _download_info(self, obs, art, raw, reader, optional=None):
         d = self._load_json(raw)
         if not isinstance(d, dict):
             raise ValueError("archive_info.json nie jest obiektem")
@@ -274,7 +267,7 @@ class DocumentsExtractor:
         return feats, [self._st(obs.observation_id, art, ExtractionState.ok, "archive_info")]
 
     # ------------------------------------------------------------ cookies / Web Storage
-    def _storage(self, obs, art, raw, reader):
+    def _storage(self, obs, art, raw, reader, optional=None):
         area = STORAGE_FILES[_base(art).lower()]
         d = self._load_json(raw)
         feats, add = self._mk(obs, art, "browser_state")
@@ -318,7 +311,7 @@ class DocumentsExtractor:
         except Exception:
             return a.sha256
 
-    def _manifest(self, obs, art, raw, reader):
+    def _manifest(self, obs, art, raw, reader, optional=None):
         n = _base(art)
         text = self._decode(raw)
         expected: dict[str, str] = {}
