@@ -21,8 +21,8 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - K03 (`1be5c51`). DBSCAN odtworzył grupy F04, OPTICS dodał p3/p4, a HDBSCAN utworzył m.in. trójkę z zerowym podobieństwem we wszystkich parach. Na próbce kontrolnej wszystkie trzy metody odtworzyły oczekiwaną parę i trójkę oraz rozdzieliły szum od braku danych. [Konfiguracja i pomiary](../configs/density/README.md)
 
 ## W toku — koordynator Claude (nie wydawać ponownie)
-- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14.
-- W toku: E06 `codex/exp-semantic`, E11 `codex/exp-visual-embedding`, E16 `codex/exp-video-audio`, K10 `codex/cluster-network-fusion`, E17 `codex/exp-learned-pairs`, K11 `codex/cluster-consensus`, R04 `codex/source-monitor`, K15 `codex/cluster-graph-walk`.
+- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14, E17.
+- W toku: E06 `codex/exp-semantic`, E11 `codex/exp-visual-embedding`, E16 `codex/exp-video-audio`, K10 `codex/cluster-network-fusion`, K11 `codex/cluster-consensus`, R04 `codex/source-monitor`, K15 `codex/cluster-graph-walk`.
 
 ## Następne (zależności już w main)
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
