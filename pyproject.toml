@@ -17,6 +17,7 @@ pdf = ["pypdf>=4"]
 ocr = ["Pillow>=10", "rapidocr-onnxruntime>=1.2"]
 graph = ["leidenalg>=0.10", "igraph>=0.11"]
 density = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
+provenance = ["c2pa-python>=0.30", "cryptography>=42"]
 perceptual = ["numpy>=1.24", "Pillow>=10", "opencv-python-headless>=4.8"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
@@ -40,6 +41,7 @@ source-mobile-app = "methadata.sources.mobile_app:get_adapters"
 source-contact = "methadata.sources.contact:get_adapters"
 source-affiliate = "methadata.sources.affiliate:get_adapters"
 source-offer-id = "methadata.sources.offer_id:get_adapters"
+source-media-provenance = "methadata.sources.media_provenance:get_adapters"
 extract-documents = "methadata.extractors.documents:get_adapters"
 lexical = "methadata.experiments.lexical:get_adapters"
 production-kit = "methadata.experiments.production_kit:get_adapters"
