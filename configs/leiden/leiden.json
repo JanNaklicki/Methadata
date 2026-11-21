@@ -1,0 +1,2 @@
+{"similarity_version": "VERSION_PODOBIENSTW", "dataset_version": "VERSION_ZBIORU", "relation": "shared_template",
+ "quality": "cpm", "resolution": 0.5, "min_edge_weight": 0.1, "popularity_alpha": 1.0, "popular_degree": 5, "repeats": 10}
