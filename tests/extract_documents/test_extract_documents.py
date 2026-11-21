@@ -218,7 +218,7 @@ def test_pdf_text_persisted_via_real_store(tmp_path):
     a = Artifact(artifact_id=ids.artifact_id(oid, "document", sha, "page.pdf"), observation_id=oid,
                  role=ArtifactRole.document, local_ref=st.blob_ref(sha), sha256=sha, size=size,
                  media_type="application/pdf", origin="page.pdf")
-    obs = Observation(observation_id=oid, canonical_id=ids.canonical_id([("document", sha)]),
+    obs = Observation(observation_id=oid, canonical_id=ids.canonical_id([], "synthetic://pdf"),
                       source_ref="synthetic://pdf", input_kind=InputKind.full_capture, artifacts=[a])
     st.save_observation(obs, "imp1")
     feats, sts = DocumentsExtractor().extract(obs, reader=st, optional={"store": st})
