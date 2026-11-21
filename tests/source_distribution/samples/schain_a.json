@@ -1,0 +1,8 @@
+{
+  "ver": "1.0",
+  "complete": 1,
+  "nodes": [
+    {"asi": "ssp.example.test", "sid": "3333", "hp": 1, "rid": "req-1"},
+    {"asi": "adnet.example.test", "sid": "1111", "hp": 1, "rid": "req-2", "name": "Pub Alpha Inc", "domain": "pub-a.example.test"}
+  ]
+}

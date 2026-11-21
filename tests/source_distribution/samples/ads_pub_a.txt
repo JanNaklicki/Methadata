@@ -1,0 +1,8 @@
+# ads.txt wydawcy A (syntetyczny, example.test)
+adnet.example.test, 1111, DIRECT, abc123
+adnet.example.test, 2222, RESELLER
+ssp.example.test, 3333, RESELLER  # komentarz w linii
+CONTACT=ads@pub-a.example.test
+OWNERDOMAIN=pub-a.example.test
+,9999,DIRECT
+to jest blad bez przecinkow
