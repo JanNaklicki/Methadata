@@ -1,7 +1,5 @@
 import itertools
 import random
-import sys
-from pathlib import Path
 
 import pytest
 
@@ -151,12 +149,5 @@ def test_baseline_measurement_section1():
 
 
 def test_adapter_discovery():
-    ext = Path(__file__).resolve().parents[2] / "src/methadata/clustering/components"
-    sys.path.insert(0, str(ext))
-    try:
-        found = discover(AdapterKind.clusterer)
-    finally:
-        sys.path.remove(str(ext))
-        for k in [k for k in sys.modules if k.startswith("methadata_ext")]:
-            del sys.modules[k]
+    found = discover(AdapterKind.clusterer)
     assert isinstance(found["components-threshold-v1"], ComponentsClusterer)
