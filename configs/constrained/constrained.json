@@ -1,0 +1,9 @@
+{
+  "threshold": 0.5,
+  "similarity_version": "asset-jaccard-v1",
+  "dataset_version": "SET-ME",
+  "relation": "shared_template",
+  "constraints": [
+    {"a": "CANONICAL_A", "b": "CANONICAL_C", "kind": "cannot", "relation": "shared_template", "analyst": "analyst-1", "note": "różne szablony mimo mostu przez B"}
+  ]
+}
