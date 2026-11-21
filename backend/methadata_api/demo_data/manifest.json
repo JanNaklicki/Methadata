@@ -1,0 +1,11 @@
+{
+  "synthetic": true,
+  "dataset_name": "Zestaw demonstracyjny (3 materiały, syntetyczny)",
+  "dataset_version": "synthetic-demo-1",
+  "description": "Jawnie syntetyczny zestaw przykładowy dostarczany z projektem. W indeksie są dwa materiały (A i B); analiza trzeciego materiału (C) odnajduje A, z którym ma wspólne grafiki.",
+  "index": [
+    {"dir": "ad-a", "label": "Reklama A (przykład syntetyczny)"},
+    {"dir": "ad-b", "label": "Reklama B (przykład syntetyczny)"}
+  ],
+  "target": {"dir": "ad-c", "label": "Reklama C (przykład syntetyczny)"}
+}

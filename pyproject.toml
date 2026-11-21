@@ -11,6 +11,7 @@ dependencies = ["pydantic>=2.5,<3"]
 
 [project.optional-dependencies]
 test = ["pytest>=8", "jsonschema>=4.20", "pyyaml>=6", "openapi-spec-validator>=0.7"]
+web = ["fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9", "httpx>=0.27"]
 media = ["Pillow>=10"]
 pdf = ["pypdf>=4"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
@@ -29,9 +30,10 @@ lexical = "methadata.experiments.lexical:get_adapters"
 near-copy = "methadata.experiments.near_copy:get_adapters"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["src", "backend"]
 
 [tool.setuptools.package-data]
+"methadata_api" = ["demo_data/manifest.json", "demo_data/*/*.html", "demo_data/*/*.png", "demo_data/*/assets/*.png"]
 "methadata.contracts" = ["schemas/v1/*.json"]
 
 [tool.pytest.ini_options]
