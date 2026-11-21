@@ -1,0 +1,31 @@
+{
+  "name": "fusion-eval-v1",
+  "note": "Wagi i progi nie sa dopasowane do danych: neutralne ustawienia wyjsciowe (rowne wagi, support_min = threshold). Ocena bada ich wplyw, nie je dostraja.",
+  "threshold": 0.5,
+  "probe_threshold": 0.13,
+  "coverage_min": 0.5,
+  "families": {
+    "asset": {"method_id": "assets-jaccard-v1", "weight": 1.0, "origin": "asset", "support_min": 0.5},
+    "text": {"method_id": "lexical-tfidf-v1", "weight": 1.0, "origin": "content-text", "support_min": 0.5},
+    "dom": {"method_id": "dom-paths-jaccard-v1", "weight": 1.0, "origin": "dom-structure", "support_min": 0.5}
+  },
+  "extractors": ["assets-hash-extractor", "lexical-text-extractor", "dom-struct-extractor"],
+  "profiles": {
+    "baseline": {"hypothesis": "szablon", "families": ["asset"], "min_support": 1},
+    "tylko-text": {"hypothesis": "narracja", "families": ["text"], "min_support": 1},
+    "tylko-dom": {"hypothesis": "szablon", "families": ["dom"], "min_support": 1},
+    "szablon": {"hypothesis": "szablon", "families": ["asset", "dom"], "min_support": 1},
+    "kampania": {"hypothesis": "kampania", "families": ["asset", "text", "dom"], "min_support": 2},
+    "kampania-scisla": {"hypothesis": "kampania", "families": ["asset", "text", "dom"], "min_support": 3}
+  },
+  "ablate": ["szablon", "kampania"],
+  "reference": {
+    "note": "Szablon/rodziny wg PLAN_KLASTROWANIA.md (p2/p7/p15, p8/p11 potwierdzone grafikami i DOM; p3/p4 = ten sam schemat, hipoteza kampanii niepotwierdzona). Reszta: singletony.",
+    "families": [["p2", "p7", "p15"], ["p8", "p11"], ["p3", "p4"]],
+    "campaign_confirmed": [["p2", "p7", "p15"], ["p8", "p11"]]
+  },
+  "control_cases": {
+    "p2/p7/p15": ["p2", "p7", "p15"],
+    "p3/p4": ["p3", "p4"]
+  }
+}
