@@ -1,0 +1,12 @@
+{
+  "name": "incremental-v1",
+  "note": "Przyrostowe dołączanie przez reprezentanta i próbkę członków. Wagi/progi fuzji pochodzą z configs/fusion/eval.json (profil); tu tylko parametry przyrostu, bez dopasowania do danych.",
+  "profile": "kampania",
+  "sample_size": 2,
+  "min_fraction": 0.5,
+  "holdout": ["p15"],
+  "order_experiments": [
+    {"holdout": ["p2", "p7", "p15"]},
+    {"holdout": ["p8", "p11", "p15"]}
+  ]
+}
