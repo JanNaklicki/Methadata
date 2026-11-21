@@ -22,6 +22,7 @@ provenance = ["c2pa-python>=0.30", "cryptography>=42"]
 perceptual = ["numpy>=1.24", "Pillow>=10", "opencv-python-headless>=4.8"]
 semantic = ["sentence-transformers>=3"]
 speech = ["faster-whisper>=1.0"]  # opcjonalna transkrypcja (E16); wagi do katalogu cache poza repo
+visual-embedding = ["numpy>=1.24", "Pillow>=10", "torch>=2.1", "open_clip_torch>=2.24"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
 [project.entry-points."methadata.adapters"]
@@ -71,6 +72,7 @@ perceptual = "methadata.experiments.perceptual:get_adapters"
 temporal = "methadata.experiments.temporal:get_adapters"
 semantic = "methadata.experiments.semantic:get_adapters"
 video-audio = "methadata.experiments.video_audio:get_adapters"
+visual-embedding = "methadata.experiments.visual_embedding:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src", "backend"]
