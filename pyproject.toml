@@ -17,6 +17,7 @@ pdf = ["pypdf>=4"]
 ocr = ["Pillow>=10", "rapidocr-onnxruntime>=1.2"]
 graph = ["leidenalg>=0.10", "igraph>=0.11"]
 density = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
+spectral = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
 provenance = ["c2pa-python>=0.30", "cryptography>=42"]
 perceptual = ["numpy>=1.24", "Pillow>=10", "opencv-python-headless>=4.8"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
@@ -29,6 +30,7 @@ components = "methadata.clustering.components:ADAPTERS"
 linkage = "methadata.clustering.linkage:get_adapters"
 density = "methadata.clustering.density:get_adapters"
 leiden = "methadata.clustering.leiden:get_adapters"
+spectral = "methadata.clustering.spectral:get_adapters"
 overlapping = "methadata.clustering.overlapping:get_adapters"
 medoids = "methadata.clustering.medoids:get_adapters"
 soft-membership = "methadata.clustering.soft_membership:get_adapters"
