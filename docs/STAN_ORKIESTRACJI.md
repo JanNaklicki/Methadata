@@ -21,11 +21,12 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - K03 (`1be5c51`). DBSCAN odtworzył grupy F04, OPTICS dodał p3/p4, a HDBSCAN utworzył m.in. trójkę z zerowym podobieństwem we wszystkich parach. Na próbce kontrolnej wszystkie trzy metody odtworzyły oczekiwaną parę i trójkę oraz rozdzieliły szum od braku danych. [Konfiguracja i pomiary](../configs/density/README.md)
 
 ## W toku — koordynator Claude (nie wydawać ponownie)
-- E09 `codex/exp-perceptual`, E12 `codex/exp-production-kit`, S03 `codex/source-contact`, K04 `codex/cluster-medoids`, S06 `codex/source-mobile-app`.
+- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05.
+- W toku: S04 `codex/source-payee`, S10 `codex/source-offer-id`, S07 `codex/source-media-provenance`, S09 `codex/source-distribution`.
 
 ## Następne (zależności już w main)
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
-- Od razu: K06, K07, K13, E06, S04, S05, S10, E11, E16, S02, E15, S07, S09, K08, K15, K12, E17, K10, K14, K11, R04.
+- Od razu: K06, K07, K13, E06, E11, E16, S02, E15, K08, K15, K12, E17, K10, K14, K11, R04.
 
 ## Konwencje (obowiązkowe dla wykonawców)
 - Adaptery: entry point `[project.entry-points."methadata.adapters"]`, test `discover()`; bez shimów `methadata_ext`.
@@ -36,6 +37,7 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 ## Znane luki do późniejszej integracji
 - Runner F03 nie przekazuje komparatorom korpusu (ważony Jaccard E01, rare-motifs E14, IDF E02 bez modelu) — pełne wyniki tylko ścieżką `methadata.clustering.fusion run` / baseline.
 - E10: heurystyka układu słaba na postach społecznościowych; E08: etykiety obrazów referencyjnych `verified=false`.
+- S03/S04: klucz HMAC PII z METHADATA_PII_KEY lub METHADATA_PII_KEY_DIR; domyślnie katalog tymczasowy (klucz może zniknąć) — ustawić na stałe przed produkcją.
 - R01: ścieżka TLS/internet nietestowana. X05: klatki wideo nietestowane (brak ffmpeg).
 
 ## Wznowienie
