@@ -237,7 +237,8 @@ def run_eval(store_dir: str | Path, baseline_cfg: Mapping[str, Any], cfg: Mappin
                       if v["accepted"] or v["status"] == "insufficient_support" or v["fused"] and v["fused"] >= 0.3]
     report["recommendation"] = _recommendation(report)
     markdown = render_markdown(report)
-    return {"report": report, "markdown": markdown, "results": results, "fused": fused_res, "bundle": ext["bundle"]}
+    return {"report": report, "markdown": markdown, "results": results, "fused": fused_res, "bundle": ext["bundle"],
+            "raw": raw, "label": label, "seed": seed, "dataset_version": dataset_version}   # wejścia dla E18
 
 
 def _contribution(cfg, results):

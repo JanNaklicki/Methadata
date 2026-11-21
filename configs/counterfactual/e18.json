@@ -1,0 +1,8 @@
+{
+  "name": "counterfactual-v1",
+  "note": "Stala konfiguracja fuzji: profil z F06 (configs/fusion/eval.json), wagi, progi i min_support bez zmian; zmienia sie tylko zestaw wlaczonych rodzin.",
+  "profile": "kampania",
+  "families": ["asset", "text", "dom"],
+  "min_family_drop_similarity": 0.0,
+  "targets": ["p2", "p3", "p8"]
+}
