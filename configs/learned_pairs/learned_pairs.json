@@ -1,0 +1,2 @@
+{"seed": 0, "heldout_fraction": 0.3, "l2": 0.1, "queue": 10,
+ "methods": ["assets-jaccard-v1", "assets-weighted-jaccard-v1"], "relation": "shared_template"}
