@@ -1,20 +1,24 @@
 # Stan orkiestracji (2026-11-21)
 
-Lokalny `main` po scaleniu W02 (niepublikowany na origin). Pełny pytest: 282 passed, 2 skipped (brak ffmpeg, brak próbek jQuery).
+Lokalny `main` po scaleniu W04 i E18. Pełny pytest zaliczył 310 testów i pominął 2 z powodu braku ffmpeg i próbki jQuery.
 
 ## Scalone do main
 F01, E01, K01, F03, W01, X01, X03, X05, S01, F02 (+ujednolicony DerivedStore), X04 (+kanoniczny DerivedStore),
-E02, E03, F05, F04, E05, R01, E04, E10, K02, E14, E13, X02, K09, E08, E07, W02, W03, F06, K05, poprawki testów (TFIX, TFIX2).
+E02, E03, F05, F04, E05, R01, E04, E10, K02, E14, E13, X02, K09, E08, E07, W02, W03, F06, K05, W04, E18, poprawki testów (TFIX, TFIX2).
 
 ## W02 (backend)
 Start: `METHADATA_DATA_DIR=var/methadata-data .venv/bin/python -m methadata_api` (port 8000; METHADATA_HOST/PORT/WORKERS), opis w backend/README.md.
 Walidacja: `python contracts/http/check_conformance.py --base-url http://localhost:8000` → OK. Ograniczenia: jedyny profil analizy `demo` (baseline assets-jaccard, bez fuzji K09); URL bez pobierania (offline); kolejka w jednym procesie.
 
+## W04 i E18
+
+- W04 (`64a88f8`). Trzy scenariusze Playwright na Compose przeszły przed zatrzymaniem backendu i po jego przywróceniu. Podczas awarii główny scenariusz zgłosił HTTP 502, a test komunikatu w UI przeszedł. [Instrukcja i wyniki](../tests/web-e2e/README.md)
+- E18 (`8bb01e5`). CLI przeliczyło siedem kombinacji dla każdego z trzech celów na lokalnym korpusie. Wynik zawiera bazę i 21 scenariuszy, zmiany krawędzi oraz dowody gotowe do odczytu przez R03. [Konfiguracja, instrukcja i wyniki](../configs/counterfactual/README.md)
+
 ## Następne (zależności już w main)
-- PRZERWANE (WIP, niezweryfikowane, worktree zachowany): W04 `codex/web-e2e`, E18 `codex/exp-counterfactual` (worktree w .claude/worktrees/<KARTA>).
-- Demo: po W04 i E18 → R02 → R03.
+- R02 jest gotowe do przydzielenia po scaleniu W04 i F06. R03 można przydzielić po scaleniu R02.
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
-- Od razu: K03, K04, K06, K07, K13, E06, S04, S05, S10, E09, E11, E16, S02, E15, S06, S07, S09, E12, S03, K08, K15, K12, E17 (po F06), K10/K14 (po F06), K11 (po F06), K06 (po K05), R04.
+- Od razu: K03, K04, K06, K07, K13, E06, S04, S05, S10, E09, E11, E16, S02, E15, S06, S07, S09, E12, S03, K08, K15, K12, E17, K10, K14, K11, R04.
 
 ## Konwencje (obowiązkowe dla wykonawców)
 - Adaptery: entry point `[project.entry-points."methadata.adapters"]`, test `discover()`; bez shimów `methadata_ext`.
