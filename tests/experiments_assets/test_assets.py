@@ -104,3 +104,10 @@ def test_order_independent_and_adapters_valid():
     from methadata.experiments.assets import get_adapters
     for ad in get_adapters():
         check_adapter(ad)
+
+
+def test_discover_finds_adapters():
+    from methadata.contracts import discover
+    found = discover()
+    for i in ("assets-hash-extractor", "assets-jaccard-v1", "assets-weighted-jaccard-v1"):
+        assert i in found
