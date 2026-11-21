@@ -20,13 +20,13 @@ def mk(name, start, stop=None, cap="2026-11-01T10:00:00Z", domain=None, img=None
 
     def add(fam, kind, v):
         fs.append(Feature(feature_id=ids.feature_id(oid, fam, kind, "t/1", v), observation_id=oid, family=fam, kind=kind,
-                          value_type=ValueType.string, value=v, extractor_version="t/1", evidence_refs=ref))
+                          value_type=ValueType.json if isinstance(v, dict) else ValueType.string, value=v, extractor_version="t/1", evidence_refs=ref))
     if start:
         add("payer", "delivery_start", start)
     if stop:
         add("payer", "delivery_stop", stop)
     if domain:
-        add("url", "domain", domain)
+        add("url_har", "url_parts", {"host": domain})
     for i in ([img] if isinstance(img, str) else img or []):
         add("asset", "image_sha256", i)
     return obs, fs
@@ -115,3 +115,48 @@ def test_config_file_matches_defaults():
     p = Path(__file__).resolve().parents[2] / "configs" / "temporal" / "temporal.json"
     c = json.loads(p.read_text())
     assert all(c[k] == DEFAULT_CONFIG[k] for k in DEFAULT_CONFIG)
+
+
+def test_registrable_domain():
+    from methadata.experiments.temporal.series import host_of, registrable_domain
+    assert registrable_domain("sub.sklep.example.com") == "example.com"
+    assert registrable_domain("a.sklep.com.pl") == "sklep.com.pl" and registrable_domain("x.shop.co.uk") == "shop.co.uk"
+    assert registrable_domain("1.2.3.4") == "1.2.3.4" and registrable_domain("localhost") == "localhost"
+    assert host_of({"host": "www.promo.example.pl", "path": "/"}) == "example.pl"
+
+
+def test_integration_real_extractors_series_on_three_domains():
+    from methadata.experiments.url_har import UrlHarExtractor
+    from methadata.sources.payer import PayerExtractor
+
+    class Mem:
+        def __init__(self): self.d = {}
+        def open_bytes(self, ref): return self.d[ref.artifact_id]
+    mem = Mem()
+    obs, fm = [], {}
+    for n, (url, start, stop) in enumerate([("https://www.oferta.alfa.pl/a?x=1", "2026-09-01", "2026-09-10"),
+                                            ("https://promo.beta.com.pl/b", "2026-09-07", "2026-09-20"),
+                                            ("https://gamma.example.com/c", "2026-09-14", "2026-09-30"),
+                                            ("https://delta.pl/d", "2025-01-01", "2025-01-10")]):
+        data = json.dumps({"id": str(n), "page_name": "Marka", "ad_delivery_start_time": start,
+                           "ad_delivery_stop_time": stop,
+                           "beneficiary_payers": [{"payer": "Firma X", "beneficiary": "Firma X"}]}).encode()
+        oid = ids.observation_id(f"synthetic://i{n}", "full_capture")
+        sha = ids.sha256_bytes(data)
+        doc = Artifact(artifact_id=ids.artifact_id(oid, "document", sha, "r.json"), observation_id=oid, role="document",
+                       local_ref=f"i{n}/r.json", sha256=sha, media_type="application/json", origin="r.json")
+        inp = Artifact(artifact_id=ids.artifact_id(oid, "input_url", ids.sha256_bytes(url.encode())), observation_id=oid,
+                       role="input_url", url=url, sha256=ids.sha256_bytes(url.encode()))
+        mem.d[doc.artifact_id] = data
+        o = Observation(observation_id=oid, canonical_id=f"can-i{n}", source_ref=f"synthetic://i{n}",
+                        input_kind=InputKind.creative_only, artifacts=[doc, inp], tags=["synthetic"],
+                        capture_time="2026-11-01T10:00:00Z")
+        obs.append(o)
+        fm[oid] = list(PayerExtractor().extract(o, reader=mem)[0]) + list(UrlHarExtractor().extract(o, reader=mem)[0])
+    cfg = {"pattern_kinds": [["payer", "payer_name"]], "max_gap_days": 14}
+    its = items(obs, fm, cfg)
+    assert [i.domain for i in its] == ["alfa.pl", "beta.com.pl", "example.com", "delta.pl"]
+    [s] = detect_series(its, cfg)   # bez delta.pl (rok wcześniej, poza oknem odstępu)
+    assert s.kind == "sequential" and [m.domain for m in s.members] == ["alfa.pl", "beta.com.pl", "example.com"]
+    [pe] = TemporalComparator(cfg).compare(obs[0], obs[1], fm, run_id="r1")
+    assert pe.score == 1.0

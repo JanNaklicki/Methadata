@@ -12,7 +12,7 @@ VERSION = "1"
 DEFAULT_CONFIG = {
     "timezone": DEFAULT_TZ,
     "pattern_kinds": [["asset", "image_sha256"]],   # (family, kind) cech tworzących wzorzec
-    "domain_kinds": [["url", "domain"], ["url", "host"], ["network", "host"]],
+    "domain_kinds": [["url_har", "url_parts"]],   # E04: value_type=json z polem "host"
     "max_gap_days": 14.0,          # największy odstęp między kolejnymi startami w jednej serii
     "min_domains": 3,              # minimum różnych domen w serii
     "coactivity_cap": 0.2,         # sufit wyniku pary z samą zbieżnością okresu (bez wspólnego wzorca)
@@ -26,11 +26,30 @@ def cfg(over: Optional[Mapping[str, Any]] = None) -> dict:
     return c
 
 
+# Wielopoziomowe końcówki publiczne (skrócona lista; pełna wymagałaby Public Suffix List).
+_SLD = {"co", "com", "net", "org", "gov", "edu", "ac"}
+_MULTI = {"waw.pl", "info.pl", "biz.pl", "com.pl", "net.pl", "org.pl", "edu.pl", "gov.pl", "co.uk", "org.uk", "ac.uk",
+          "com.au", "com.br", "co.jp", "co.nz", "co.za", "com.tr", "com.ua", "co.in"}
+
+
+def registrable_domain(host: str) -> str:
+    """Domena rejestrowana: ostatnie dwie etykiety, trzy dla znanych końcówek (co.uk, com.pl). IP i pojedyncze etykiety bez zmian."""
+    h = (host or "").strip().lower().strip(".")
+    labels = h.split(".")
+    if len(labels) <= 2 or all(x.isdigit() for x in labels[-1:]) or ":" in h:
+        return h
+    n = 3 if ".".join(labels[-2:]) in _MULTI else 2
+    return ".".join(labels[-n:])
+
+
 def host_of(value: Any) -> str:
+    """Host z wartości cechy: dict (url_parts: pole host) albo tekst (host lub URL); -> domena rejestrowana."""
+    if isinstance(value, Mapping):
+        value = value.get("host")
     v = str(value or "").strip().lower()
     if "//" in v:
         v = urlsplit(v).hostname or ""
-    return v.removeprefix("www.").strip(".")
+    return registrable_domain(v.removeprefix("www."))
 
 
 @dataclass

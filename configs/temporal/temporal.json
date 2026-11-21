@@ -8,16 +8,8 @@
   ],
   "domain_kinds": [
     [
-      "url",
-      "domain"
-    ],
-    [
-      "url",
-      "host"
-    ],
-    [
-      "network",
-      "host"
+      "url_har",
+      "url_parts"
     ]
   ],
   "max_gap_days": 14.0,
