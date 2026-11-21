@@ -11,9 +11,7 @@ from methadata.ingest.__main__ import main as ingest_main
 
 ROOT = Path(__file__).resolve().parents[3]
 CONFIG = ROOT / "configs" / "baseline" / "baseline.json"
-BACKUP = Path(os.environ.get("METHADATA_BACKUP", ROOT.parents[2] / "BACKUP"))
-if not BACKUP.is_dir():  # worktree w .claude/worktrees/<id>: BACKUP leży w głównym katalogu projektu
-    BACKUP = next((p / "BACKUP" for p in ROOT.parents if (p / "BACKUP").is_dir()), BACKUP)
+from methadata.devtools.realdata import BACKUP
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 24
 
 
