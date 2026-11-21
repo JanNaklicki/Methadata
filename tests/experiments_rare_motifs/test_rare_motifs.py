@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import json
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from methadata.contracts.registry import discover
 from methadata.experiments.rare_motifs import (MotifConfig, RareMotifComparator, TraceConfig, TraceMatrix, ablate_rarest,
                                                dumps, mine_motifs, minimal_signature, store_export)
 
-BACKUP = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
+BACKUP = _REAL_BACKUP
 RES_A, RES_B = "https://cdn.evil.example/kit/pay.js", "https://cdn.evil.example/kit/img.png"
 FORM = {"method": "post", "action": "/x", "action_resolved": "https://a.example/x",
         "fields": [{"tag": "input", "name": "card", "type": "text"}, {"tag": "input", "name": "cvv", "type": "text"}]}

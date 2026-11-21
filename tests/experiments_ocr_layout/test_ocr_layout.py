@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import io
 import json
 from pathlib import Path
@@ -252,7 +253,7 @@ def test_real_ocr_layout_on_rendered_ad_two_resolutions():
 
 
 def _backup_shot():
-    p = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP/p1/Zrzut ekranu 2026-10-08 105745.png")
+    p = _REAL_BACKUP / "p1" / "Zrzut ekranu 2026-10-08 105745.png"
     if not p.is_file():
         pytest.skip("brak danych BACKUP")
     return p.read_bytes()

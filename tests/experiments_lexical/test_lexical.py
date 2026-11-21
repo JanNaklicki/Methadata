@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 from pathlib import Path
 
 import pytest
@@ -8,7 +9,7 @@ from methadata.experiments.lexical import (LexicalModel, LexicalTextExtractor, L
                                            sections)
 from methadata.experiments.lexical.tfidf import cosine
 
-BACKUP_ABS = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
+BACKUP_ABS = _REAL_BACKUP
 
 
 class Reader:

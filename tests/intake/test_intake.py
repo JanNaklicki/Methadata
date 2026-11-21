@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import os
 import socket
 import threading
@@ -183,7 +184,7 @@ def test_file_submissions_image_html_video(tmp_path):
     assert submit_files([f], st).count("new") == 1
 
 
-REAL = Path(os.environ.get("METHADATA_BACKUP", Path(__file__).resolve().parents[2].parent.parent.parent / "BACKUP")).parent / "scam_links.dec"
+REAL = _REAL_BACKUP.parent / "scam_links.dec"
 
 
 @pytest.mark.skipif(not REAL.is_file(), reason="brak danych rzeczywistych")

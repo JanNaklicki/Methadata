@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import json
 from pathlib import Path
 
@@ -7,7 +8,7 @@ from methadata.contracts import Artifact, ArtifactRef, Bundle, InputKind, Observ
 from methadata.experiments.funnel import (FunnelComparator, FunnelExtractor, analyze_html, edit_similarity,
                                           lcs_pairs, lcs_similarity)
 
-BACKUP = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
+BACKUP = _REAL_BACKUP
 LONG = "Lorem ipsum dolor sit amet consectetur. " * 8
 
 

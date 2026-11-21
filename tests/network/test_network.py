@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import base64
 import json
 import os
@@ -203,7 +204,7 @@ def test_deterministic_and_discover():
     assert "network-extractor" in discover()
 
 
-BACKUP = Path(os.environ.get("METHADATA_BACKUP", "/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP"))
+BACKUP = _REAL_BACKUP
 
 
 @pytest.mark.skipif(not BACKUP.is_dir(), reason="brak katalogu BACKUP")
