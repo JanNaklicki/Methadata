@@ -1,0 +1,419 @@
+{
+  "$defs": {
+    "Artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "display_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Url"
+        },
+        "local_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Ref"
+        },
+        "media_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Media Type"
+        },
+        "observation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "origin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Origin"
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "parent_relation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParentRelation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "role": {
+          "$ref": "#/$defs/ArtifactRole"
+        },
+        "schema_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "observation_id",
+        "role",
+        "sha256"
+      ],
+      "title": "Artifact",
+      "type": "object"
+    },
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "description": "Odwołanie do artefaktu, opcjonalnie do jego fragmentu. Bez locator = cały artefakt.",
+      "properties": {
+        "artifact_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "byte_range": "#/$defs/ByteRange",
+                  "har_entry": "#/$defs/HarEntry",
+                  "image_rect": "#/$defs/ImageRect",
+                  "text_span": "#/$defs/TextSpan"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                {
+                  "$ref": "#/$defs/ImageRect"
+                },
+                {
+                  "$ref": "#/$defs/HarEntry"
+                },
+                {
+                  "$ref": "#/$defs/ByteRange"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        }
+      },
+      "required": [
+        "artifact_id"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "ArtifactRole": {
+      "enum": [
+        "landing_html",
+        "landing_dom",
+        "landing_screenshot",
+        "creative_image",
+        "resource",
+        "har",
+        "input_url",
+        "archive",
+        "document",
+        "video",
+        "audio",
+        "vector_store",
+        "graph_edges",
+        "other"
+      ],
+      "title": "ArtifactRole",
+      "type": "string"
+    },
+    "ByteRange": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "byte_range",
+          "default": "byte_range",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "ByteRange",
+      "type": "object"
+    },
+    "HarEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "har_entry",
+          "default": "har_entry",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index"
+      ],
+      "title": "HarEntry",
+      "type": "object"
+    },
+    "ImageRect": {
+      "additionalProperties": false,
+      "properties": {
+        "frame_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frame Ms"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "title": "Height",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "image_rect",
+          "default": "image_rect",
+          "title": "Kind",
+          "type": "string"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "title": "Width",
+          "type": "integer"
+        },
+        "x": {
+          "minimum": 0,
+          "title": "X",
+          "type": "integer"
+        },
+        "y": {
+          "minimum": 0,
+          "title": "Y",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "title": "ImageRect",
+      "type": "object"
+    },
+    "InputKind": {
+      "enum": [
+        "full_capture",
+        "url_only",
+        "creative_only"
+      ],
+      "title": "InputKind",
+      "type": "string"
+    },
+    "ParentRelation": {
+      "enum": [
+        "archive_member",
+        "har_response",
+        "inline_in",
+        "referenced_by",
+        "derived_from"
+      ],
+      "title": "ParentRelation",
+      "type": "string"
+    },
+    "TextSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "text_span",
+          "default": "text_span",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TextSpan",
+      "type": "object"
+    }
+  },
+  "$id": "https://methadata.local/schemas/v1/observation.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/Artifact"
+      },
+      "minItems": 1,
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "canonical_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+      "title": "Canonical Id",
+      "type": "string"
+    },
+    "capture_time": {
+      "anyOf": [
+        {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capture Time"
+    },
+    "input_kind": {
+      "$ref": "#/$defs/InputKind"
+    },
+    "observation_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+      "title": "Observation Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_ref": {
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "array"
+    }
+  },
+  "required": [
+    "observation_id",
+    "canonical_id",
+    "source_ref",
+    "input_kind",
+    "artifacts"
+  ],
+  "title": "Observation",
+  "type": "object"
+}

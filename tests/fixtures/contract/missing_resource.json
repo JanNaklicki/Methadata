@@ -1,0 +1,170 @@
+{
+  "features": [],
+  "observations": [
+    {
+      "artifacts": [
+        {
+          "artifact_id": "art-02007799b96986e5",
+          "display_url": null,
+          "local_ref": "obs-5b399a255c21158c/page.html",
+          "media_type": "text/html",
+          "observation_id": "obs-5b399a255c21158c",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "landing_html",
+          "schema_version": "1",
+          "sha256": "56a6c1607f98a5c34407db87d886bd2d88fe7b0dc371c7c4016fc200dff82535",
+          "size": 1000,
+          "url": null
+        }
+      ],
+      "canonical_id": "can-eb89c1a531d76442",
+      "capture_time": null,
+      "input_kind": "full_capture",
+      "observation_id": "obs-5b399a255c21158c",
+      "schema_version": "1",
+      "source_ref": "synthetic://contract/missing-1",
+      "tags": [
+        "synthetic"
+      ]
+    },
+    {
+      "artifacts": [
+        {
+          "artifact_id": "art-b237f0a20395ccd5",
+          "display_url": null,
+          "local_ref": "obs-c8bdc54a69cea82d/page.html",
+          "media_type": "text/html",
+          "observation_id": "obs-c8bdc54a69cea82d",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "landing_html",
+          "schema_version": "1",
+          "sha256": "8e56ecf6867fc5a93d8268d6ffa11269df7d29604f97c72d99caa57db3fc963a",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-e6605c57081832b9",
+          "display_url": null,
+          "local_ref": "obs-c8bdc54a69cea82d/capture.har",
+          "media_type": null,
+          "observation_id": "obs-c8bdc54a69cea82d",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "har",
+          "schema_version": "1",
+          "sha256": "6c6c82543702f33227c22f7fd3e6a910752962afc811f4328715becd657cccd4",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-48eb898c38afe868",
+          "display_url": null,
+          "local_ref": "obs-c8bdc54a69cea82d/screenshot.png",
+          "media_type": null,
+          "observation_id": "obs-c8bdc54a69cea82d",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "landing_screenshot",
+          "schema_version": "1",
+          "sha256": "7b41efe3e4e8e04794c97227626b4231b2a3657d3246b63db561b0c4dc75f35c",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-98e558d2879fa4d5",
+          "display_url": null,
+          "local_ref": "obs-c8bdc54a69cea82d/res/hero.webp",
+          "media_type": null,
+          "observation_id": "obs-c8bdc54a69cea82d",
+          "origin": "res/hero.webp",
+          "parent": {
+            "artifact_id": "art-b237f0a20395ccd5",
+            "locator": {
+              "end": 190,
+              "kind": "text_span",
+              "start": 120
+            }
+          },
+          "parent_relation": "referenced_by",
+          "role": "resource",
+          "schema_version": "1",
+          "sha256": "c4d42b36d41f49b6e8458bf97a0f50d0285b740ac21396d849a3cccd06d17c65",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-ead8a70394e4d8fc",
+          "display_url": null,
+          "local_ref": "obs-c8bdc54a69cea82d/res/body.js",
+          "media_type": null,
+          "observation_id": "obs-c8bdc54a69cea82d",
+          "origin": "har:3",
+          "parent": {
+            "artifact_id": "art-e6605c57081832b9",
+            "locator": {
+              "index": 3,
+              "kind": "har_entry"
+            }
+          },
+          "parent_relation": "har_response",
+          "role": "resource",
+          "schema_version": "1",
+          "sha256": "3c5bb990ba4b4723634f4f24e4497358d0e9749d722eb193785243d67b4610eb",
+          "size": 1000,
+          "url": null
+        }
+      ],
+      "canonical_id": "can-fb89fc89dbc10fa6",
+      "capture_time": "2026-10-08T09:09:40Z",
+      "input_kind": "full_capture",
+      "observation_id": "obs-c8bdc54a69cea82d",
+      "schema_version": "1",
+      "source_ref": "synthetic://contract/ad-002",
+      "tags": [
+        "synthetic"
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "evidence_refs": {},
+      "explanation": "Porównanie niewykonalne: brak zasobów po jednej stronie.",
+      "method_id": "asset-jaccard-v1",
+      "pair": [
+        "can-eb89c1a531d76442",
+        "can-fb89fc89dbc10fa6"
+      ],
+      "pair_evidence_id": "pev-a7d1efe0130e3fca",
+      "relation": "shared_template",
+      "run_id": "run-missing",
+      "schema_version": "1",
+      "score": null
+    }
+  ],
+  "runs": [],
+  "schema_version": "1",
+  "statuses": [
+    {
+      "artifact_id": null,
+      "detail": "brak HAR",
+      "extractor_version": "demo-1",
+      "observation_id": "obs-5b399a255c21158c",
+      "schema_version": "1",
+      "state": "missing_input"
+    },
+    {
+      "artifact_id": "art-02007799b96986e5",
+      "detail": null,
+      "extractor_version": "demo-1",
+      "observation_id": "obs-5b399a255c21158c",
+      "schema_version": "1",
+      "state": "ok"
+    }
+  ]
+}
