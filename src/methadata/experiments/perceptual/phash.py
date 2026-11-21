@@ -5,13 +5,12 @@ import io
 from functools import lru_cache
 from typing import Optional
 
-import numpy as np
-
 SIZE, LOW = 32, 8
 
 
 @lru_cache(maxsize=1)
-def _dct_matrix() -> np.ndarray:
+def _dct_matrix():
+    import numpy as np
     n = SIZE
     k = np.arange(n)[:, None]
     m = np.cos(np.pi * (2 * np.arange(n)[None, :] + 1) * k / (2 * n)) * np.sqrt(2.0 / n)
@@ -37,6 +36,7 @@ def load_gray(data: bytes):
 
 def phash_gray(gray, flat_std: float = 2.0) -> Optional[int]:
     """64-bitowy pHash; None dla obrazu płaskiego (brak informacji - hash byłby kolizją wszystkich płaskich)."""
+    import numpy as np
     from PIL import Image
     px = np.asarray(gray.resize((SIZE, SIZE), Image.Resampling.LANCZOS), dtype=np.float64)
     if float(px.std()) < flat_std:

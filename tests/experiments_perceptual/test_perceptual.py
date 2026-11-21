@@ -2,7 +2,10 @@ import json
 from pathlib import Path
 
 import pytest
-from PIL import Image
+
+for _m in ("numpy", "cv2", "PIL"):
+    pytest.importorskip(_m)
+from PIL import Image  # noqa: E402
 
 from methadata.contracts import AdapterKind, Artifact, InputKind, Observation, ids
 from methadata.contracts.models import ImageRect
