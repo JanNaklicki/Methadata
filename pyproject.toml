@@ -15,7 +15,7 @@ web = ["fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9", "httpx>=0.2
 media = ["Pillow>=10"]
 pdf = ["pypdf>=4"]
 ocr = ["Pillow>=10", "rapidocr-onnxruntime>=1.2"]
-graph = ["leidenalg>=0.10", "igraph>=0.11"]
+graph = ["leidenalg>=0.10", "igraph>=0.11"]  # igraph: community_infomap (K15), leidenalg (K05)
 density = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
 spectral = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
 provenance = ["c2pa-python>=0.30", "cryptography>=42"]
@@ -33,6 +33,7 @@ learned-pairs = "methadata.experiments.learned_pairs.adapters:get_adapters"
 leiden = "methadata.clustering.leiden:get_adapters"
 spectral = "methadata.clustering.spectral:get_adapters"
 consensus = "methadata.clustering.consensus:get_adapters"
+graph-walk = "methadata.clustering.graph_walk:get_adapters"
 overlapping = "methadata.clustering.overlapping:get_adapters"
 constrained = "methadata.clustering.constrained:get_adapters"
 bicluster = "methadata.clustering.bicluster:get_adapters"
