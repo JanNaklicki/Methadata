@@ -1,0 +1,16 @@
+{
+  "icon_max_side": 256,
+  "phash_threshold": 10,
+  "phash_flat_std": 2.0,
+  "kp_max_features": 300,
+  "kp_work_side": 640,
+  "kp_ratio": 0.75,
+  "kp_ransac_px": 4.0,
+  "kp_min_inliers": 15,
+  "kp_target_inliers": 40,
+  "kp_scale_range": [
+    0.1,
+    10.0
+  ],
+  "max_images": 8
+}

@@ -17,6 +17,7 @@ pdf = ["pypdf>=4"]
 ocr = ["Pillow>=10", "rapidocr-onnxruntime>=1.2"]
 graph = ["leidenalg>=0.10", "igraph>=0.11"]
 density = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
+perceptual = ["numpy>=1.24", "Pillow>=10", "opencv-python-headless>=4.8"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
 [project.entry-points."methadata.adapters"]
@@ -44,6 +45,7 @@ funnel = "methadata.experiments.funnel:get_adapters"
 fusion = "methadata.clustering.fusion:get_adapters"
 people-entities = "methadata.experiments.people_entities:get_adapters"
 narrative-slots = "methadata.experiments.narrative_slots:get_adapters"
+perceptual = "methadata.experiments.perceptual:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src", "backend"]
