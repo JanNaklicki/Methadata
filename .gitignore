@@ -1,0 +1,10 @@
+# surowe dane źródłowe i sekrety – nie wersjonujemy
+BACKUP/
+PAKIET_DLA_MODELI.zip
+scam_links.enc
+scam_links.dec
+[[]Naukowa*/
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
