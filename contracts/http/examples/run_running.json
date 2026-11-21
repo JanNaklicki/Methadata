@@ -1,0 +1,11 @@
+{
+  "run_id": "run-demo-0001",
+  "observation_id": "obs-9271e8a859000be5",
+  "status": "running",
+  "created_at": "2026-11-21T10:00:00Z",
+  "updated_at": "2026-11-21T10:00:02Z",
+  "progress": {
+    "stage": "Porównywanie grafik",
+    "fraction": 0.5
+  }
+}

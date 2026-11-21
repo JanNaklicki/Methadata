@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": "observation_not_found",
+    "message": "Nie znaleziono takiego materiału. Dodaj go ponownie.",
+    "details": [
+      {
+        "field": "observation_id",
+        "message": "Nieznane ID."
+      }
+    ],
+    "retryable": false
+  }
+}

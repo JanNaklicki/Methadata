@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "evidence_not_found",
+    "message": "Nie znaleziono takiego dowodu w tej analizie.",
+    "retryable": false
+  }
+}

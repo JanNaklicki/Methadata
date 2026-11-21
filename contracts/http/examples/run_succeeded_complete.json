@@ -1,0 +1,186 @@
+{
+  "run_id": "run-demo-0001",
+  "observation_id": "obs-9271e8a859000be5",
+  "status": "succeeded",
+  "created_at": "2026-11-21T10:00:00Z",
+  "updated_at": "2026-11-21T10:00:05Z",
+  "result": {
+    "cluster_run": {
+      "schema_version": "1",
+      "run_id": "run-demo-0001",
+      "dataset_version": "synthetic-contract-1",
+      "method_id": "threshold-components",
+      "method_version": "1",
+      "config": {
+        "threshold": 0.5
+      },
+      "seed": 0,
+      "relation": "shared_template",
+      "assignments": [
+        {
+          "material_id": "can-4e2b580a4837ff9e",
+          "cluster_ids": [
+            "c1"
+          ],
+          "status": "grouped"
+        },
+        {
+          "material_id": "can-fb89fc89dbc10fa6",
+          "cluster_ids": [
+            "c1"
+          ],
+          "status": "grouped"
+        },
+        {
+          "material_id": "can-108e4a07067233b6",
+          "cluster_ids": [
+            "c1"
+          ],
+          "status": "grouped"
+        },
+        {
+          "material_id": "can-2a9d0ef002c8ff17",
+          "cluster_ids": [],
+          "status": "singleton"
+        }
+      ],
+      "edges": [
+        {
+          "source": "can-4e2b580a4837ff9e",
+          "target": "can-fb89fc89dbc10fa6",
+          "relation": "shared_template",
+          "pair_evidence_id": "pev-89be6f276d83bdae",
+          "weight": 1.0
+        },
+        {
+          "source": "can-108e4a07067233b6",
+          "target": "can-4e2b580a4837ff9e",
+          "relation": "shared_template",
+          "pair_evidence_id": "pev-3febc8757fd52ef4",
+          "weight": 0.9
+        }
+      ]
+    },
+    "summary": {
+      "outcome": "grouped",
+      "material_count": 4,
+      "grouped": 3,
+      "singleton": 1,
+      "noise": 0,
+      "insufficient_data": 0,
+      "message": "Znaleziono jedną grupę: 3 materiały ze wspólną grafiką. Jeden materiał nie pasuje do żadnej grupy."
+    },
+    "materials": [
+      {
+        "material_id": "can-4e2b580a4837ff9e",
+        "observation_id": "obs-9271e8a859000be5",
+        "input_kind": "full_capture",
+        "label": "Reklama p15 (zapis strony)",
+        "display_url": null,
+        "thumbnail": {
+          "href": "/static/previews/can-4e2b580a4837ff9e-screenshot.png",
+          "media_type": "image/png",
+          "width": 640,
+          "height": 360,
+          "alt": "Zrzut strony Reklama p15 (zapis strony)"
+        },
+        "available_evidence": [
+          "asset",
+          "text"
+        ]
+      },
+      {
+        "material_id": "can-fb89fc89dbc10fa6",
+        "observation_id": "obs-c8bdc54a69cea82d",
+        "input_kind": "full_capture",
+        "label": "Reklama p2 (zapis strony)",
+        "display_url": null,
+        "thumbnail": {
+          "href": "/static/previews/can-fb89fc89dbc10fa6-screenshot.png",
+          "media_type": "image/png",
+          "width": 640,
+          "height": 360,
+          "alt": "Zrzut strony Reklama p2 (zapis strony)"
+        },
+        "available_evidence": [
+          "asset",
+          "text"
+        ]
+      },
+      {
+        "material_id": "can-108e4a07067233b6",
+        "observation_id": "obs-178fd95e4250a234",
+        "input_kind": "full_capture",
+        "label": "Reklama p7 (zapis strony)",
+        "display_url": null,
+        "thumbnail": {
+          "href": "/static/previews/can-108e4a07067233b6-screenshot.png",
+          "media_type": "image/png",
+          "width": 640,
+          "height": 360,
+          "alt": "Zrzut strony Reklama p7 (zapis strony)"
+        },
+        "available_evidence": [
+          "asset",
+          "text"
+        ]
+      },
+      {
+        "material_id": "can-2a9d0ef002c8ff17",
+        "observation_id": "obs-83f1f2825977449b",
+        "input_kind": "full_capture",
+        "label": "Reklama p9 (zapis strony)",
+        "display_url": null,
+        "thumbnail": {
+          "href": "/static/previews/can-2a9d0ef002c8ff17-screenshot.png",
+          "media_type": "image/png",
+          "width": 640,
+          "height": 360,
+          "alt": "Zrzut strony Reklama p9 (zapis strony)"
+        },
+        "available_evidence": [
+          "asset",
+          "text"
+        ]
+      }
+    ],
+    "clusters": [
+      {
+        "cluster_id": "c1",
+        "material_ids": [
+          "can-4e2b580a4837ff9e",
+          "can-fb89fc89dbc10fa6",
+          "can-108e4a07067233b6"
+        ],
+        "relation": "shared_template",
+        "summary": "Wspólna grafika otwierająca stronę."
+      }
+    ],
+    "pair_evidence": [
+      {
+        "evidence_id": "pev-89be6f276d83bdae",
+        "pair": [
+          "can-4e2b580a4837ff9e",
+          "can-fb89fc89dbc10fa6"
+        ],
+        "method_id": "asset-jaccard-v1",
+        "relation": "shared_template",
+        "score": 1.0,
+        "explanation": "1 z 1 zbadanych grafik ma identyczną zawartość.",
+        "evidence_url": "/api/v1/runs/run-demo-0001/evidence/pev-89be6f276d83bdae"
+      },
+      {
+        "evidence_id": "pev-3febc8757fd52ef4",
+        "pair": [
+          "can-108e4a07067233b6",
+          "can-4e2b580a4837ff9e"
+        ],
+        "method_id": "asset-jaccard-v1",
+        "relation": "shared_template",
+        "score": 0.9,
+        "explanation": "9 z 10 zbadanych grafik ma identyczną zawartość.",
+        "evidence_url": "/api/v1/runs/run-demo-0001/evidence/pev-3febc8757fd52ef4"
+      }
+    ]
+  }
+}

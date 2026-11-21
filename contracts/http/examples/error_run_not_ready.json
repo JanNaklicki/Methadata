@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "run_not_ready",
+    "message": "Analiza jeszcze się nie zakończyła, dowody są niedostępne. Spróbuj za chwilę.",
+    "retryable": true
+  }
+}

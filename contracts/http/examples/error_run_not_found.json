@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "run_not_found",
+    "message": "Nie znaleziono takiej analizy. Uruchom analizę ponownie.",
+    "retryable": false
+  }
+}

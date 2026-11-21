@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "bad_request",
+    "message": "Nie udało się odczytać żądania. Sprawdź, czy treść jest poprawnym JSON-em.",
+    "retryable": false
+  }
+}
