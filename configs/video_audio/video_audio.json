@@ -1,0 +1,20 @@
+{
+  "frame_interval_ms": 500,
+  "max_frames": 240,
+  "max_bytes": 268435456,
+  "hash_threshold": 10,
+  "flat_std": 2.0,
+  "min_run_frames": 3,
+  "gap_tolerance": 1,
+  "shot_cut_threshold": 20,
+  "min_shot_matches": 2,
+  "audio_hop_ms": 100,
+  "audio_window_hops": 20,
+  "audio_max_ber": 0.3,
+  "audio_max_seconds": 120,
+  "audio_silence_rms": 0.002,
+  "transcript_ngram": 4,
+  "transcript_min_words": 6,
+  "voice_min_voiced_s": 3.0,
+  "max_items": 4
+}

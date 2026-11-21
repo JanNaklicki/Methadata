@@ -20,6 +20,7 @@ density = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
 spectral = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
 provenance = ["c2pa-python>=0.30", "cryptography>=42"]
 perceptual = ["numpy>=1.24", "Pillow>=10", "opencv-python-headless>=4.8"]
+speech = ["faster-whisper>=1.0"]  # opcjonalna transkrypcja (E16); wagi do katalogu cache poza repo
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
 [project.entry-points."methadata.adapters"]
@@ -63,6 +64,7 @@ people-entities = "methadata.experiments.people_entities:get_adapters"
 narrative-slots = "methadata.experiments.narrative_slots:get_adapters"
 perceptual = "methadata.experiments.perceptual:get_adapters"
 temporal = "methadata.experiments.temporal:get_adapters"
+video-audio = "methadata.experiments.video_audio:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src", "backend"]
