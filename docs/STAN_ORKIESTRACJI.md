@@ -20,9 +20,12 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - R02 (`18e2b51`). Chromium potwierdził, że pakiet p15 z zasobami trafia do grupy p2/p7/p15. Oba dowody pokazują grafiki po obu stronach i odtwarzają się po restarcie. Z samego URL-u żadne z 13 porównań nie uzyskało oceny. [Scenariusz i polecenia](../README.md#scenariusz-jury)
 - K03 (`1be5c51`). DBSCAN odtworzył grupy F04, OPTICS dodał p3/p4, a HDBSCAN utworzył m.in. trójkę z zerowym podobieństwem we wszystkich parach. Na próbce kontrolnej wszystkie trzy metody odtworzyły oczekiwaną parę i trójkę oraz rozdzieliły szum od braku danych. [Konfiguracja i pomiary](../configs/density/README.md)
 
+## W toku — koordynator Claude (nie wydawać ponownie)
+- E09 `codex/exp-perceptual`, E12 `codex/exp-production-kit`, S03 `codex/source-contact`, K04 `codex/cluster-medoids`, S06 `codex/source-mobile-app`.
+
 ## Następne (zależności już w main)
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
-- Od razu: K04, K06, K07, K13, E06, S04, S05, S10, E09, E11, E16, S02, E15, S06, S07, S09, E12, S03, K08, K15, K12, E17, K10, K14, K11, R04.
+- Od razu: K06, K07, K13, E06, S04, S05, S10, E11, E16, S02, E15, S07, S09, K08, K15, K12, E17, K10, K14, K11, R04.
 
 ## Konwencje (obowiązkowe dla wykonawców)
 - Adaptery: entry point `[project.entry-points."methadata.adapters"]`, test `discover()`; bez shimów `methadata_ext`.
