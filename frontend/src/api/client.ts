@@ -67,8 +67,8 @@ export const api = {
     if (label) form.append('label', label)
     return request<ObservationCreated>('/observations', { method: 'POST', body: form })
   },
-  createRun: (observationId: string) =>
-    request<RunAccepted>('/runs', json({ observation_id: observationId, profile: 'demo' })),
+  createRun: (observationId: string, profile?: 'demo' | 'jury') =>
+    request<RunAccepted>('/runs', json({ observation_id: observationId, ...(profile ? { profile } : {}) })),
   getRun: (runId: string, signal?: AbortSignal) => request<Run>(`/runs/${encodeURIComponent(runId)}`, { signal }),
   getEvidence: (runId: string, evidenceId: string, signal?: AbortSignal) =>
     request<Evidence>(`/runs/${encodeURIComponent(runId)}/evidence/${encodeURIComponent(evidenceId)}`, { signal }),

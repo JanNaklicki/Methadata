@@ -84,6 +84,10 @@ function Result({ runId, result, evidenceId, navigate }: { runId: string; result
       </ul>
 
       <h2>Dowody</h2>
+      {evidenceId && (
+        <EvidencePanel key={evidenceId} runId={runId} evidenceId={evidenceId}
+          onClose={() => navigate(`/runs/${encodeURIComponent(runId)}`)} />
+      )}
       {result.pair_evidence.length === 0 ? (
         <p>Brak dowodów do wyświetlenia.</p>
       ) : (
@@ -93,10 +97,6 @@ function Result({ runId, result, evidenceId, navigate }: { runId: string; result
               onOpen={() => navigate(`/runs/${encodeURIComponent(runId)}/evidence/${encodeURIComponent(p.evidence_id)}`)} />
           ))}
         </ul>
-      )}
-      {evidenceId && (
-        <EvidencePanel key={evidenceId} runId={runId} evidenceId={evidenceId}
-          onClose={() => navigate(`/runs/${encodeURIComponent(runId)}`)} />
       )}
     </>
   )
@@ -112,7 +112,7 @@ function MaterialCard({ m }: { m: Material }) {
         <div className="muted">
           {m.available_evidence && m.available_evidence.length > 0
             ? `Dostępne dowody: ${m.available_evidence.join(', ')}`
-            : 'Tylko adres URL, brak dowodów'}
+            : m.input_kind === 'url_only' ? 'Tylko adres URL, brak dowodów' : 'Brak dostępnych dowodów'}
         </div>
       </div>
     </li>

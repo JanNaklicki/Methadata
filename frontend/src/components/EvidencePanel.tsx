@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api, ApiError } from '../api/client'
 import type { Evidence, EvidenceItem, TextExcerpt } from '../api/types'
 
 export default function EvidencePanel({ runId, evidenceId, onClose }: { runId: string; evidenceId: string; onClose: () => void }) {
+  const panel = useRef<HTMLElement>(null)
   const [evidence, setEvidence] = useState<Evidence | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
 
   useEffect(() => {
+    panel.current?.scrollIntoView?.({ block: 'nearest' })
     const ctrl = new AbortController()
     api.getEvidence(runId, evidenceId, ctrl.signal).then(setEvidence, (e) => {
       if (!ctrl.signal.aborted) setError(e instanceof ApiError ? e : null)
@@ -15,7 +17,7 @@ export default function EvidencePanel({ runId, evidenceId, onClose }: { runId: s
   }, [runId, evidenceId])
 
   return (
-    <section className="evidence" aria-label="Dowód">
+    <section ref={panel} className="evidence" aria-label="Dowód">
       <div className="row">
         <h2>Dowód</h2>
         <button type="button" onClick={onClose}>Zamknij</button>
@@ -36,7 +38,7 @@ export default function EvidencePanel({ runId, evidenceId, onClose }: { runId: s
                 <h3>{s.label}</h3>
                 {s.display_url && <div className="muted">{s.display_url}</div>}
                 {s.items.length === 0 && <p className="muted">Brak dowodów po tej stronie.</p>}
-                {s.items.map((it) => <Item key={it.artifact_id} it={it} />)}
+                {s.items.map((it) => <Item key={JSON.stringify([it.artifact_id, it.locator])} it={it} />)}
               </div>
             ))}
           </div>

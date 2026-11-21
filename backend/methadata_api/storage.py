@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import threading
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Optional
 
@@ -41,6 +42,17 @@ class Storage:
     def __init__(self, settings: Settings):
         self.settings = settings
         self.lock = threading.RLock()
+        self.jury = (
+            Storage(replace(settings, data_dir=settings.jury_data_dir, jury_data_dir=None, default_profile="demo"))
+            if settings.jury_data_dir is not None else None
+        )
+
+    def for_profile(self, profile: str) -> Storage | None:
+        if profile == "demo":
+            return self
+        if profile == "jury":
+            return self.jury
+        return None
 
     # ---- dostępność
     def available(self) -> bool:
