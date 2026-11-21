@@ -15,6 +15,7 @@ test = ["pytest>=8", "jsonschema>=4.20", "pyyaml>=6", "openapi-spec-validator>=0
 
 [project.entry-points."methadata.adapters"]
 assets = "methadata.experiments.assets.adapters:get_adapters"
+dom = "methadata.experiments.dom.adapters:get_adapters"
 components = "methadata.clustering.components:ADAPTERS"
 extract-html = "methadata.extractors.html:get_adapters"
 
