@@ -1,6 +1,6 @@
 # Stan orkiestracji (2026-11-21)
 
-Lokalny `main` po scaleniu R02 i K03. Pełny pytest zaliczył 331 testów i pominął 2 z powodu braku ffmpeg i próbki jQuery. R03 jest w trakcie odbioru na `codex/demo-explain`.
+Lokalny `main` (2026-11-22): WSZYSTKIE 63 karty z `zadania/` scalone. Pełny pytest: 663 testy, 0 błędów, 6 pominiętych (brak sentence-transformers, open_clip w głównym .venv, ffmpeg, plików wideo, próbek jQuery, tokenu Meta). Frontend: 17 testów vitest, build OK.
 
 ## Scalone do main
 F01, E01, K01, F03, W01, X01, X03, X05, S01, F02 (+ujednolicony DerivedStore), X04 (+kanoniczny DerivedStore),
@@ -21,8 +21,8 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - K03 (`1be5c51`). DBSCAN odtworzył grupy F04, OPTICS dodał p3/p4, a HDBSCAN utworzył m.in. trójkę z zerowym podobieństwem we wszystkich parach. Na próbce kontrolnej wszystkie trzy metody odtworzyły oczekiwaną parę i trójkę oraz rozdzieliły szum od braku danych. [Konfiguracja i pomiary](../configs/density/README.md)
 
 ## W toku — koordynator Claude (nie wydawać ponownie)
-- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14, E17, K11, R04, K15, K10, E06, E11, E16, S08.
-- W toku: R03 `codex/demo-explain` (dokończenie niezacommitowanej pracy poprzedniego wykonawcy).
+- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14, E17, K11, R04, K15, K10, E06, E11, E16, S08, R03 (dokończona praca poprzedniego wykonawcy).
+- W toku: brak.
 
 ## Następne (zależności już w main)
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
