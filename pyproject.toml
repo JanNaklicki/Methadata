@@ -17,6 +17,7 @@ test = ["pytest>=8", "jsonschema>=4.20", "pyyaml>=6", "openapi-spec-validator>=0
 assets = "methadata.experiments.assets.adapters:get_adapters"
 components = "methadata.clustering.components:ADAPTERS"
 extract-html = "methadata.extractors.html:get_adapters"
+lexical = "methadata.experiments.lexical:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src"]
