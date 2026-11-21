@@ -21,12 +21,12 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - K03 (`1be5c51`). DBSCAN odtworzył grupy F04, OPTICS dodał p3/p4, a HDBSCAN utworzył m.in. trójkę z zerowym podobieństwem we wszystkich parach. Na próbce kontrolnej wszystkie trzy metody odtworzyły oczekiwaną parę i trójkę oraz rozdzieliły szum od braku danych. [Konfiguracja i pomiary](../configs/density/README.md)
 
 ## W toku — koordynator Claude (nie wydawać ponownie)
-- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02.
-- W toku: K12 `codex/cluster-constrained`, K14 `codex/cluster-incremental`, K06 `codex/cluster-spectral`, K08 `codex/cluster-bicluster`, K13 `codex/cluster-soft-membership`, E15 `codex/exp-temporal`.
+- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13.
+- W toku: E15 `codex/exp-temporal` (poprawka cech domeny), K15 `codex/cluster-graph-walk`, K12 `codex/cluster-constrained`, K14 `codex/cluster-incremental`, K06 `codex/cluster-spectral`, K08 `codex/cluster-bicluster`.
 
 ## Następne (zależności już w main)
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
-- Od razu: E06, E11, E16, K15, E17, K10, K11, R04.
+- Od razu: E06, E11, E16, E17, K10, K11, R04.
 
 ## Konwencje (obowiązkowe dla wykonawców)
 - Adaptery: entry point `[project.entry-points."methadata.adapters"]`, test `discover()`; bez shimów `methadata_ext`.
