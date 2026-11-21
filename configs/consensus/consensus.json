@@ -1,0 +1,27 @@
+{
+  "name": "consensus-v1",
+  "threshold": 0.6,
+  "similarity_version": "consensus-in(assets-jaccard-v1,lexical-tfidf-v1,fusion-v1)",
+  "min_evaluable": 3,
+  "min_families": 2,
+  "weighting": "family",
+  "relation": "campaign_candidate",
+  "max_family_dominance": 0.5,
+  "max_decisive_fraction": 0.5,
+  "families": {
+    "components-threshold": "threshold-graph",
+    "linkage-average-v1": "hierarchical",
+    "linkage-complete-v1": "hierarchical",
+    "leiden-v1": "modularity-graph",
+    "spectral-v1": "spectral"
+  },
+  "ensemble": {
+    "evidence": ["assets-jaccard-v1", "lexical-tfidf-v1", "fusion-v1"],
+    "specs": [
+      {"clusterer": "components-threshold-v1", "config": {"threshold": 0.5}, "family": "threshold-graph"},
+      {"clusterer": "components-threshold-v1", "config": {"threshold": 0.3}, "family": "threshold-graph"},
+      {"clusterer": "linkage-average-v1", "config": {"threshold": 0.4}, "family": "hierarchical"},
+      {"clusterer": "linkage-complete-v1", "config": {"threshold": 0.4}, "family": "hierarchical"}
+    ]
+  }
+}
