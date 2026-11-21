@@ -28,12 +28,14 @@ extract-documents = "methadata.extractors.documents:get_adapters"
 lexical = "methadata.experiments.lexical:get_adapters"
 near-copy = "methadata.experiments.near_copy:get_adapters"
 url-har = "methadata.experiments.url_har:get_adapters"
+people-entities = "methadata.experiments.people_entities:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 "methadata.contracts" = ["schemas/v1/*.json"]
+"methadata.experiments.people_entities" = ["data/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
