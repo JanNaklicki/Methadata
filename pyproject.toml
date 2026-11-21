@@ -32,6 +32,7 @@ lexical = "methadata.experiments.lexical:get_adapters"
 near-copy = "methadata.experiments.near_copy:get_adapters"
 url-har = "methadata.experiments.url_har:get_adapters"
 rare-motifs = "methadata.experiments.rare_motifs:get_adapters"
+funnel = "methadata.experiments.funnel:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src"]
