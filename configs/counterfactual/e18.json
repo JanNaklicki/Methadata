@@ -1,0 +1,6 @@
+{
+  "name": "counterfactual-v1",
+  "profile": "kampania",
+  "families": ["asset", "text", "dom"],
+  "targets": ["p2", "p3", "p8"]
+}
