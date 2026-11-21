@@ -64,19 +64,32 @@ class PerceptualExtractor:
             except (FileNotFoundError, KeyError, OSError) as e:
                 status(art, ExtractionState.missing_input, f"brak pliku {art.local_ref}: {type(e).__name__}")
                 continue
-            gray = P.load_gray(data) if data else None
+            try:
+                gray = P.load_gray(data) if data else None
+            except ImportError as e:
+                status(art, ExtractionState.unsupported, f"brak biblioteki ({e.name}); zainstaluj extra perceptual")
+                continue
             if gray is None:
                 status(art, ExtractionState.unsupported, "obraz niedekodowalny (np. SVG, uszkodzony)")
                 continue
             w, h = gray.size
             group = group_of(w, h, self.cfg)
-            ph = P.phash_gray(gray, self.cfg["phash_flat_std"])
+            try:
+                ph = P.phash_gray(gray, self.cfg["phash_flat_std"])
+            except ImportError as e:
+                status(art, ExtractionState.unsupported, f"brak biblioteki ({e.name}); zainstaluj extra perceptual")
+                continue
             feats.append(self._feat(oid, art, KIND_PHASH, {
                 "artifact_id": art.artifact_id, "phash": None if ph is None else P.to_hex(ph),
                 "width": w, "height": h, "group": group}))
             note = "obraz płaski: brak pHash" if ph is None else None
             if group == "illustration":
-                ks = K.detect(gray, self.cfg)
+                try:
+                    ks = K.detect(gray, self.cfg)
+                except ImportError as e:
+                    status(art, ExtractionState.unsupported,
+                           f"brak biblioteki ({e.name}); pHash zapisany, punkty pominięte")
+                    continue
                 feats.append(self._feat(oid, art, KIND_KP, {"artifact_id": art.artifact_id, "group": group,
                                                             **ks.to_json()}))
                 if len(ks.pts) < self.cfg["kp_min_inliers"]:
@@ -112,7 +125,10 @@ class _Base:
         if not ia or not ib:
             return self._none(pair, run_id, "brak podstaw: po jednej ze stron brak grafik w grupie illustration "
                                             "(ikony to grupa kontrolna i nie są porównywane)")
-        res = self._best(ia, ib)
+        try:
+            res = self._best(ia, ib)
+        except ImportError as e:
+            return self._none(pair, run_id, f"brak podstaw: brak biblioteki ({e.name}); zainstaluj extra perceptual")
         if res is None:
             return self._none(pair, run_id, "brak podstaw: żadna para grafik nie jest porównywalna "
                                             "(obrazy płaskie lub zbyt mało punktów charakterystycznych)")

@@ -5,8 +5,6 @@ from __future__ import annotations
 import random
 from typing import Any, Iterable, Mapping
 
-import numpy as np
-
 from . import keypoints as K
 from . import phash as P
 from . import variants as V
@@ -15,6 +13,7 @@ from .config import DEFAULTS
 
 def synthetic_illustration(seed: int, size: tuple[int, int] = (640, 480)):
     """Ilustracja: losowe kolorowe prostokąty, elipsy i linie na gradiencie (dużo narożników)."""
+    import numpy as np
     from PIL import Image, ImageDraw
     r = random.Random(seed)
     w, h = size
@@ -81,6 +80,7 @@ def verdict(a_im, b_im, cfg: Mapping[str, Any] = DEFAULTS) -> dict[str, Any]:
 
 def robustness(seeds: Iterable[int] = range(10), cfg: Mapping[str, Any] = DEFAULTS) -> dict[str, dict[str, Any]]:
     """Osobno: kompresja, skalowanie, kadrowanie. Zwraca {test: {n, phash_recall, kp_recall, mean_hamming}}."""
+    import numpy as np
     tests = {
         "jpeg_q75": lambda im: V.jpeg(im, 75), "jpeg_q40": lambda im: V.jpeg(im, 40), "jpeg_q15": lambda im: V.jpeg(im, 15),
         "scale_0.5": lambda im: V.scale(im, 0.5), "scale_0.25": lambda im: V.scale(im, 0.25),

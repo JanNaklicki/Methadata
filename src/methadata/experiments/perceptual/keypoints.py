@@ -5,8 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Mapping, Optional
 
-import numpy as np
-
 from .config import DEFAULTS
 
 
@@ -25,6 +23,7 @@ class KeypointSet:
 
     @classmethod
     def from_json(cls, v: Mapping[str, Any]) -> "KeypointSet":
+        import numpy as np
         desc = np.frombuffer(bytes.fromhex(v["desc"]), dtype=np.uint8).reshape(-1, 32) if v["desc"] else np.zeros((0, 32), np.uint8)
         pts = np.array(v["pts"], dtype=np.float32).reshape(-1, 2)
         return cls(int(v["width"]), int(v["height"]), float(v["scale"]), pts, desc)
@@ -32,6 +31,7 @@ class KeypointSet:
 
 def detect(gray, cfg: Mapping[str, Any] = DEFAULTS) -> Optional[KeypointSet]:
     import cv2
+    import numpy as np
     from PIL import Image
     w, h = gray.size
     side = max(w, h)
@@ -59,7 +59,8 @@ class GeoMatch:
     pairs: list[tuple[tuple[float, float], tuple[float, float]]] = field(default_factory=list)
 
 
-def _rect(pts: np.ndarray, w: int, h: int) -> tuple[int, int, int, int]:
+def _rect(pts, w: int, h: int) -> tuple[int, int, int, int]:
+    import numpy as np
     x0, y0 = np.floor(pts.min(axis=0)).astype(int)
     x1, y1 = np.ceil(pts.max(axis=0)).astype(int)
     x0, y0 = max(0, int(x0)), max(0, int(y0))
@@ -71,6 +72,7 @@ def match(a: KeypointSet, b: KeypointSet, cfg: Mapping[str, Any] = DEFAULTS) -> 
     """None, gdy brak wystarczających dopasowań do estymacji (< 3). Wynik z inliers < min_inliers
     wywołujący decyduje jako brak trafienia."""
     import cv2
+    import numpy as np
     if len(a.desc) < 3 or len(b.desc) < 3:
         return None
     bf = cv2.BFMatcher(cv2.NORM_HAMMING)
