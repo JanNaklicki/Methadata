@@ -11,11 +11,13 @@ dependencies = ["pydantic>=2.5,<3"]
 
 [project.optional-dependencies]
 test = ["pytest>=8", "jsonschema>=4.20"]
+media = ["Pillow>=10"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
 [project.entry-points."methadata.adapters"]
 assets = "methadata.experiments.assets.adapters:get_adapters"
 components = "methadata.clustering.components:ADAPTERS"
+media = "methadata.extractors.media:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src"]
