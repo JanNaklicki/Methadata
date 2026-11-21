@@ -1,0 +1,211 @@
+{
+  "features": [],
+  "observations": [
+    {
+      "artifacts": [
+        {
+          "artifact_id": "art-c292eb05f3b0da1a",
+          "display_url": null,
+          "local_ref": "obs-be9d15108f649fdc/page.html",
+          "media_type": "text/html",
+          "observation_id": "obs-be9d15108f649fdc",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "landing_html",
+          "schema_version": "1",
+          "sha256": "a529a6cbb8157e0093aaa5d05fb08cf6956c10318fc81a19a1f710ac64cc0587",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-0af8be7a12e2e559",
+          "display_url": null,
+          "local_ref": "obs-be9d15108f649fdc/capture.har",
+          "media_type": null,
+          "observation_id": "obs-be9d15108f649fdc",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "har",
+          "schema_version": "1",
+          "sha256": "0f03ccb9a41d3e8810c8283cb7693dcaa75e40e442ddd7d2b9a65b91c38c64a7",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-03ff593f4d5bc79e",
+          "display_url": null,
+          "local_ref": "obs-be9d15108f649fdc/screenshot.png",
+          "media_type": null,
+          "observation_id": "obs-be9d15108f649fdc",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "landing_screenshot",
+          "schema_version": "1",
+          "sha256": "ae72776c45f8c29069e5be7cd11439452986557d26e9046df92ca0a54eabe7ce",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-ea3fb7e95872a108",
+          "display_url": null,
+          "local_ref": "obs-be9d15108f649fdc/res/hero.webp",
+          "media_type": null,
+          "observation_id": "obs-be9d15108f649fdc",
+          "origin": "res/hero.webp",
+          "parent": {
+            "artifact_id": "art-c292eb05f3b0da1a",
+            "locator": {
+              "end": 190,
+              "kind": "text_span",
+              "start": 120
+            }
+          },
+          "parent_relation": "referenced_by",
+          "role": "resource",
+          "schema_version": "1",
+          "sha256": "c4d42b36d41f49b6e8458bf97a0f50d0285b740ac21396d849a3cccd06d17c65",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-5348cbbe5725dcb4",
+          "display_url": null,
+          "local_ref": "obs-be9d15108f649fdc/res/body.js",
+          "media_type": null,
+          "observation_id": "obs-be9d15108f649fdc",
+          "origin": "har:3",
+          "parent": {
+            "artifact_id": "art-0af8be7a12e2e559",
+            "locator": {
+              "index": 3,
+              "kind": "har_entry"
+            }
+          },
+          "parent_relation": "har_response",
+          "role": "resource",
+          "schema_version": "1",
+          "sha256": "5c0bd9ee11ec9964225e893a1d5f217ef735a99a5498a2cc24ea09d217d04300",
+          "size": 1000,
+          "url": null
+        }
+      ],
+      "canonical_id": "can-6bd95a1aed912680",
+      "capture_time": "2026-10-08T09:09:40Z",
+      "input_kind": "full_capture",
+      "observation_id": "obs-be9d15108f649fdc",
+      "schema_version": "1",
+      "source_ref": "synthetic://contract/dup-1",
+      "tags": [
+        "synthetic"
+      ]
+    },
+    {
+      "artifacts": [
+        {
+          "artifact_id": "art-a391626c78e8f9eb",
+          "display_url": null,
+          "local_ref": "obs-318845fdf5d7cbab/page.html",
+          "media_type": "text/html",
+          "observation_id": "obs-318845fdf5d7cbab",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "landing_html",
+          "schema_version": "1",
+          "sha256": "a529a6cbb8157e0093aaa5d05fb08cf6956c10318fc81a19a1f710ac64cc0587",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-0aa7022a21dc46dc",
+          "display_url": null,
+          "local_ref": "obs-318845fdf5d7cbab/capture.har",
+          "media_type": null,
+          "observation_id": "obs-318845fdf5d7cbab",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "har",
+          "schema_version": "1",
+          "sha256": "0f03ccb9a41d3e8810c8283cb7693dcaa75e40e442ddd7d2b9a65b91c38c64a7",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-7153d2d3ee3d7ee4",
+          "display_url": null,
+          "local_ref": "obs-318845fdf5d7cbab/screenshot.png",
+          "media_type": null,
+          "observation_id": "obs-318845fdf5d7cbab",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "landing_screenshot",
+          "schema_version": "1",
+          "sha256": "ae72776c45f8c29069e5be7cd11439452986557d26e9046df92ca0a54eabe7ce",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-fc7c8dd52a71899d",
+          "display_url": null,
+          "local_ref": "obs-318845fdf5d7cbab/res/hero.webp",
+          "media_type": null,
+          "observation_id": "obs-318845fdf5d7cbab",
+          "origin": "res/hero.webp",
+          "parent": {
+            "artifact_id": "art-a391626c78e8f9eb",
+            "locator": {
+              "end": 190,
+              "kind": "text_span",
+              "start": 120
+            }
+          },
+          "parent_relation": "referenced_by",
+          "role": "resource",
+          "schema_version": "1",
+          "sha256": "c4d42b36d41f49b6e8458bf97a0f50d0285b740ac21396d849a3cccd06d17c65",
+          "size": 1000,
+          "url": null
+        },
+        {
+          "artifact_id": "art-101ba8574172c7b7",
+          "display_url": null,
+          "local_ref": "obs-318845fdf5d7cbab/res/body.js",
+          "media_type": null,
+          "observation_id": "obs-318845fdf5d7cbab",
+          "origin": "har:3",
+          "parent": {
+            "artifact_id": "art-0aa7022a21dc46dc",
+            "locator": {
+              "index": 3,
+              "kind": "har_entry"
+            }
+          },
+          "parent_relation": "har_response",
+          "role": "resource",
+          "schema_version": "1",
+          "sha256": "5c0bd9ee11ec9964225e893a1d5f217ef735a99a5498a2cc24ea09d217d04300",
+          "size": 1000,
+          "url": null
+        }
+      ],
+      "canonical_id": "can-6bd95a1aed912680",
+      "capture_time": "2026-10-08T09:09:40Z",
+      "input_kind": "full_capture",
+      "observation_id": "obs-318845fdf5d7cbab",
+      "schema_version": "1",
+      "source_ref": "synthetic://contract/dup-2",
+      "tags": [
+        "synthetic"
+      ]
+    }
+  ],
+  "pairs": [],
+  "runs": [],
+  "schema_version": "1",
+  "statuses": []
+}

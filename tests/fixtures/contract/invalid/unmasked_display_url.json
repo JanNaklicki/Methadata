@@ -1,0 +1,46 @@
+{
+  "features": [],
+  "observations": [
+    {
+      "artifacts": [
+        {
+          "artifact_id": "art-ae658b4492a73ab7",
+          "display_url": "https://example.invalid/oferta?gclid=SECRET123&gad_source=5&utm=a",
+          "local_ref": null,
+          "media_type": null,
+          "observation_id": "obs-a07de641ba99369e",
+          "origin": null,
+          "parent": null,
+          "parent_relation": null,
+          "role": "input_url",
+          "schema_version": "1",
+          "sha256": "87d474eede739729a6bb2e140da9c1301882e697ecfd71abcfeab7b1196c39c6",
+          "size": null,
+          "url": "https://example.invalid/oferta?gclid=SECRET123&gad_source=5&utm=a"
+        }
+      ],
+      "canonical_id": "can-6eaa95a34145edcb",
+      "capture_time": null,
+      "input_kind": "url_only",
+      "observation_id": "obs-a07de641ba99369e",
+      "schema_version": "1",
+      "source_ref": "synthetic://contract/url-001",
+      "tags": [
+        "synthetic"
+      ]
+    }
+  ],
+  "pairs": [],
+  "runs": [],
+  "schema_version": "1",
+  "statuses": [
+    {
+      "artifact_id": "art-ae658b4492a73ab7",
+      "detail": "brak zapisu strony: porównania treści niewykonalne",
+      "extractor_version": "demo-1",
+      "observation_id": "obs-a07de641ba99369e",
+      "schema_version": "1",
+      "state": "missing_input"
+    }
+  ]
+}

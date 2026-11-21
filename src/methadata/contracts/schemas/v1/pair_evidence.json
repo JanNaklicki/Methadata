@@ -1,0 +1,284 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "description": "Odwołanie do artefaktu, opcjonalnie do jego fragmentu. Bez locator = cały artefakt.",
+      "properties": {
+        "artifact_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "byte_range": "#/$defs/ByteRange",
+                  "har_entry": "#/$defs/HarEntry",
+                  "image_rect": "#/$defs/ImageRect",
+                  "text_span": "#/$defs/TextSpan"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                {
+                  "$ref": "#/$defs/ImageRect"
+                },
+                {
+                  "$ref": "#/$defs/HarEntry"
+                },
+                {
+                  "$ref": "#/$defs/ByteRange"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        }
+      },
+      "required": [
+        "artifact_id"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "ByteRange": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "byte_range",
+          "default": "byte_range",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "ByteRange",
+      "type": "object"
+    },
+    "HarEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "har_entry",
+          "default": "har_entry",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index"
+      ],
+      "title": "HarEntry",
+      "type": "object"
+    },
+    "ImageRect": {
+      "additionalProperties": false,
+      "properties": {
+        "frame_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frame Ms"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "title": "Height",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "image_rect",
+          "default": "image_rect",
+          "title": "Kind",
+          "type": "string"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "title": "Width",
+          "type": "integer"
+        },
+        "x": {
+          "minimum": 0,
+          "title": "X",
+          "type": "integer"
+        },
+        "y": {
+          "minimum": 0,
+          "title": "Y",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "title": "ImageRect",
+      "type": "object"
+    },
+    "Relation": {
+      "enum": [
+        "duplicate_capture",
+        "shared_template",
+        "shared_narrative",
+        "campaign_candidate"
+      ],
+      "title": "Relation",
+      "type": "string"
+    },
+    "TextSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "text_span",
+          "default": "text_span",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TextSpan",
+      "type": "object"
+    }
+  },
+  "$id": "https://methadata.local/schemas/v1/pair_evidence.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "evidence_refs": {
+      "patternProperties": {
+        "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$": {
+          "items": {
+            "$ref": "#/$defs/ArtifactRef"
+          },
+          "type": "array"
+        }
+      },
+      "title": "Evidence Refs",
+      "type": "object"
+    },
+    "explanation": {
+      "minLength": 1,
+      "title": "Explanation",
+      "type": "string"
+    },
+    "method_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+      "title": "Method Id",
+      "type": "string"
+    },
+    "pair": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+          "type": "string"
+        }
+      ],
+      "title": "Pair",
+      "type": "array"
+    },
+    "pair_evidence_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pair Evidence Id"
+    },
+    "relation": {
+      "$ref": "#/$defs/Relation"
+    },
+    "run_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score"
+    }
+  },
+  "required": [
+    "run_id",
+    "pair",
+    "method_id",
+    "relation",
+    "explanation"
+  ],
+  "title": "PairEvidence",
+  "type": "object"
+}
