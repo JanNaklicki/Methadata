@@ -37,6 +37,7 @@ extract-code = "methadata.extractors.code:get_adapters"
 source-payer = "methadata.sources.payer:get_adapters"
 source-mobile-app = "methadata.sources.mobile_app:get_adapters"
 source-contact = "methadata.sources.contact:get_adapters"
+source-offer-id = "methadata.sources.offer_id:get_adapters"
 extract-documents = "methadata.extractors.documents:get_adapters"
 lexical = "methadata.experiments.lexical:get_adapters"
 near-copy = "methadata.experiments.near_copy:get_adapters"
@@ -55,6 +56,7 @@ where = ["src", "backend"]
 "methadata_api" = ["demo_data/manifest.json", "demo_data/*/*.html", "demo_data/*/*.png", "demo_data/*/assets/*.png"]
 "methadata.contracts" = ["schemas/v1/*.json"]
 "methadata.experiments.people_entities" = ["data/*.json"]
+"methadata.sources.offer_id" = ["config.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
