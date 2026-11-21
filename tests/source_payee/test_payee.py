@@ -131,4 +131,4 @@ def test_real_har_no_false_wallet_hits_and_no_crash():
         assert s[0].state is ExtractionState.ok
         for x in f:
             if x.kind == "payee_account":
-                assert x.value["masked"] and len(x.value["token"]) == 64
+                assert x.value["masked"] and len(x.value["token"]) == 20

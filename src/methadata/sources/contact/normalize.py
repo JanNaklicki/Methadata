@@ -5,13 +5,9 @@ Wartość jawna nie opuszcza ekstraktora: cechy niosą tylko znormalizowany skr�
 from __future__ import annotations
 
 import hashlib
-import hmac
-import os
 import re
-import secrets
-import tempfile
-from pathlib import Path
 from typing import Optional
+from methadata.privacy.pii import key_id, pii_key, pii_token
 from urllib.parse import parse_qs, unquote, urlparse
 
 # kod kraju -> (ISO, dopuszczalne długości numeru krajowego)
@@ -28,31 +24,10 @@ _OCR_DIGITS = str.maketrans({"O": "0", "o": "0", "I": "1", "l": "1"})
 
 
 def digest(kind: str, value: str, key: bytes) -> str:
-    """HMAC-SHA256(klucz lokalny, rodzaj|wartość), 20 znaków hex; bez klucza nie da się odtworzyć numeru słownikiem."""
-    return hmac.new(key, f"{kind}|{value}".encode("utf-8"), hashlib.sha256).hexdigest()[:20]
+    return pii_token(value, kind, key)[0]
 
 
-def key_id(key: bytes) -> str:
-    return hashlib.sha256(b"key-id|" + key).hexdigest()[:8]
-
-
-def resolve_key(key: "bytes | str | None" = None, key_dir: "str | os.PathLike | None" = None) -> bytes:
-    """Kolejność: argument, METHADATA_PII_KEY, plik pii.key w key_dir / METHADATA_PII_KEY_DIR / katalogu tymczasowym
-    (tworzony raz, uprawnienia 0600, poza gitem)."""
-    k = key or os.environ.get("METHADATA_PII_KEY")
-    if k:
-        return k if isinstance(k, bytes) else k.encode("utf-8")
-    d = Path(key_dir or os.environ.get("METHADATA_PII_KEY_DIR") or Path(tempfile.gettempdir()) / "methadata-pii")
-    f = d / "pii.key"
-    if not f.exists():
-        d.mkdir(parents=True, exist_ok=True)
-        try:
-            fd = os.open(f, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-            with os.fdopen(fd, "wb") as fh:
-                fh.write(secrets.token_hex(32).encode())
-        except FileExistsError:
-            pass
-    return f.read_bytes().strip()
+resolve_key = pii_key
 
 
 def normalize_phone(raw: str, default_region: str = "PL", ocr: bool = False,

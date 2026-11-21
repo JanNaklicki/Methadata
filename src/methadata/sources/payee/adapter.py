@@ -7,15 +7,12 @@ i tego samego klucza. Nazwa bramki sama w sobie nie jest dowodem. Nic nie jest w
 from __future__ import annotations
 
 import hashlib
-import hmac
 import json
-import os
 import re
-import secrets
-from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
 
 from methadata.contracts import ids
+from methadata.privacy.pii import mask, pii_token
 from methadata.contracts.interfaces import AdapterKind, AdapterSpec
 from methadata.contracts.models import (ArtifactRef, ExtractionState, ExtractionStatus, Feature, Observation,
                                         PairEvidence, Relation, TextSpan, ValueType)
@@ -24,47 +21,6 @@ ADAPTERS_VERSION = "1.0.0"
 EXTRACTOR_VERSION = f"s04-payee/{ADAPTERS_VERSION}"
 FAMILY = "payee"
 _TEXT_EXT = (".html", ".htm", ".json", ".har", ".txt", ".js", ".md")
-
-# ---------------------------------------------------------------- klucz lokalny
-_EPHEMERAL: dict[str, bytes] = {}
-
-
-def _key_file() -> Optional[Path]:
-    env = os.environ.get("METHADATA_PII_KEY_FILE")
-    if env:
-        return Path(env)
-    from methadata.devtools.realdata import BACKUP
-    return BACKUP / ".pii_key" if BACKUP.is_dir() else None
-
-
-def pii_key() -> tuple[str, bytes]:
-    """-> (key_id, key). METHADATA_PII_KEY; inaczej plik w katalogu danych (poza gitem); inaczej klucz procesowy."""
-    raw = os.environ.get("METHADATA_PII_KEY")
-    if raw:
-        key = raw.encode()
-    else:
-        path = _key_file()
-        if path is not None:
-            try:
-                if not path.exists():
-                    path.write_bytes(secrets.token_hex(32).encode())
-                    path.chmod(0o600)
-                key = path.read_bytes().strip()
-            except OSError:
-                key = _EPHEMERAL.setdefault("k", secrets.token_hex(32).encode())
-        else:
-            key = _EPHEMERAL.setdefault("k", secrets.token_hex(32).encode())
-    return hashlib.sha256(b"methadata-pii-keyid\0" + key).hexdigest()[:8], key
-
-
-def pii_token(space: str, canonical: str) -> tuple[str, str]:
-    kid, key = pii_key()
-    return kid, hmac.new(key, f"{space}\0{canonical}".encode(), hashlib.sha256).hexdigest()
-
-
-def mask(value: str) -> str:
-    v = value.strip()
-    return v if len(v) <= 6 else v[:2] + "…" + v[-3:]
 
 # ---------------------------------------------------------------- walidacja
 _IBAN = re.compile(r"\b([A-Z]{2}\d{2}(?:[  -]?[A-Z0-9]{2,4}){3,8})\b")
@@ -190,7 +146,7 @@ class PayeeExtractor:
                 if (space, canon) in seen:
                     continue
                 seen.add((space, canon))
-                kid, tok = pii_token(space, canon)
+                tok, kid = pii_token(canon, space)
                 val = {"space": space, "key_id": kid, "token": tok, "masked": mask(canon), "declared": True,
                        "retrieved_at": observation.capture_time, "status": "extracted"}
                 if gw:

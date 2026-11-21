@@ -1,5 +1,5 @@
-from .adapter import (ADAPTERS_VERSION, PayeeComparator, PayeeExtractor, find_payees, group_by_payee, iban_valid, mask,
-                      pii_token)
+from methadata.privacy.pii import mask, pii_token  # noqa: F401
+from .adapter import (ADAPTERS_VERSION, PayeeComparator, PayeeExtractor, find_payees, group_by_payee, iban_valid)
 
 
 def get_adapters():
@@ -8,5 +8,5 @@ def get_adapters():
 
 ADAPTERS = get_adapters()
 
-__all__ = ["PayeeExtractor", "PayeeComparator", "find_payees", "group_by_payee", "iban_valid", "mask", "pii_token",
+__all__ = ["PayeeExtractor", "PayeeComparator", "find_payees", "group_by_payee", "iban_valid", 
            "get_adapters", "ADAPTERS", "ADAPTERS_VERSION"]
