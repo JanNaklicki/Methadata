@@ -1,3 +1,5 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
+import os
 import glob
 import struct
 import tempfile
@@ -13,8 +15,8 @@ from methadata.contracts.registry import discover
 from methadata.extractors.code import CodeExtractor, js_similarity
 from methadata.extractors.code import cssscan, jsscan
 
-BACKUP = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
-JQ = Path.home() / "Library/Application Support/Google/Chrome/Default/Extensions"
+BACKUP = _REAL_BACKUP
+JQ = Path(os.environ.get("METHADATA_JQUERY_SAMPLES", "/nonexistent"))  # katalog z próbkami jQuery (opcjonalny)
 
 
 class Mem:

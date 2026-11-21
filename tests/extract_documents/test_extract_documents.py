@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import json
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from methadata.contracts.models import (Artifact, ArtifactRole, ExtractionState,
 from methadata.contracts.registry import discover
 from methadata.extractors.documents import DocumentsExtractor
 
-REAL = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
+REAL = _REAL_BACKUP
 
 
 class Mem:

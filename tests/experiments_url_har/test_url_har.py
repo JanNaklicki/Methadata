@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import json
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from methadata.contracts.registry import discover
 from methadata.experiments.url_har import (UrlHarComparator, UrlHarExtractor, compare_features, detect_integrations,
                                            parse_url, redirect_features)
 
-BACKUP = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
+BACKUP = _REAL_BACKUP
 
 
 class Reader:
