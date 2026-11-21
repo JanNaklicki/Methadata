@@ -1,0 +1,11 @@
+{
+  "scores": {"same_offer": 0.97, "same_gtin": 0.9, "same_sku_same_seller": 0.7, "same_sku_unknown_seller": 0.12,
+             "same_sku_other_sellers": 0.15, "different_gtin": 0.0, "no_shared_id": 0.0},
+  "marketplaces": {
+    "allegro": {"hosts": ["allegro.pl", "allegro.cz", "allegro.sk"], "offer": "-(\\d{8,14})(?:[/?#]|$)|/oferta/[^?#]*?(\\d{8,14})(?:[/?#]|$)", "seller": "/(?:uzytkownik|user)/([^/?#]+)"},
+    "olx": {"hosts": ["olx.pl"], "offer": "-ID([A-Za-z0-9]{5,10})\\.html", "seller": "/oferty/uzytkownik/([^/?#]+)"},
+    "ebay": {"hosts": ["ebay.com", "ebay.pl", "ebay.de", "ebay.co.uk"], "offer": "/itm/(?:[^/?#]*/)?(\\d{9,14})", "seller": "/usr/([^/?#]+)"},
+    "amazon": {"hosts": ["amazon.com", "amazon.de", "amazon.pl", "amazon.co.uk"], "offer": "/(?:dp|gp/product)/([A-Z0-9]{10})", "seller": "[?&]seller=([A-Z0-9]+)"},
+    "aliexpress": {"hosts": ["aliexpress.com", "aliexpress.us"], "offer": "/item/(\\d{10,20})\\.html", "seller": "/store/(\\d+)"}
+  }
+}
