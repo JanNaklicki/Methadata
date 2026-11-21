@@ -26,6 +26,7 @@ media = "methadata.extractors.media:get_adapters"
 source-payer = "methadata.sources.payer:get_adapters"
 extract-documents = "methadata.extractors.documents:get_adapters"
 lexical = "methadata.experiments.lexical:get_adapters"
+url-har = "methadata.experiments.url_har:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src"]
