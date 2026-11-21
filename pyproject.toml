@@ -15,6 +15,7 @@ test = ["pytest>=8", "jsonschema>=4.20"]
 
 [project.entry-points."methadata.adapters"]
 assets = "methadata.experiments.assets.adapters:get_adapters"
+components = "methadata.clustering.components:ADAPTERS"
 
 [tool.setuptools.packages.find]
 where = ["src"]
