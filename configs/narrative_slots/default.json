@@ -1,0 +1,244 @@
+{
+ "backend": null,
+ "class_share": 0.5,
+ "experiment": "E07 narrative-slots",
+ "extractor": "narrative-slots-extractor",
+ "lexicon": {
+  "call": {
+   "claim": [
+    "odbierz",
+    "pobierz",
+    "skorzystaj"
+   ],
+   "get_access": [
+    "rejestr\\w*",
+    "zarejestruj\\w*",
+    "dostęp\\w*",
+    "uzyska\\w*",
+    "link\\w*",
+    "sprawdź",
+    "dołącz\\w*",
+    "załóż",
+    "zapisz\\w*",
+    "kliknij",
+    "wejdź"
+   ],
+   "purchase": [
+    "kup\\w*",
+    "zamów\\w*",
+    "zapłać"
+   ]
+  },
+  "call_urgency": [
+   "jeszcze \\d+ godzin\\w*",
+   "pozostaje otwart\\w*",
+   "ostatni\\w*",
+   "tylko dziś",
+   "zamkn\\w*",
+   "ogranicz\\w*"
+  ],
+  "event": {
+   "arrest": [
+    "aresztow\\w*",
+    "zatrzyman\\w*",
+    "zarzut\\w*",
+    "wyrok\\w*"
+   ],
+   "attack": [
+    "napa(ść|sc|d)\\w*",
+    "napadn\\w*",
+    "zaatak\\w*",
+    "pobit\\w*",
+    "pobici\\w*",
+    "\\batak\\w*",
+    "zamach\\w*",
+    "strzel\\w*",
+    "strzał\\w*"
+   ],
+   "death": [
+    "zmarł\\w*",
+    "zginął\\w*",
+    "śmierć\\w*",
+    "nie żyje"
+   ],
+   "decision": [
+    "decyzj\\w*",
+    "ustaw\\w*",
+    "wprowadz\\w*",
+    "zakaz\\w*",
+    "oświadczy\\w*"
+   ],
+   "scandal": [
+    "skandal\\w*",
+    "afer\\w*",
+    "ujawni\\w*",
+    "wyciek\\w*",
+    "zdemaskow\\w*"
+   ]
+  },
+  "generic_name_stems": [
+   "redakc",
+   "nota",
+   "minist",
+   "urząd",
+   "bank",
+   "gazeta",
+   "kancel"
+  ],
+  "max_quote_chars": 240,
+  "product_generic": [
+   "sztuczn\\w+ inteligencj\\w*",
+   "algorytm\\w*",
+   "\\bai\\b"
+  ],
+  "product_nouns": {
+   "aplikacj": "app",
+   "fundusz": "fund",
+   "kurs": "course",
+   "metod": "method",
+   "narzędzi": "tool",
+   "platform": "platform",
+   "program": "program",
+   "robot": "robot",
+   "system": "system"
+  },
+  "profession": [
+   "dziennikar",
+   "polityk",
+   "lekarz",
+   "aktor",
+   "piosenk",
+   "premier",
+   "prezydent",
+   "minister",
+   "ekonomist",
+   "ekspert",
+   "prezenter",
+   "celebryt",
+   "biznesmen",
+   "naukowiec",
+   "piłkarz",
+   "trener",
+   "prezes",
+   "wokalist",
+   "komik",
+   "youtuber"
+  ],
+  "promise": {
+   "free": [
+    "za darmo",
+    "bezpłatn\\w*",
+    "gratis"
+   ],
+   "guarantee": [
+    "gwarant\\w*",
+    "bez ryzyka",
+    "bezpiecz\\w*"
+   ],
+   "return": [
+    "zysk\\w*",
+    "doch[óo]d\\w*",
+    "zarob\\w*",
+    "zarób\\w*",
+    "zarabi\\w*",
+    "pasywn\\w*",
+    "wypłac\\w*",
+    "wypłat\\w*"
+   ],
+   "savings": [
+    "oszczęd\\w*",
+    "odsetk\\w*",
+    "taniej",
+    "rabat\\w*"
+   ]
+  },
+  "promise_penalty": [
+   "lokat\\w*",
+   "prowizj\\w*"
+  ],
+  "promise_weak": [
+   "\\d+\\s?%",
+   "\\d[\\d\\s]*\\s?zł",
+   "miesięcznie",
+   "dziennie",
+   "24 godzin\\w*",
+   "jednorazow\\w*",
+   "bonus\\w*"
+  ],
+  "stop_name_stems": [
+   "polsk",
+   "polsc",
+   "europ",
+   "warsza",
+   "unia",
+   "unii",
+   "gazeta",
+   "gazet"
+  ],
+  "stop_names": [
+   "AI",
+   "VIP",
+   "TV",
+   "OK",
+   "PILNE",
+   "REKLAMA",
+   "NOTA",
+   "RODO",
+   "CTA",
+   "PLN",
+   "EUR",
+   "USD",
+   "SMS",
+   "PDF"
+  ],
+  "stop_tokens": [
+   "oraz",
+   "który",
+   "która",
+   "które",
+   "który",
+   "jest",
+   "się",
+   "ale",
+   "dla",
+   "przez",
+   "jako",
+   "tego",
+   "tym",
+   "jego",
+   "jej",
+   "ich",
+   "gdy",
+   "lub",
+   "też",
+   "nie",
+   "już",
+   "tylko",
+   "bez",
+   "pod",
+   "nad",
+   "przy",
+   "tak",
+   "jak",
+   "czy",
+   "ten",
+   "ta",
+   "to",
+   "te",
+   "tej",
+   "tych",
+   "tuż",
+   "po"
+  ],
+  "version": "narrative-slots-rules-1"
+ },
+ "method_id": "narrative-slots-v1",
+ "min_slots_both": 2,
+ "weights": {
+  "call": 1,
+  "event": 1,
+  "product": 1,
+  "promise": 1,
+  "who": 1
+ }
+}
