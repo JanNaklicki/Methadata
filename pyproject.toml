@@ -59,6 +59,7 @@ fusion = "methadata.clustering.fusion:get_adapters"
 people-entities = "methadata.experiments.people_entities:get_adapters"
 narrative-slots = "methadata.experiments.narrative_slots:get_adapters"
 perceptual = "methadata.experiments.perceptual:get_adapters"
+temporal = "methadata.experiments.temporal:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src", "backend"]
