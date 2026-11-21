@@ -21,12 +21,12 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - K03 (`1be5c51`). DBSCAN odtworzył grupy F04, OPTICS dodał p3/p4, a HDBSCAN utworzył m.in. trójkę z zerowym podobieństwem we wszystkich parach. Na próbce kontrolnej wszystkie trzy metody odtworzyły oczekiwaną parę i trójkę oraz rozdzieliły szum od braku danych. [Konfiguracja i pomiary](../configs/density/README.md)
 
 ## W toku — koordynator Claude (nie wydawać ponownie)
-- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14, E17.
-- W toku: E06 `codex/exp-semantic`, E11 `codex/exp-visual-embedding`, E16 `codex/exp-video-audio`, K10 `codex/cluster-network-fusion`, K11 `codex/cluster-consensus`, R04 `codex/source-monitor`, K15 `codex/cluster-graph-walk`.
+- Scalone przez Claude: S06, K04, E09 (+lazy import), S03 (HMAC), E12, S05, S10, S04 (+wspólny methadata.privacy.pii), S07, S09, K07, S02, K13, K06, E15, K12, K08, K14, E17, E17, K11, R04, K15, K10, E06, E11, E16.
+- W toku: R03 `codex/demo-explain` (dokończenie niezacommitowanej pracy poprzedniego wykonawcy), S08 `codex/source-history`.
 
 ## Następne (zależności już w main)
 - W03: `docker compose up --build` → http://localhost:5173 (backend 127.0.0.1:8000). F06: `python -m methadata.fusion_eval run ...` (raport fusion_eval.md z rekomendacją dla R02).
-- Od razu: (wszystkie karty wydane).
+- Od razu: brak — pozostały tylko karty w toku.
 
 ## Konwencje (obowiązkowe dla wykonawców)
 - Adaptery: entry point `[project.entry-points."methadata.adapters"]`, test `discover()`; bez shimów `methadata_ext`.
@@ -35,6 +35,9 @@ Walidacja: `python contracts/http/check_conformance.py --base-url http://localho
 - Extras do pełnych testów: `pip install -e '.[test,media,pdf,ocr,web,graph,density]'`.
 
 ## Znane luki do późniejszej integracji
+- Modele: E06 (sentence-transformers) nieuruchomiony z braku miejsca; E11 CLIP uruchomiony tylko w worktree (test z METHADATA_MODEL_CACHE); E16 bez ffmpeg/prawdziwego wideo; R04 bez tokenu Meta Ad Library.
+- K10 SNF skleja p2/p7/p15 z p3/p4 (zawodność opisana); K09 nie.
+- Każdy worktree z pełnym .venv zajmuje ~0,5–1,3 GB — przy wielu równoległych kartach pilnuj miejsca na dysku.
 - Runner F03 nie przekazuje komparatorom korpusu (ważony Jaccard E01, rare-motifs E14, IDF E02 bez modelu) — pełne wyniki tylko ścieżką `methadata.clustering.fusion run` / baseline.
 - E10: heurystyka układu słaba na postach społecznościowych; E08: etykiety obrazów referencyjnych `verified=false`.
 - PII (S03/S04): methadata.privacy.pii; klucz METHADATA_PII_KEY → METHADATA_PII_KEY_DIR/pii.key → var/pii.key (gitignore). Zmiana klucza = brak dopasowań między przebiegami.
