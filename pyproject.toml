@@ -16,6 +16,7 @@ media = ["Pillow>=10"]
 pdf = ["pypdf>=4"]
 ocr = ["Pillow>=10", "rapidocr-onnxruntime>=1.2"]
 graph = ["leidenalg>=0.10", "igraph>=0.11"]
+density = ["numpy>=1.24", "scikit-learn>=1.3,<2"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
 [project.entry-points."methadata.adapters"]
@@ -24,6 +25,7 @@ assets = "methadata.experiments.assets.adapters:get_adapters"
 dom = "methadata.experiments.dom.adapters:get_adapters"
 components = "methadata.clustering.components:ADAPTERS"
 linkage = "methadata.clustering.linkage:get_adapters"
+density = "methadata.clustering.density:get_adapters"
 leiden = "methadata.clustering.leiden:get_adapters"
 extract-html = "methadata.extractors.html:get_adapters"
 network = "methadata.extractors.network:get_adapters"

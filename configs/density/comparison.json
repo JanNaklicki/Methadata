@@ -1,0 +1,27 @@
+{
+  "control": {
+    "dataset_version": "density-control-v1",
+    "materials": ["A", "B", "C", "D", "E", "X", "M"],
+    "unobserved": ["M"],
+    "comparisons": {"AB": 0.98, "CD": 0.78, "CE": 0.76, "DE": 0.80}
+  },
+  "profiles": {
+    "dbscan": {
+      "base": {"eps": 0.50, "min_samples": 2},
+      "lower_eps": {"eps": 0.10},
+      "higher_eps": {"eps": 0.87},
+      "more_neighbors": {"min_samples": 3}
+    },
+    "hdbscan": {
+      "base": {"min_cluster_size": 2, "min_samples": 2},
+      "larger_clusters": {"min_cluster_size": 3},
+      "more_neighbors": {"min_samples": 3}
+    },
+    "optics": {
+      "base": {"max_eps": 1.0, "xi": 0.05, "min_cluster_size": 2, "min_samples": 2},
+      "lower_max_eps": {"max_eps": 0.10},
+      "steeper_xi": {"xi": 0.80},
+      "more_neighbors": {"min_samples": 3}
+    }
+  }
+}
