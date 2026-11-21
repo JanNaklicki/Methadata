@@ -1,13 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, ApiError } from '../api/client'
 import type { Evidence, EvidenceItem, TextExcerpt } from '../api/types'
+import ScenarioPanel from '../counterfactual/ScenarioPanel'
 
-export default function EvidencePanel({ runId, evidenceId, onClose }: { runId: string; evidenceId: string; onClose: () => void }) {
+interface Props {
+  runId: string
+  evidenceId: string
+  onClose: () => void
+  scenario?: { label: (id: string) => string }
+}
+
+export default function EvidencePanel({ runId, evidenceId, onClose, scenario }: Props) {
   const panel = useRef<HTMLElement>(null)
   const [evidence, setEvidence] = useState<Evidence | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
 
   useEffect(() => {
+    panel.current?.focus({ preventScroll: true })
     panel.current?.scrollIntoView?.({ block: 'nearest' })
     const ctrl = new AbortController()
     api.getEvidence(runId, evidenceId, ctrl.signal).then(setEvidence, (e) => {
@@ -17,7 +26,7 @@ export default function EvidencePanel({ runId, evidenceId, onClose }: { runId: s
   }, [runId, evidenceId])
 
   return (
-    <section ref={panel} className="evidence" aria-label="Dowód">
+    <section ref={panel} className="evidence" aria-label="Dowód" tabIndex={-1}>
       <div className="row">
         <h2>Dowód</h2>
         <button type="button" onClick={onClose}>Zamknij</button>
@@ -42,6 +51,7 @@ export default function EvidencePanel({ runId, evidenceId, onClose }: { runId: s
               </div>
             ))}
           </div>
+          {scenario && <ScenarioPanel runId={runId} evidenceId={evidenceId} {...scenario} />}
         </>
       )}
     </section>

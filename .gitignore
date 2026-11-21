@@ -9,3 +9,4 @@ __pycache__/
 .venv/
 .pytest_cache/
 var/
+tests/web-e2e/node_modules/

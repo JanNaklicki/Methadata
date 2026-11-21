@@ -22,6 +22,7 @@ from methadata.intake import submit_files, submit_url
 from . import engine as engine_mod
 from .errors import ApiError, safe_text, storage_unavailable, validation
 from .runs import RUN_ID, RunManager
+from .scenarios import RunScenarios
 from .settings import API_VERSION, PROFILES, Settings
 from .storage import Storage
 from .views import PREVIEW_NAME, build_evidence, default_label, observation_display_url
@@ -96,6 +97,7 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
     settings = settings or Settings.from_env()
     storage = Storage(settings)
     manager = RunManager(storage, engine or engine_mod.compute_run)
+    scenarios = RunScenarios(manager)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -341,6 +343,15 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
         if ev is None:
             raise ApiError(404, "evidence_not_found", "Nie znaleziono takiego dowodu w tej analizie.")
         return _json(200, ev)
+
+    @app.get("/api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios")
+    def get_scenario(run_id: str, evidence_id: str, request: Request):
+        st = _run_state(run_id)
+        if st["status"] != "succeeded":
+            raise ApiError(409, "run_not_ready", "Analiza jeszcze się nie zakończyła. Spróbuj za chwilę.",
+                           retryable=st["status"] in ("queued", "running"))
+        query = request.query_params
+        return _json(200, scenarios.compare(st, evidence_id, query.getlist("disabled"), query.get("material_id")))
 
     # ------------------------------------------------------------ statyczne podglądy
     @app.get("/static/previews/{name}")

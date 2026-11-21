@@ -24,3 +24,17 @@ button:disabled { opacity: 0.5; cursor: default; }
 .item img { max-width: 100%; height: auto; }
 blockquote { margin: 6px 0; padding: 6px 10px; border-left: 3px solid #aab; background: #f2f4f7; white-space: pre-wrap; }
 mark { background: #ffe58a; }
+.scenarios { border-top: 1px solid #d7dbe0; margin-top: 16px; }
+.scenarios fieldset { border: 1px solid #d7dbe0; border-radius: 6px; margin: 0; }
+.scenario-material { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.scenario-material select { font: inherit; max-width: 100%; }
+.scenario-options { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.scenario-options label { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; }
+.scenario-options button[aria-disabled='true'] { opacity: 0.65; cursor: default; }
+.scenario-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.scenario-columns h4 { margin: 0 0 12px; }
+.scenario-columns h5 { font-size: 0.95rem; margin-bottom: 6px; }
+.scenario-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin: 0; }
+.scenario-metrics dt { color: #5b636d; }
+.scenario-metrics dd { margin: 0; overflow-wrap: anywhere; }
+.scenario-hops { margin-top: 6px; padding-left: 22px; }

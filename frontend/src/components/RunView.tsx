@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useRunPolling } from '../usePolling'
 import type { ClusterRunView, Material, PairEvidenceView } from '../api/types'
 import EvidencePanel from './EvidencePanel'
@@ -46,10 +47,15 @@ export default function RunView({ runId, evidenceId, navigate, pollMs }: Props) 
   )
 }
 
-function Result({ runId, result, evidenceId, navigate }: { runId: string; result: ClusterRunView; evidenceId: string | null; navigate: (p: string) => void }) {
+function Result({ runId, result, evidenceId, navigate }: {
+  runId: string; result: ClusterRunView; evidenceId: string | null; navigate: (p: string) => void
+}) {
+  const opener = useRef<HTMLButtonElement | null>(null)
   const byId = new Map(result.materials.map((m) => [m.material_id, m]))
   const label = (id: string) => byId.get(id)?.label ?? id
   const { summary } = result
+  const pair = result.pair_evidence.find((p) => p.evidence_id === evidenceId)
+  const scenario = pair?.method_id === 'fusion-v1' ? { label } : undefined
 
   return (
     <>
@@ -85,8 +91,11 @@ function Result({ runId, result, evidenceId, navigate }: { runId: string; result
 
       <h2>Dowody</h2>
       {evidenceId && (
-        <EvidencePanel key={evidenceId} runId={runId} evidenceId={evidenceId}
-          onClose={() => navigate(`/runs/${encodeURIComponent(runId)}`)} />
+        <EvidencePanel key={evidenceId} runId={runId} evidenceId={evidenceId} scenario={scenario}
+          onClose={() => {
+            navigate(`/runs/${encodeURIComponent(runId)}`)
+            opener.current?.focus()
+          }} />
       )}
       {result.pair_evidence.length === 0 ? (
         <p>Brak dowodów do wyświetlenia.</p>
@@ -94,7 +103,10 @@ function Result({ runId, result, evidenceId, navigate }: { runId: string; result
         <ul className="pairs">
           {result.pair_evidence.map((p) => (
             <PairRow key={p.evidence_id} p={p} label={label} selected={p.evidence_id === evidenceId}
-              onOpen={() => navigate(`/runs/${encodeURIComponent(runId)}/evidence/${encodeURIComponent(p.evidence_id)}`)} />
+              onOpen={(button) => {
+                opener.current = button
+                navigate(`/runs/${encodeURIComponent(runId)}/evidence/${encodeURIComponent(p.evidence_id)}`)
+              }} />
           ))}
         </ul>
       )}
@@ -119,7 +131,7 @@ function MaterialCard({ m }: { m: Material }) {
   )
 }
 
-function PairRow({ p, label, selected, onOpen }: { p: PairEvidenceView; label: (id: string) => string; selected: boolean; onOpen: () => void }) {
+function PairRow({ p, label, selected, onOpen }: { p: PairEvidenceView; label: (id: string) => string; selected: boolean; onOpen: (button: HTMLButtonElement) => void }) {
   return (
     <li className={selected ? 'pair selected' : 'pair'}>
       <div>
@@ -129,7 +141,7 @@ function PairRow({ p, label, selected, onOpen }: { p: PairEvidenceView; label: (
           {p.score == null ? 'wynik: niewykonalne' : `wynik: ${p.score.toFixed(2)}`} · metoda {p.method_id}
         </div>
       </div>
-      <button type="button" onClick={onOpen} aria-label={`Pokaż dowody: ${label(p.pair[0])} i ${label(p.pair[1])}`}>
+      <button type="button" onClick={(e) => onOpen(e.currentTarget)} aria-label={`Pokaż dowody: ${label(p.pair[0])} i ${label(p.pair[1])}`}>
         Pokaż dowody
       </button>
     </li>

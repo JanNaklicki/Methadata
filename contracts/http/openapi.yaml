@@ -184,6 +184,44 @@ paths:
         "404": {$ref: "#/components/responses/NotFound"}
         "409": {$ref: "#/components/responses/RunNotReady"}
         "503": {$ref: "#/components/responses/StorageUnavailable"}
+  /api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios:
+    get:
+      tags: [runs]
+      operationId: getScenario
+      summary: Porównaj wpływ rodzin śladów na parę i graf
+      description: |
+        Dostępne dla zakończonego przebiegu jury i publicznego dowodu fusion-v1.
+        Wyłączenia dotyczą wyłącznie porównań wskazanego materiału.
+        Graf jest przeliczany na zamrożonych dowodach.
+        Brak parametru disabled zwraca wynik bazowy w obu wariantach.
+        Najkrótsze ścieżki pośrednie zawierają wyłącznie zaakceptowane krawędzie.
+      parameters:
+        - {$ref: "#/components/parameters/RunId"}
+        - name: evidence_id
+          in: path
+          required: true
+          schema: {$ref: "#/components/schemas/Id"}
+        - name: disabled
+          in: query
+          style: form
+          explode: true
+          schema: {$ref: "#/components/schemas/ScenarioFamilyMask"}
+          description: "Powtarzany parametr (np. disabled=asset&disabled=dom). Dozwolone rodziny zależą od przebiegu."
+        - name: material_id
+          in: query
+          schema: {$ref: "#/components/schemas/Id"}
+          description: Strona pary objęta wyłączeniem. Domyślnie zgłoszony materiał, jeśli należy do pary, lub pierwsza strona.
+      responses:
+        "200":
+          description: Wynik bazowy i scenariusz.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ScenarioComparison"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/RunNotReady"}
+        "422": {$ref: "#/components/responses/ValidationFailed"}
+        "503": {$ref: "#/components/responses/StorageUnavailable"}
+
 components:
   parameters:
     RunId:
@@ -221,7 +259,7 @@ components:
           examples:
             unsupported: {externalValue: examples/error_unsupported_media_type.json}
     NotFound:
-      description: Nieznane ID (obserwacji, przebiegu lub dowodu).
+      description: Nieznane ID obserwacji, przebiegu lub dowodu albo niedostępne porównanie rodzin.
       content:
         application/json:
           schema: {$ref: "#/components/schemas/ErrorResponse"}
@@ -248,6 +286,102 @@ components:
       type: string
       pattern: "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$"
       description: Stabilne ID z F01 (obs-, can-, art-, pev-, ...) lub run_id.
+    ScenarioFamilyMask:
+      type: array
+      uniqueItems: true
+      items: {type: string, minLength: 1}
+    ScenarioPair:
+      type: array
+      minItems: 2
+      maxItems: 2
+      uniqueItems: true
+      items: {$ref: "#/components/schemas/Id"}
+    ScenarioMetrics:
+      type: object
+      additionalProperties: false
+      required: [score, fused, status, coverage, supporting_origins, accepted]
+      properties:
+        score:
+          description: Wynik po uwzględnieniu warunków pokrycia i wsparcia.
+          oneOf: [{$ref: "#/components/schemas/Score"}, {type: "null"}]
+        fused:
+          description: Surowe podobieństwo fuzji przed zastosowaniem warunków decyzji.
+          oneOf: [{$ref: "#/components/schemas/Score"}, {type: "null"}]
+        status: {type: string, enum: [ok, no_evidence, insufficient_coverage, insufficient_support]}
+        coverage: {$ref: "#/components/schemas/Score"}
+        supporting_origins: {type: integer, minimum: 0}
+        accepted: {type: boolean}
+    ScenarioHop:
+      type: object
+      additionalProperties: false
+      required: [from_id, to_id, score, families]
+      properties:
+        from_id: {$ref: "#/components/schemas/Id"}
+        to_id: {$ref: "#/components/schemas/Id"}
+        score: {$ref: "#/components/schemas/Score"}
+        families: {$ref: "#/components/schemas/ScenarioFamilyMask"}
+    ScenarioVariant:
+      type: object
+      additionalProperties: false
+      required: [engine_run_id, pair, group, assignment_status, indirect_paths]
+      properties:
+        engine_run_id: {$ref: "#/components/schemas/Id"}
+        pair: {$ref: "#/components/schemas/ScenarioMetrics"}
+        group:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: {$ref: "#/components/schemas/Id"}
+          description: Skład grupy wskazanego materiału, a przy braku grupy ID samego materiału.
+        assignment_status: {type: string, enum: [grouped, singleton, insufficient_data]}
+        indirect_paths:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [member_id, hops]
+            properties:
+              member_id: {$ref: "#/components/schemas/Id"}
+              hops:
+                type: array
+                minItems: 2
+                items: {$ref: "#/components/schemas/ScenarioHop"}
+    ScenarioEdgeChange:
+      type: object
+      additionalProperties: false
+      required: [pair_ids, kind, baseline, scenario]
+      properties:
+        pair_ids: {$ref: "#/components/schemas/ScenarioPair"}
+        kind:
+          type: string
+          enum: [utrata_pokrycia, utrata_wsparcia, spadek_podobienstwa, nowa_krawedz, zmiana_parametrow]
+        baseline: {$ref: "#/components/schemas/ScenarioMetrics"}
+        scenario: {$ref: "#/components/schemas/ScenarioMetrics"}
+    ScenarioComparison:
+      type: object
+      additionalProperties: false
+      required: [run_id, evidence_id, dataset_version, target_id, pair_ids, families, disabled, threshold, coverage_min,
+                 min_support, baseline, scenario, edge_changes, minimal_masks]
+      properties:
+        run_id: {$ref: "#/components/schemas/Id"}
+        evidence_id: {$ref: "#/components/schemas/Id"}
+        dataset_version: {$ref: "#/components/schemas/SafeText"}
+        target_id: {$ref: "#/components/schemas/Id"}
+        pair_ids: {$ref: "#/components/schemas/ScenarioPair"}
+        families: {$ref: "#/components/schemas/ScenarioFamilyMask"}
+        disabled: {$ref: "#/components/schemas/ScenarioFamilyMask"}
+        threshold: {$ref: "#/components/schemas/Score"}
+        coverage_min: {$ref: "#/components/schemas/Score"}
+        min_support: {type: integer, minimum: 1}
+        baseline: {$ref: "#/components/schemas/ScenarioVariant"}
+        scenario: {$ref: "#/components/schemas/ScenarioVariant"}
+        edge_changes:
+          type: array
+          items: {$ref: "#/components/schemas/ScenarioEdgeChange"}
+        minimal_masks:
+          type: array
+          description: Wszystkie zestawy o najmniejszej liczności zmieniające skład grupy wskazanego materiału.
+          items: {$ref: "#/components/schemas/ScenarioFamilyMask"}
     Timestamp:
       type: string
       pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
@@ -281,6 +415,7 @@ components:
         - observation_not_found
         - run_not_found
         - evidence_not_found
+        - scenario_not_available
         - run_not_ready
         - run_failed
         - storage_unavailable
