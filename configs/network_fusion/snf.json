@@ -1,0 +1,34 @@
+{
+  "name": "snf-v1",
+  "similarity_version": "snf-v1(lexical-tfidf-v1+assets-jaccard-v1+dom-paths-jaccard-v1)",
+  "views": {
+    "text": {
+      "method_id": "lexical-tfidf-v1"
+    },
+    "image": {
+      "method_id": "assets-jaccard-v1"
+    },
+    "structure": {
+      "method_id": "dom-paths-jaccard-v1"
+    }
+  },
+  "extractors": [
+    "assets-hash-extractor",
+    "lexical-text-extractor",
+    "dom-struct-extractor"
+  ],
+  "subset": "complete",
+  "neighbors": 5,
+  "iterations": 20,
+  "threshold": 0.5,
+  "scale": "local",
+  "min_view_mean": 0.2,
+  "top_via": 3,
+  "clusterer": "components",
+  "clusterer_config": {},
+  "fusion": {
+    "min_support": 2,
+    "coverage_min": 0.5,
+    "support_min": 0.5
+  }
+}
