@@ -13,6 +13,9 @@ dependencies = ["pydantic>=2.5,<3"]
 test = ["pytest>=8", "jsonschema>=4.20"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
+[project.entry-points."methadata.adapters"]
+extract-html = "methadata.extractors.html:get_adapters"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
