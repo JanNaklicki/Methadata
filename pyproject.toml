@@ -14,6 +14,7 @@ test = ["pytest>=8", "jsonschema>=4.20", "pyyaml>=6", "openapi-spec-validator>=0
 web = ["fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9", "httpx>=0.27"]
 media = ["Pillow>=10"]
 pdf = ["pypdf>=4"]
+ocr = ["Pillow>=10", "rapidocr-onnxruntime>=1.2"]
 # Moduły dodają własne extras tutaj (np. ocr = [...], vectors = [...], graph = [...]).
 
 [project.entry-points."methadata.adapters"]
@@ -21,13 +22,22 @@ importer-files = "methadata.ingest.importer:get_adapters"
 assets = "methadata.experiments.assets.adapters:get_adapters"
 dom = "methadata.experiments.dom.adapters:get_adapters"
 components = "methadata.clustering.components:ADAPTERS"
+linkage = "methadata.clustering.linkage:get_adapters"
 extract-html = "methadata.extractors.html:get_adapters"
 network = "methadata.extractors.network:get_adapters"
 media = "methadata.extractors.media:get_adapters"
+ocr-layout = "methadata.experiments.ocr_layout:get_adapters"
+extract-code = "methadata.extractors.code:get_adapters"
 source-payer = "methadata.sources.payer:get_adapters"
 extract-documents = "methadata.extractors.documents:get_adapters"
 lexical = "methadata.experiments.lexical:get_adapters"
 near-copy = "methadata.experiments.near_copy:get_adapters"
+url-har = "methadata.experiments.url_har:get_adapters"
+rare-motifs = "methadata.experiments.rare_motifs:get_adapters"
+funnel = "methadata.experiments.funnel:get_adapters"
+fusion = "methadata.clustering.fusion:get_adapters"
+people-entities = "methadata.experiments.people_entities:get_adapters"
+narrative-slots = "methadata.experiments.narrative_slots:get_adapters"
 
 [tool.setuptools.packages.find]
 where = ["src", "backend"]
@@ -35,6 +45,7 @@ where = ["src", "backend"]
 [tool.setuptools.package-data]
 "methadata_api" = ["demo_data/manifest.json", "demo_data/*/*.html", "demo_data/*/*.png", "demo_data/*/assets/*.png"]
 "methadata.contracts" = ["schemas/v1/*.json"]
+"methadata.experiments.people_entities" = ["data/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

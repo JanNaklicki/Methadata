@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import json
 from pathlib import Path
 
@@ -170,7 +171,7 @@ def test_discover():
     assert "extract-html" in found and isinstance(found["extract-html"], HtmlExtractor)
 
 
-REAL = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
+REAL = _REAL_BACKUP
 
 
 @pytest.mark.skipif(not REAL.exists(), reason="brak BACKUP")

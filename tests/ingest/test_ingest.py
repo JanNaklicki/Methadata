@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import json
 import os
 import shutil
@@ -11,7 +12,7 @@ from methadata.contracts.interfaces import AdapterKind
 from methadata.ingest import FileImporter, Limits, Store, verify_blobs
 from methadata.ingest.detect import sniff
 
-DATA = Path(os.environ.get("METHADATA_BACKUP", Path(__file__).resolve().parents[2].parent.parent.parent / "BACKUP"))
+DATA = _REAL_BACKUP
 URLS = DATA.parent / "scam_links.dec"
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
 

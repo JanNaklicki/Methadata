@@ -1,3 +1,4 @@
+from methadata.devtools.realdata import BACKUP as _REAL_BACKUP
 import random
 from pathlib import Path
 
@@ -8,7 +9,7 @@ from methadata.experiments.dom import (DomStructureExtractor, PathSetComparator,
                                        SequenceEditComparator, levenshtein)
 from methadata.experiments.dom.seq import drop_subtrees, tag_paths
 
-BACKUP = Path("/Users/jnaklicki/Documents/Hackathon/Methadata/BACKUP")
+BACKUP = _REAL_BACKUP
 
 
 class Mem:
