@@ -1,0 +1,26 @@
+:root { font-family: system-ui, sans-serif; color: #1c1f23; background: #f6f7f9; }
+body { margin: 0; }
+.app { max-width: 1000px; margin: 0 auto; padding: 16px; }
+.top { display: flex; gap: 12px; align-items: baseline; padding-bottom: 12px; border-bottom: 1px solid #d7dbe0; }
+.top a { font-weight: 700; font-size: 1.2rem; text-decoration: none; color: inherit; }
+.muted { color: #5b636d; font-size: 0.9rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.card { background: #fff; border: 1px solid #d7dbe0; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+input[type='text'] { padding: 8px; border: 1px solid #aab; border-radius: 4px; }
+button { padding: 8px 14px; border-radius: 4px; border: 0; background: #1f5fbf; color: #fff; cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+.error { background: #fde8e8; border: 1px solid #e0a0a0; padding: 10px 12px; border-radius: 6px; margin: 12px 0; }
+.summary { background: #fff; border-left: 6px solid #888; padding: 8px 16px; border-radius: 4px; }
+.summary.grouped { border-color: #2c8a4b; }
+.summary.insufficient_evidence { border-color: #c98a00; }
+.materials, .pairs { list-style: none; padding: 0; display: grid; gap: 8px; }
+.material, .pair { display: flex; gap: 12px; background: #fff; border: 1px solid #d7dbe0; border-radius: 6px; padding: 10px; align-items: center; justify-content: space-between; }
+.material { justify-content: flex-start; }
+.pair.selected { border-color: #1f5fbf; }
+.evidence { background: #fff; border: 2px solid #1f5fbf; border-radius: 8px; padding: 16px; margin-top: 16px; }
+.row { display: flex; justify-content: space-between; align-items: center; }
+.sides { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.side { border: 1px solid #d7dbe0; border-radius: 6px; padding: 10px; }
+.item img { max-width: 100%; height: auto; }
+blockquote { margin: 6px 0; padding: 6px 10px; border-left: 3px solid #aab; background: #f2f4f7; white-space: pre-wrap; }
+mark { background: #ffe58a; }
