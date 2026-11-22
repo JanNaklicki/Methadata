@@ -28,6 +28,14 @@ export default function RelationshipGraph({
 }: Props) {
   const [promoting, setPromoting] = useState('')
   const manualEdgeIds = useMemo(() => new Set(result.investigation?.manual_edge_ids ?? []), [result.investigation?.manual_edge_ids])
+  const phylo = result.investigation?.phylofake
+  const patientZeroByMaterial = useMemo(() => {
+    const map = new Map<string, { reason: string; mutation: string }>()
+    for (const c of Object.values(phylo?.clusters ?? {})) {
+      map.set(c.patient_zero, { reason: c.patient_zero_reason, mutation: c.dominant_mutation_label })
+    }
+    return map
+  }, [phylo])
   const [query, setQuery] = useState('')
   const [group, setGroup] = useState('')
   const [families, setFamilies] = useState<string[]>([])
@@ -91,10 +99,11 @@ export default function RelationshipGraph({
     const hasSelectedEdge = Boolean(pair || suggestedEdge)
     graph.updateEachNodeAttributes((id, attrs) => {
       const base = attrs.baseSize ?? (ungrouped.has(id) ? 10 : 16)
+      const isRoot = patientZeroByMaterial.has(id)
       return {
         ...attrs,
         selected: id === selected,
-        emphasized: recent.has(id),
+        emphasized: recent.has(id) || isRoot,
         muted: id !== selected && (!matchingIds.has(id) || Boolean(current && !adjacent.has(id))),
         size: id === selected ? base + 4 : recent.has(id) ? base + 3 : base,
       }
@@ -240,6 +249,19 @@ export default function RelationshipGraph({
               {materials.get(pair.pair[0])?.label ?? pair.pair[0]} <span aria-hidden="true">↔</span> {materials.get(pair.pair[1])?.label ?? pair.pair[1]}
             </p>
           </div>
+          {phylo?.edges[pair.evidence_id] && (() => {
+            const pf = phylo.edges[pair.evidence_id]
+            return <div className="phylo-box">
+              <div className="phylo-head">
+                <span className={`phylo-tag phylo-${pf.mutation.toLowerCase()}`}>{pf.mutation_label}</span>
+                <span className="phylo-acig">ACIG <strong>{formatScore(pf.acig)}</strong></span>
+              </div>
+              <p className="muted">{pf.detail}</p>
+              {pf.top_traces.length > 0 && <div className="signal-chips">
+                {pf.top_traces.map((t) => <span key={t} className="signal-chip">{t}</span>)}
+              </div>}
+            </div>
+          })()}
           {collectionRun && <>
             <h4>Wyniki sygnałów</h4>
             <PairSignals runId={collectionRun} evidenceId={pair.evidence_id} />
@@ -310,6 +332,10 @@ export default function RelationshipGraph({
           </button>
         </> : current ? <>
           <h3>{current.label}</h3>
+          {patientZeroByMaterial.has(selected) && <div className="phylo-pz-badge">
+            <strong>★ Szablon źródłowy (Patient Zero)</strong>
+            <span>{patientZeroByMaterial.get(selected)!.reason}</span>
+          </div>}
           {current.thumbnail && <img className="graph-preview" src={current.thumbnail.href} alt="" />}
           {current.display_url && <p className="muted">{current.display_url}</p>}
           {(() => {

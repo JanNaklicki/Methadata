@@ -195,19 +195,24 @@ export function buildRelationshipNetwork(result: ClusterRunView) {
     degrees.set(edge.target, (degrees.get(edge.target) ?? 0) + 1)
   })
 
+  const phylo = result.investigation?.phylofake
+  const patientZeros = new Set(Object.values(phylo?.clusters ?? {}).map((c) => c.patient_zero))
+
   result.materials.forEach((material) => {
     const grouped = !remaining.has(material.material_id)
     const image = material.thumbnail?.href ?? ''
-    const ring = clusterColorOf.get(material.material_id) ?? (grouped ? MATERIAL_RING_COLOR : UNGROUPED_RING_COLOR)
-    const baseSize = nodeRadius(degrees.get(material.material_id) ?? 0, grouped, Boolean(image))
+    const isRoot = patientZeros.has(material.material_id)
+    const ring = isRoot ? '#f4c37b' : (clusterColorOf.get(material.material_id) ?? (grouped ? MATERIAL_RING_COLOR : UNGROUPED_RING_COLOR))
+    const baseSize = nodeRadius(degrees.get(material.material_id) ?? 0, grouped, Boolean(image)) + (isRoot ? 3 : 0)
     graph.addNode(material.material_id, {
       x: 0,
       y: 0,
       color: grouped ? MATERIAL_COLOR : UNGROUPED_COLOR,
       borderColor: ring,
-      borderSize: grouped ? 2.6 : 1.8,
+      borderSize: isRoot ? 3.5 : grouped ? 2.6 : 1.8,
+      emphasized: isRoot,
       image,
-      label: compactLabel(material.label),
+      label: `${isRoot ? '★ ' : ''}${compactLabel(material.label)}`,
       size: baseSize,
       baseSize,
     })
@@ -215,11 +220,12 @@ export function buildRelationshipNetwork(result: ClusterRunView) {
   relationships.forEach((edge) => {
     const [source, target] = edge.source <= edge.target ? [edge.source, edge.target] : [edge.target, edge.source]
     const color = relationshipColor(edge, [])
+    const mutShort = phylo?.edges[edge.pair_evidence_id]?.mutation_short
     graph.addUndirectedEdgeWithKey(edge.pair_evidence_id, source, target, {
       size: edgeThickness(edge.score),
       opacity: edgeOpacity(edge.score),
       score: edge.score,
-      label: formatScore(edge.score),
+      label: mutShort ? `${formatScore(edge.score)} · ${mutShort}` : formatScore(edge.score),
       color,
       plainColor: color,
       dashSize: 0,

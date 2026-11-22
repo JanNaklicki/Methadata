@@ -2,17 +2,17 @@
 name: Methadata
 description: "Polish-language workspace for comparing saved pages and ads."
 colors:
-  canvas: "#0b1019"
-  panel: "#131923"
-  panel-raised: "#19212e"
+  canvas: "#0a0e17"
+  panel: "#0f131c"
+  panel-raised: "#181b25"
   wash: "#1b2432"
   divider: "#283140"
   control-border: "#394659"
-  ink: "#e3e9f4"
-  muted: "#a4b1c3"
+  ink: "#dfe2ef"
+  muted: "#bbc9cf"
   primary: "#a5e7ff"
   primary-hover: "#cef2ff"
-  accent: "#52dacd"
+  accent: "#4fdbc8"
   graph-stage: "#0b111b"
   graph-grid: "#28364a"
   graph-selected: "#62daca"
@@ -26,12 +26,14 @@ colors:
   insufficient-border: "#594930"
 typography:
   headline:
-    fontFamily: "Inter, system-ui, sans-serif"
+    fontFamily: "Hanken Grotesk, Inter, system-ui, sans-serif"
+    fontWeight: 650
     fontSize: "clamp(1.85rem, 3vw, 2.5rem)"
     lineHeight: 1.14
     letterSpacing: "-.035em"
   title:
-    fontFamily: "Inter, system-ui, sans-serif"
+    fontFamily: "Hanken Grotesk, Inter, system-ui, sans-serif"
+    fontWeight: 650
     fontSize: "1rem"
     lineHeight: 1.14
   body:
@@ -46,11 +48,11 @@ typography:
     fontSize: ".9rem"
     fontWeight: 690
   score:
-    fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
+    fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, Consolas, monospace"
     fontSize: "1.6rem"
     fontWeight: 650
   timestamp:
-    fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
+    fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, Consolas, monospace"
     fontSize: ".76rem"
 rounded:
   panel: "12px"
@@ -115,7 +117,7 @@ components:
 
 Methadata is a Polish-language investigation workspace for comparing saved pages and ads. Analysts need to see which pairs met the grouping criteria, trace the result to source material, and recognize when the available input cannot support a conclusion.
 
-The collection uses a dark navy shell and a navigation rail. Place counts, relationships, captures, and provenance where analysts need them to follow a result from the collection to the source. The supplied Stitch series covers the [explorer](docs/stitch/explorer.png), [graph](docs/stitch/graph.png), [evidence inspector](docs/stitch/evidence.png), and [timeline and simulator](docs/stitch/timeline.png). The HTML companions sit beside the PNGs. The running interface uses saved collection data and the tokens in [the frontend stylesheet](frontend/src/styles.css).
+The collection uses a dark navy shell and a navigation rail. Place counts, relationships, captures, and provenance where analysts need them to follow a result from the collection to the source. The local Stitch export provides the [forensic design guide](stitch_campaign_intelligence_platform/forensic_intelligence/DESIGN.md), [explorer](stitch_campaign_intelligence_platform/campaign_explorer_methadata_simplified/screen.png), [graph](stitch_campaign_intelligence_platform/investigation_graph_methadata/screen.png), [evidence inspector](stitch_campaign_intelligence_platform/evidence_inspector_methadata/screen.png), and [timeline and simulator](stitch_campaign_intelligence_platform/campaign_timeline_engine_config_methadata/screen.png). The export includes HTML companions. The running interface uses saved collection data and the tokens in [the frontend stylesheet](frontend/src/styles.css).
 
 ## Colors
 
@@ -126,7 +128,7 @@ The collection uses a dark navy shell and a navigation rail. Place counts, relat
 
 ## Typography
 
-Inter with system fallbacks serves headings, body text, and controls. The collection title scales from 1.85rem to 2.5rem. Panel headings are 1rem and filter labels are .83rem. Monospace distinguishes identifiers, collection metrics, scores, and timestamps. Numeric result rows use tabular figures where values need to align.
+Hanken Grotesk serves headings and Inter serves body text and controls. JetBrains Mono distinguishes technical values. Latin and Latin Extended subsets load locally and cover Polish diacritics. The collection title scales from 1.85rem to 2.5rem. Panel headings are 1rem and filter labels are .83rem. Monospace distinguishes identifiers, collection metrics, scores, and timestamps. Numeric result rows use tabular figures where values need to align.
 
 ## Layout
 
@@ -147,10 +149,10 @@ Use 12px corners for containers, 10px for individual comparison panes, and 7px f
 - **Controls.** Primary buttons use a cyan fill and dark text. Secondary actions use a bordered navy surface. Text fields and selects have labeled targets, a 44px minimum height, and the shared keyboard focus outline.
 - **Navigation.** The current collection view uses a slate fill, a blue border, and cyan text. The rail retains text labels beside its icons.
 - **New analysis and results.** Give file comparison the primary action, show URL limitations beside the field, and keep the synthetic example in its own panel. Begin results with the outcome and counts. Prioritize accepted pairs and comparisons involving the submitted material. Give groups and material details adjacent space at wide widths.
-- **Collection.** Show filtered counts and groups alongside recent material. Group cards pair collection metrics with saved sample captures. The Materials view retains import records and uploaded files.
-- **Graph and inspector.** Build the relationship view from accepted links and the artifact view from observed shared domains, trackers, image hashes, and script hashes. Keep the active selection identifiable with labels and a clear route from the selected relationship to its evidence. The expandable graph list provides a second way to reach nodes and relationships.
-- **Pair evidence.** Identify the pair first, show its saved score and two source captures, then expose family scores, thresholds, supplemental methods, and provenance where available. Closing evidence returns to the previous view and restores focus to the opener when available, with the selected view control as a fallback.
-- **Timeline and simulator.** Show recorded capture and import timestamps as separate event types. Let analysts adjust family weights and the threshold for a chosen pair and compare the local simulation with the saved score. Use live values for score, coverage, independent support, and the simulated decision.
+- **Collection.** Show filtered counts and groups alongside recent material. Group cards pair collection metrics with previews of the closest recorded pair when available. A selected recent material shows its saved preview and the strongest recorded relationship in scope. The unassigned table shows recorded domains and assignment state. The Materials view retains import records and uploaded files.
+- **Graph and inspector.** Build the relationship view from accepted links and the artifact view from observed shared domains, trackers, image hashes, and script hashes. Show the selected pair and score above the shared signal meters. Preserve a clear route to the full inspector. The expandable graph list provides a second way to reach nodes and relationships.
+- **Pair evidence.** Identify the pair first, show its saved score and two source captures, then show source excerpts, family scores, thresholds, supplemental methods, and the artifact audit. Use the stored SHA-256 values and show an explicit missing state for older responses. Closing evidence returns to the previous view and restores focus to the opener when available, with the selected view control as a fallback.
+- **Timeline and simulator.** Show recorded capture and import timestamps as separate event types. Let analysts adjust family weights and the threshold for a chosen pair and compare the local simulation with the saved score. Keep saved and simulated scores side by side. Use actual coverage, independent support, and the simulated decision.
 
 ## Do's and Don'ts
 

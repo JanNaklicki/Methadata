@@ -14,6 +14,7 @@ interface Props {
   materials: Material[]
   domains?: Record<string, string[]>
   artifacts?: { material_ids: string[] }[]
+  phylofake?: import('../api/types').PhyloFakeData
   edges: PairEvidenceView[]
   sources?: SourceDates
   runId?: string | null
@@ -23,7 +24,7 @@ interface Props {
   onEvidence: (id: string, opener: HTMLElement) => void
 }
 
-export default function CampaignOverview({ groups, materials, domains, artifacts, edges, sources, runId, assignments, onGroup, onMaterial, onEvidence }: Props) {
+export default function CampaignOverview({ groups, materials, domains, artifacts, phylofake, edges, sources, runId, assignments, onGroup, onMaterial, onEvidence }: Props) {
   const [recentSelection, setRecentSelection] = useState('')
   const byId = new Map(materials.map((item) => [item.material_id, item]))
   const assigned = new Set(groups.flatMap((group) => group.material_ids))
@@ -53,9 +54,16 @@ export default function CampaignOverview({ groups, materials, domains, artifacts
         const best = links.reduce<PairEvidenceView | undefined>((match, edge) =>
           edge.score != null && (!match || edge.score > (match.score ?? -1)) ? edge : match, undefined)
         const samples = best ? best.pair.flatMap((id) => byId.get(id) ?? []) : members.slice(0, 2)
+        const pf = phylofake?.clusters[group.cluster_id]
         return <article className="campaign-card" key={group.cluster_id}>
           <header>
-            <h3>Grupa {group.index}</h3>
+            <div>
+              <h3>Grupa {group.index}</h3>
+              {pf && <div className="phylo-card-meta">
+                <span className={`phylo-tag phylo-${pf.dominant_mutation.toLowerCase()}`}>{pf.dominant_mutation_label}</span>
+                <span className="phylo-acig">★ Źródło: <strong>{pf.patient_zero_label}</strong> · ACIG <strong>{formatScore(pf.avg_acig)}</strong></span>
+              </div>}
+            </div>
             <button type="button" className="outline icon-button" onClick={() => onGroup(group.cluster_id)}>
               Otwórz graf <WorkspaceIcon name="arrow" />
             </button>

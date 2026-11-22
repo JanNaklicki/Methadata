@@ -502,6 +502,51 @@ mark { background: #254857; color: var(--ink); }
 .signal-row-actions { display: flex; gap: .35rem; align-items: stretch; margin-top: .4rem; }
 .signal-row-actions .graph-neighbour { margin-top: 0; flex: 1; }
 .signal-row-actions .promote-mini { flex: none; padding-inline: .6rem; font-size: .8rem; border-color: rgba(98, 218, 202, 0.5); color: var(--accent); }
+.phylo-box {
+  margin-top: .7rem;
+  padding: .65rem .75rem;
+  border-radius: 8px;
+  background: rgba(18, 28, 44, 0.85);
+  border: 1px solid rgba(244, 195, 123, 0.28);
+  display: grid;
+  gap: .45rem;
+}
+.phylo-head { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.phylo-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin-top: .35rem; }
+.phylo-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: .14rem .5rem;
+  border-radius: 999px;
+  font: 680 .72rem var(--mono);
+  letter-spacing: .02em;
+  background: rgba(124, 226, 255, 0.14);
+  border: 1px solid rgba(124, 226, 255, 0.4);
+  color: #cef2ff;
+}
+.phylo-tag.phylo-celebrity_swap, .phylo-tag.phylo-product_swap {
+  background: rgba(244, 195, 123, 0.16);
+  border-color: rgba(244, 195, 123, 0.55);
+  color: #f4c37b;
+}
+.phylo-tag.phylo-cross_media_bridge {
+  background: rgba(196, 165, 247, 0.16);
+  border-color: rgba(196, 165, 247, 0.55);
+  color: #d6c0ff;
+}
+.phylo-acig { font: .78rem var(--mono); color: var(--muted); }
+.phylo-acig strong { color: var(--accent); }
+.phylo-pz-badge {
+  margin-top: .45rem;
+  padding: .5rem .65rem;
+  border-radius: 7px;
+  background: rgba(244, 195, 123, 0.12);
+  border: 1px solid rgba(244, 195, 123, 0.45);
+  display: grid;
+  gap: .15rem;
+}
+.phylo-pz-badge strong { color: #f4c37b; font-size: .82rem; }
+.phylo-pz-badge span { color: var(--muted); font-size: .78rem; }
 .network-canvas { height: clamp(24rem, 55vh, 42rem); }
 .evidence-select { max-width: 37rem; margin-bottom: 1rem; }
 .evidence-pair { font-size: clamp(1.05rem, 2vw, 1.4rem); }

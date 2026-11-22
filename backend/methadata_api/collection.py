@@ -17,6 +17,7 @@ from methadata.contracts.models import ArtifactRef, InputKind, Observation
 from methadata.experiments.perceptual import PerceptualExtractor
 from methadata.ingest.detect import sniff
 from methadata.ingest.store import now_iso
+from methadata.phylofake import analyze_phylofake
 from methadata.runner import save_run
 
 from .collection_archive import archive_groups, build_loose_observation, build_observation, build_url_observation, read_zip
@@ -36,7 +37,7 @@ def is_analysable(observation) -> bool:
     """Czy materiał ma choć jeden ślad, który którykolwiek ekstraktor potrafi odczytać (zwykły plik tekstowy nie)."""
     for artifact in observation.artifacts:
         role, media = artifact.role.value, (artifact.media_type or "").lower()
-        if role not in ANALYSABLE or (role == "resource" and not media.startswith("image/")):
+        if role not in ANALYSABLE or (role == "resource" and not media.startswith("image/")) or (role == "document" and media != "application/pdf"):
             continue
         if role == "document" and media != "application/pdf":
             continue
@@ -268,6 +269,7 @@ def investigation_metadata(bundle, accepted, store=None, previews_dir=None, cach
             for kind, label, ids_ in shared
         ],
         "artifact_previews": store is not None,
+        "reference_checked": True,
         # Wyszukiwanie po treści (słowa kluczowe, nazwa produktu): zwięzły, małymi literami, ograniczony indeks na materiał.
         "search_text": {mid: " ".join(parts)[:1500].lower() for mid, parts in texts.items()},
         "domains": {mid: sorted(hosts) for mid, hosts in domains.items()},
@@ -452,7 +454,7 @@ class Collection:
             bundle = None
             investigation = graph.get("investigation") or {}
             if "suggested_edges" not in investigation or "domain_meta" not in investigation or not investigation.get("artifact_previews")\
-                    or "search_text" not in investigation:
+                    or "search_text" not in investigation or not investigation.get("reference_checked"):
                 bundle = self.runs.bundle(row[1])
                 if bundle is not None:
                     graph["investigation"] = investigation_metadata(
@@ -466,9 +468,10 @@ class Collection:
             if manual_ids:
                 accepted = {e["pair_evidence_id"] for e in graph["cluster_run"]["edges"]}
             graph.setdefault("investigation", {})["manual_edge_ids"] = sorted(manual_ids)
+            if bundle is None:
+                bundle = self.runs.bundle(row[1])
+            graph["investigation"]["phylofake"] = analyze_phylofake(bundle, graph)
             if graph.get("clusters"):
-                if bundle is None:
-                    bundle = self.runs.bundle(row[1])
                 summarize_clusters(bundle, graph, self.storage.settings.meta_dir / "cluster_summaries.json")
             graph["pair_evidence"] = [p for p in graph["pair_evidence"] if p["score"] is not None
                                       and p["evidence_id"] in accepted]

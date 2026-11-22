@@ -56,6 +56,8 @@ export default function CollectionScreen({ view: mode, params, navigate }: { vie
   const [report, setReport] = useState<ImportReport>()
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [scanning, setScanning] = useState(false)
+  const [monitorNote, setMonitorNote] = useState('')
   // Stan widoku żyje w adresie (zob. routes.ts), więc „wstecz”, odświeżenie i linki działają.
   const reportId = params.get('import') ?? undefined
   const graphMode: 'graph' | 'artifacts' = params.get('graph') === 'artifacts' ? 'artifacts' : 'graph'
@@ -210,6 +212,33 @@ export default function CollectionScreen({ view: mode, params, navigate }: { vie
     }
   }
 
+  async function onMonitorScan() {
+    setScanning(true)
+    setError('')
+    setMonitorNote('')
+    try {
+      const res = await api.runMonitorScan()
+      const srcName = typeof res.source === 'string' ? res.source : res.source?.name ?? 'monitor'
+      const cursor = res.state?.cursor ?? res.cursor ?? '—'
+      if (!res.ok) {
+        setError(res.error ?? 'Nie udało się przeskanować źródła.')
+      } else if (res.new > 0) {
+        setMonitorNote(
+          `Monitor (${srcName}): przeskanowano ${res.new} ${plural(res.new, 'nowy rekord', 'nowe rekordy', 'nowych rekordów')} · kursor: ${cursor}.`,
+        )
+        await load()
+      } else {
+        setMonitorNote(
+          `Monitor (${srcName}): brak nowych rekordów (kursor: ${cursor}).`,
+        )
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Nie udało się uruchomić monitora źródeł.')
+    } finally {
+      setScanning(false)
+    }
+  }
+
   const result = collection?.graph
   const metadata = result?.investigation
   const sourceDates = collection?.sources
@@ -346,6 +375,9 @@ export default function CollectionScreen({ view: mode, params, navigate }: { vie
         </p>}
       </div>
       {mode === 'explorer' && <div className="upload-actions">
+        <button type="button" className="outline icon-button" disabled={scanning || busy || saving} onClick={() => void onMonitorScan()}>
+          <WorkspaceIcon name="refresh" />{scanning ? 'Skanowanie…' : 'Skanuj źródło (Monitor)'}
+        </button>
         <button type="button" className="outline icon-button" disabled={refreshing || saving} onClick={() => {
           setReportRefresh((count) => count + 1)
           void refresh()
@@ -389,6 +421,7 @@ export default function CollectionScreen({ view: mode, params, navigate }: { vie
     </section>}
     {!collection && !error && <p className="notice" role="status">Wczytywanie bazy…</p>}
     {busy && <p className="notice" role="status">Przesyłanie plików…</p>}
+    {monitorNote && <p className="notice" role="status">{monitorNote}</p>}
     {saving && <p className="notice" role="status">Zapisywanie zmian w bazie…</p>}
     {error && <p role="alert" className="error">{error}</p>}
     {mode === 'library' && Boolean(collection?.imports?.length) && <details className="collection-history" open>
@@ -473,7 +506,7 @@ export default function CollectionScreen({ view: mode, params, navigate }: { vie
       </dl>
       {filters}
       <CampaignOverview groups={groups} materials={explorerMaterials} domains={metadata?.domains}
-        artifacts={metadata?.artifacts} edges={acceptedEdges} sources={sourceDates} runId={collection?.run_id}
+        artifacts={metadata?.artifacts} phylofake={metadata?.phylofake} edges={acceptedEdges} sources={sourceDates} runId={collection?.run_id}
         assignments={result.cluster_run.assignments} onGroup={showGroup}
         onMaterial={inspect} onEvidence={openEvidence} />
     </>}

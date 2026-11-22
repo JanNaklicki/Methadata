@@ -71,6 +71,17 @@ W lokalnym korpusie testowym system automatycznie wyodrębnia charakterystyczne 
 
 ---
 
+## 6. Model autorski: PhyloFake v1 (Filogeneza Kampanii i Koszt Obejścia)
+
+Ponad standardową fuzją podobieństw Methadata uruchamia autorski silnik **`src/methadata/phylofake/engine.py`** łączący 4 mechanizmy ukierunkowane na taktykę operatorów kampanii oszukańczych:
+
+1. **Adversary-Cost Information Gain (ACIG):** każdemu wspólnemu śladowi przypisywana jest waga $w(f) = \left(\log\frac{N+1}{\mathrm{df}(f)+1} + 0{,}15\right) \times C_{\text{mutate}}(f)$, gdzie $C_{\text{mutate}}$ odzwierciedla koszt zmiany elementu po stronie oszusta (wysoki dla `meta_pixel`, skryptów JS, hostingu IP/rejestratora, głosu SpeechBrain i szkieletu DOM; niski dla rotowanej domeny lub podmienionego zdjęcia).
+2. **Detekcja mutacji Slot-Swap:** zamiast karać różnice wizerunkowe, silnik klasyfikuje każdą relację na **`CLONE`**, **`CELEBRITY_SWAP`** (ten sam szablon i zaplecze, podmieniona osoba publiczna — np. `Krzysztof Stanowski ↔ Tomasz Sekielski`), **`PRODUCT_SWAP`**, **`INFRA_REUSE`** lub **`CROSS_MEDIA_BRIDGE`** (most audio/wideo ↔ strona).
+3. **Skierowana filogeneza kampanii („Patient Zero”):** w każdej grupie wyznaczany jest szablon źródłowy (najwcześniejszy znacznik czasu z zapisu/RDAP oraz najwyższa centralność w grupie) wraz ze skierowanym drzewem mutacji (oznaczony symbolem `★` na grafie i kartach grup).
+4. **2-skokowa dyfuzja na hipergrafie:** wyszukuje ukryte mosty wieloskokowe między materiałami niepołączonymi bezpośrednio (np. `p2 ──[skrypt JS]──▶ p1 ──[Meta Pixel]──▶ p3`).
+
+---
+
 ## 6. Nowy materiał względem zbioru i potencjalne nowe kampanie
 
 Kolekcja działa przyrostowo: każdy import dodaje materiały do aktywnego zbioru i tworzy nową wersję grafu. Raport importu opisuje dla każdego nowego materiału jedną z trzech sytuacji:

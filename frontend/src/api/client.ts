@@ -81,6 +81,8 @@ export const api = {
     request('/collection/edges', json({ run_id: runId, evidence_id: evidenceId })),
   unpromoteEdge: (evidenceId: string) =>
     request(`/collection/edges/${encodeURIComponent(evidenceId)}`, { method: 'DELETE' }),
+  runMonitorScan: () =>
+    request<import('./types').MonitorScanResult>('/monitor/scan', { method: 'POST' }),
   getMonitor: () => request<MonitorStatus>('/monitor', { cache: 'no-store' }),
   scanMonitor: () => request<MonitorScan>('/monitor/scan', { method: 'POST' }),
   getDemo: (signal?: AbortSignal) => request<Demo>('/demo', { signal }),

@@ -87,6 +87,36 @@ export interface SuggestedEdge {
   label: string
   explanation: string
 }
+export interface PhyloFakeEdge {
+  mutation: string
+  mutation_label: string
+  mutation_short: string
+  detail: string
+  acig: number
+  top_traces: string[]
+}
+export interface PhyloFakeCluster {
+  patient_zero: string
+  patient_zero_label: string
+  patient_zero_reason: string
+  dominant_mutation: string
+  dominant_mutation_label: string
+  avg_acig: number
+  tree: { from_id: string; to_id: string; evidence_id: string; mutation: string; mutation_label: string; acig: number }[]
+}
+export interface PhyloFakeBridge {
+  source: string
+  target: string
+  via: string
+  score: number
+  path: string
+}
+export interface PhyloFakeData {
+  version: string
+  edges: Record<string, PhyloFakeEdge>
+  clusters: Record<string, PhyloFakeCluster>
+  bridges: PhyloFakeBridge[]
+}
 export interface ClusterRunView {
   investigation?: {
     artifacts: SharedArtifact[]
@@ -98,6 +128,7 @@ export interface ClusterRunView {
     edge_families: Record<string, string[]>
     suggested_edges?: SuggestedEdge[]
     manual_edge_ids?: string[]
+    phylofake?: PhyloFakeData
   }
   collection?: boolean
   cluster_run: Record<string, unknown> & {
@@ -152,6 +183,17 @@ export interface Evidence {
   sides: [EvidenceSide, EvidenceSide]
 }
 
+export interface MonitorScanResult {
+  ok: boolean
+  source: string | { kind: string; name: string; available?: boolean; synthetic?: boolean }
+  new: number
+  updated?: number
+  duplicate: number
+  cursor?: string | null
+  exhausted: boolean
+  state?: { cursor?: string | null; last_run?: string | null; totals?: Record<string, number> }
+  error?: string | null
+}
 export interface CollectionData {
   version: number
   run_id: string | null
