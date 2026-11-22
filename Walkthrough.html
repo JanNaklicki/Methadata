@@ -250,7 +250,7 @@
 
   <div class="section-label">Start</div>
   <a href="#start">Uruchomienie (Docker)</a>
-  <a href="#pierwszy-przebieg">Pierwszy przebieg</a>
+  <a href="#pierwszy-przebieg">Pierwszy import (własny ZIP)</a>
   <a href="#warianty">Warianty uruchomienia</a>
 
   <div class="section-label">Przepływ</div>
@@ -287,7 +287,7 @@
 </div>
 
 <h2>Uruchomienie (Docker)</h2>
-<p>Jedyny wymagany składnik to Docker z Compose v2. Nie trzeba pliku <code>.env</code>, prywatnego korpusu ani ręcznego importu — backend sam zasiewa syntetyczną próbkę demonstracyjną.</p>
+<p>Jedyny wymagany składnik to Docker z Compose v2. Nie trzeba pliku <code>.env</code>, klucza API ani żadnej konfiguracji wstępnej — po starcie od razu wrzucasz własne materiały.</p>
 
 <pre><code>docker compose up --build      # start (pierwsze budowanie pobiera obrazy i zależności)
 docker compose logs -f         # logi obu usług (logs -f backend, logs -f frontend)
@@ -315,17 +315,23 @@ docker compose down -v         # stop i usunięcie danych</code></pre>
 
 <!-- ══════════════════════ PIERWSZY PRZEBIEG ══════════════════════ -->
 <section id="pierwszy-przebieg">
-<h2>Pierwszy przebieg</h2>
+<h2>Pierwszy import (własny ZIP)</h2>
+<p>Normalna ścieżka pracy to <strong>Baza materiałów</strong>: zaczyna pustą i zawiera wyłącznie to, co sam zaimportujesz. Graf, grupy i dowody liczą się nad Twoimi materiałami.</p>
 <ol>
-  <li>Otwórz <code>http://localhost:5173</code> — ekran <strong>Nowa analiza</strong>.</li>
-  <li>Kliknij <strong>Uruchom przykład</strong>. Profil <code>demo</code> używa syntetycznej próbki: materiały <strong>A</strong> i <strong>C</strong> to warianty jednej kampanii i tworzą grupę, <strong>B</strong> (inny temat i szablon) zostaje osobno.</li>
-  <li>W wyniku otwórz <strong>Pokaż dowody</strong> dla pary z grupy — zobaczysz grafiki z obu stron, wynik na rodzinę cech i uzasadnienie.</li>
-  <li>Przejdź do <strong>Baza materiałów</strong> (<code>/collection</code>) i dodaj własny plik lub ZIP przyciskiem <strong>Dodaj do bazy</strong>.</li>
-  <li>Raport importu powie, czy materiał <strong>dołączył do istniejącej grupy</strong>, utworzył <strong>nową grupę</strong> (potencjalna nowa kampania), czy został <strong>bez grupy</strong>.</li>
+  <li>Otwórz <code>http://localhost:5173/collection</code> (albo wybierz <strong>Baza materiałów</strong> w nawigacji).</li>
+  <li>Kliknij <strong>Dodaj do bazy</strong> i wskaż własny <strong>ZIP</strong> z zapisami stron — jeden plik, wiele plików albo archiwum zagnieżdżone. Przyjmowane są też pojedyncze HTML/MHTML, HAR, zrzuty ekranu, PDF, wideo i audio.</li>
+  <li>Otworzy się <strong>raport importu</strong> z postępem i statusem każdego wpisu: co zostało dodane, co pominięte, co rozpoznane jako duplikat.</li>
+  <li>Raport mówi też, co stało się z każdym materiałem: <strong>dołączył do istniejącej grupy</strong>, utworzył <strong>nową grupę</strong> (potencjalna nowa kampania), czy został <strong>bez grupy</strong>.</li>
+  <li>Przejdź do widoku <strong>graph</strong> i otwórz <strong>Pokaż dowody</strong> dla pary z grupy — zobaczysz grafiki z obu stron, wynik na rodzinę cech i uzasadnienie połączenia.</li>
+  <li>Kolejne ZIP-y dorzucaj tym samym przyciskiem. Ponowny import tego samego zapisu jest rozpoznawany jako duplikat i nie dubluje węzłów.</li>
 </ol>
 
+<div class="callout callout-warn">
+  <strong>Baza materiałów vs. jednorazowa analiza.</strong> Ekran <strong>Nowa analiza</strong> porównuje wgrany plik z <em>indeksem profilu analizy</em>, w którym backend trzyma własną próbkę startową — zobaczysz tam materiały, których nie wgrałeś. Jeśli chcesz pracować wyłącznie na swoich plikach, importuj przez <strong>Baza materiałów</strong>: jej magazyn (<code>&lt;dane&gt;/collection</code>) jest osobny i startuje pusty.
+</div>
+
 <div class="callout callout-ok">
-  <strong>Stan widoku żyje w adresie.</strong> <code>/runs/:id</code>, <code>/collection/{graph|evidence|timeline|files}</code> oraz filtry (<code>?q=</code>, <code>?domain=</code>, <code>?period=</code>, <code>?min=</code>, <code>?group=</code>, <code>?material=</code>, <code>?evidence=</code>) są w URL-u, więc „wstecz”, odświeżenie i udostępnienie linku odtwarzają dokładnie ten sam widok.
+  <strong>Stan widoku żyje w adresie.</strong> <code>/collection/{graph|evidence|timeline|files}</code>, <code>/runs/:id</code> oraz filtry (<code>?q=</code>, <code>?domain=</code>, <code>?period=</code>, <code>?min=</code>, <code>?group=</code>, <code>?material=</code>, <code>?evidence=</code>) są w URL-u, więc „wstecz”, odświeżenie i udostępnienie linku odtwarzają dokładnie ten sam widok.
 </div>
 </section>
 
@@ -339,11 +345,11 @@ docker compose down -v         # stop i usunięcie danych</code></pre>
 METHADATA_WITH_FFMPEG=1 METHADATA_COLLECTION_MODELS=1 docker compose up --build</code></pre>
 <p class="muted">Wagi modeli pobierają się przy pierwszym użyciu (kilkaset MB) i wymagają dostępu do sieci.</p>
 
-<h3>Profil jury (lokalny korpus zapisów stron)</h3>
-<pre><code>pip install -e '.[web,media,pdf]'
-python -m methadata_api.prepare_jury --data-dir var/jury
-docker compose -p methadata-jury -f compose.yaml -f configs/demo/compose.jury.yaml up --build -d --wait</code></pre>
-<p>Przygotowanie tworzy indeks i magazyn w <code>var/jury</code> oraz pakiet <code>var/jury/p15.zip</code> (HTML, zasoby strony, HAR, zrzut ekranu) do wgrania na ekranie analizy. Nakładka Compose ustawia <code>METHADATA_ANALYSIS_PROFILE=jury</code> i wskazuje przygotowany magazyn przez <code>METHADATA_JURY_DATA_DIR</code>.</p>
+<h3>Czysta baza</h3>
+<p>Jeśli chcesz zacząć od zera — bez wcześniejszych importów i bez próbki startowej w indeksie analiz:</p>
+<pre><code>docker compose down -v        # usuwa wolumen methadata-data
+docker compose up --build</code></pre>
+<p class="muted">Pojedyncze materiały da się też usunąć bez czyszczenia całości: w widoku <strong>Pliki źródłowe</strong> można archiwizować i przywracać pliki oraz materiały.</p>
 
 <h3>Rozwój bez Dockera</h3>
 <pre><code># backend (port 8000)
@@ -421,10 +427,10 @@ python contracts/http/check_conformance.py --base-url http://localhost:8000</cod
 
 <table class="method-table">
   <tr><th>Wejście</th><th>Co przyjmuje</th><th>Gdzie trafia wynik</th></tr>
-  <tr><td><strong>Plik</strong></td><td>HTML/MHTML, HAR, PNG/JPEG/WebP, PDF, MP4/WebM, MP3/WAV/OGG, ZIP (także zagnieżdżony)</td><td>przebieg <code>/runs/:id</code> oraz materiał w bazie</td></tr>
+  <tr><td><strong>Import do bazy</strong> <span class="badge badge-green">podstawowa ścieżka</span></td><td>własny ZIP (także zagnieżdżony), wiele plików naraz lub pojedynczy plik; limit 128 MiB na plik</td><td>raport importu + materiały i grupy w bazie (tylko Twoje pliki)</td></tr>
+  <tr><td><strong>Plik</strong></td><td>HTML/MHTML, HAR, PNG/JPEG/WebP, PDF, MP4/WebM, MP3/WAV/OGG, ZIP</td><td>przebieg <code>/runs/:id</code> wobec indeksu profilu; plik trafia równolegle do bazy</td></tr>
   <tr><td><strong>Adres URL lub domena</strong></td><td>pełny adres albo sama domena, także długie linki reklamowe z trackerami; domyślnie bezpieczne pobranie strony wraz z przekierowaniami</td><td>przebieg; gdy strona nie odpowiada, zapisuje się sam adres i domena, a analiza nie przerywa się</td></tr>
   <tr><td><strong>Wskazówka</strong></td><td>nazwa produktu, osoba, marka, słowa kluczowe</td><td><code>/collection?q=…</code> — wyszukiwanie w bazie materiałów</td></tr>
-  <tr><td><strong>Import zbiorczy</strong></td><td>wiele plików lub ZIP z wieloma zapisami stron (limit 128 MiB na plik)</td><td>raport importu z postępem i statusem każdego wpisu</td></tr>
 </table>
 
 <h3>Widoki bazy materiałów</h3>
@@ -691,12 +697,13 @@ python contracts/http/check_conformance.py --base-url http://localhost:8000</cod
   <tr><td>wideo i audio oznaczone jako „brak”</td><td>lekki obraz bez <code>ffmpeg</code> i modeli</td><td>uruchom tryb pełny (<code>METHADATA_WITH_FFMPEG=1</code>, extras <code>media,speech</code>)</td></tr>
   <tr><td>„Za mało danych do rozstrzygnięcia”</td><td>pokrycie poniżej <code>coverage_min</code> — materiał nie ma porównywalnych cech (np. sam URL)</td><td>dodaj zapis strony lub zrzut ekranu tego materiału</td></tr>
   <tr><td>materiał bez grupy przy widocznym podobieństwie</td><td>wsparcie poniżej <code>min_support</code> — dowód tylko z jednej rodziny</td><td>sprawdź sugerowane krawędzie i scenariusze co-jeśli; ewentualnie profil <code>szablon</code></td></tr>
+  <tr><td>w wyniku widzę materiały, których nie wgrałem</td><td>ekran <strong>Nowa analiza</strong> porównuje plik z indeksem profilu, w którym jest próbka startowa backendu</td><td>pracuj przez <strong>Baza materiałów</strong> (osobny, początkowo pusty magazyn) albo wyczyść wolumen: <code>docker compose down -v</code></td></tr>
   <tr><td>brak podglądów śladów na starej migawce</td><td>migawka zapisana przed dodaniem podglądów</td><td><strong>Odśwież bazę</strong> — podglądy doliczają się raz i zapisują w migawce</td></tr>
   <tr><td>import przerwany lub nieudany</td><td>błąd pojedynczego wpisu albo przerwanie procesu</td><td>ponów z raportu importu (<code>POST /api/v1/imports/{id}/retry</code>) — wznawia się z oryginału</td></tr>
 </table>
 
 <div class="callout callout-info" style="margin-top:32px;">
-  <strong>Dalej:</strong> metodologia, wzory i obsługa niepełnych danych — <code>docs/METHODOLOGY.md</code>; wewnętrzna referencja potoku, kontraktów i API — <code>docs/data-matching-exploration.html</code>; zgodność z wymaganiami zadania — <code>docs/ZGODNOSC_Z_WYMAGANIAMI.md</code>; uruchomienie i scenariusz jury — <code>README.md</code>.
+  <strong>Dalej:</strong> profile analizy do odtwarzania ustalonych scenariuszy (<code>demo</code>, <code>jury</code>) — <code>README.md</code>; metodologia, wzory i obsługa niepełnych danych — <code>docs/METHODOLOGY.md</code>; wewnętrzna referencja potoku, kontraktów i API — <code>docs/data-matching-exploration.html</code>; zgodność z wymaganiami zadania — <code>docs/ZGODNOSC_Z_WYMAGANIAMI.md</code>; uruchomienie i scenariusz jury — <code>README.md</code>.
 </div>
 </section>
 
