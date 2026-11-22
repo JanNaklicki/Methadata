@@ -51,9 +51,11 @@ paths:
         * `application/json` – `{"url": "...", "mode": "offline"}`; domyślnie `mode=offline` (adres nie jest pobierany,
           analiza obejmuje tylko sam URL, `input_kind=url_only`),
         * `multipart/form-data` – pole `file` (plik: ZIP, HAR, HTML, PNG, JPEG, WebP, GIF, MP4, MP3) i opcjonalne `label`.
-        Limit rozmiaru pliku: 52428800 bajtów (50 MiB), po przekroczeniu `413 payload_too_large`.
+        Limit plików innych niż ZIP wynosi domyślnie 50 MiB. Dla ZIP obowiązuje limit importu kolekcji (domyślnie 128 MiB).
+        Po przekroczeniu odpowiedniego limitu API zwraca `413 payload_too_large`.
         To samo źródło daje to samo `observation_id` (ponowne dodanie: 200 zamiast 201, `created=false`).
       x-max-upload-bytes: 52428800
+      x-max-zip-upload-bytes: 134217728
       requestBody:
         required: true
         content:
@@ -222,7 +224,133 @@ paths:
         "422": {$ref: "#/components/responses/ValidationFailed"}
         "503": {$ref: "#/components/responses/StorageUnavailable"}
 
+  /api/v1/monitor:
+    get:
+      summary: Stan monitora źródła reklam (źródło, kursor, kolejka, ostatni przebieg)
+      responses:
+        "200":
+          description: Opis źródła i trwały stan monitora.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MonitorStatus"}
+  /api/v1/monitor/scan:
+    post:
+      summary: Wykonaj jeden skan źródła reklam (bonus)
+      description: >-
+        Jednorazowy przebieg `methadata.monitor` nad eksportem JSON/JSONL (bez sieci). Nowe rekordy trafiają do osobnego
+        magazynu monitora, a analiza płatnika wskazuje grupy reklam z nowymi rekordami. Błąd skanu to `ok: false`, nie błąd HTTP.
+      responses:
+        "200":
+          description: Wynik skanu.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MonitorScan"}
+  /api/v1/collection:
+    get:
+      summary: Odczytaj bieżącą migawkę kolekcji i ostatnie importy
+      responses:
+        "200":
+          description: Aktualna wersja, graf lub null, źródła, importy i limity przesyłania.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Collection"}
+  /api/v1/collection/uploads:
+    get:
+      summary: Wyświetl trwały rejestr przesłanych plików
+      responses:
+        "200":
+          description: Przesłane pliki z materiałami i wpisami archiwów.
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/CollectionUpload"}}
+  /api/v1/collection/uploads/{upload_id}:
+    parameters:
+      - {in: path, name: upload_id, required: true, schema: {type: string}}
+    patch:
+      summary: Zmień nazwę, archiwizuj lub przywróć przesłany plik
+      requestBody: {$ref: "#/components/requestBodies/CollectionEdit"}
+      responses:
+        "200": {$ref: "#/components/responses/CollectionEdited"}
+        "404": {$ref: "#/components/responses/BadRequest"}
+        "422": {$ref: "#/components/responses/ValidationFailed"}
+  /api/v1/collection/materials/{material_id}:
+    parameters:
+      - {in: path, name: material_id, required: true, schema: {type: string}}
+    patch:
+      summary: Zmień nazwę, archiwizuj lub przywróć materiał
+      requestBody: {$ref: "#/components/requestBodies/CollectionEdit"}
+      responses:
+        "200": {$ref: "#/components/responses/CollectionEdited"}
+        "404": {$ref: "#/components/responses/BadRequest"}
+        "422": {$ref: "#/components/responses/ValidationFailed"}
+  /api/v1/collection/uploads/{upload_id}/download:
+    parameters:
+      - {in: path, name: upload_id, required: true, schema: {type: string}}
+    get:
+      summary: Pobierz bajty oryginalnego pliku
+      responses:
+        "200": {$ref: "#/components/responses/CollectionDownload"}
+        "404": {$ref: "#/components/responses/BadRequest"}
+  /api/v1/collection/uploads/{upload_id}/members/{member_id}/download:
+    parameters:
+      - {in: path, name: upload_id, required: true, schema: {type: string}}
+      - {in: path, name: member_id, required: true, schema: {type: string}}
+    get:
+      summary: Pobierz rozpakowany wpis archiwum
+      responses:
+        "200": {$ref: "#/components/responses/CollectionDownload"}
+        "404": {$ref: "#/components/responses/BadRequest"}
+  /api/v1/imports:
+    post:
+      summary: Zapisz pliki i uruchom import kolekcji
+      parameters:
+        - {in: header, name: Prefer, schema: {type: string, example: respond-async}}
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [files]
+              properties:
+                files: {type: array, minItems: 1, maxItems: 32, items: {type: string, format: binary}}
+      responses:
+        "201": {$ref: "#/components/responses/CollectionImport"}
+        "202": {$ref: "#/components/responses/CollectionImport"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "413": {$ref: "#/components/responses/PayloadTooLarge"}
+        "415": {$ref: "#/components/responses/UnsupportedMediaType"}
+        "422": {$ref: "#/components/responses/ValidationFailed"}
+  /api/v1/imports/{import_id}:
+    parameters:
+      - {in: path, name: import_id, required: true, schema: {type: string}}
+    get:
+      summary: Odczytaj postęp lub raport importu
+      responses:
+        "200": {$ref: "#/components/responses/CollectionImport"}
+        "404": {$ref: "#/components/responses/BadRequest"}
+  /api/v1/imports/{import_id}/retry:
+    parameters:
+      - {in: path, name: import_id, required: true, schema: {type: string}}
+    post:
+      summary: Ponów nieudany import z zachowanych oryginałów
+      responses:
+        "202": {$ref: "#/components/responses/CollectionImport"}
+        "409": {$ref: "#/components/responses/BadRequest"}
+
 components:
+  requestBodies:
+    CollectionEdit:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            minProperties: 1
+            additionalProperties: false
+            properties:
+              label: {type: string, minLength: 1, maxLength: 200}
+              archived: {type: boolean}
   parameters:
     RunId:
       name: run_id
@@ -230,6 +358,29 @@ components:
       required: true
       schema: {$ref: "#/components/schemas/Id"}
   responses:
+    CollectionEdited:
+      description: Zapisany stan wpisu.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [id, label, archived]
+            properties:
+              id: {type: string}
+              label: {type: string}
+              archived: {type: boolean}
+    CollectionDownload:
+      description: Zapisany plik przesyłany jako załącznik.
+      headers:
+        Content-Disposition: {schema: {type: string}}
+      content:
+        application/octet-stream:
+          schema: {type: string, format: binary}
+    CollectionImport:
+      description: Bieżący raport importu z trwałym identyfikatorem.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/CollectionImport"}
     BadRequest:
       description: Nieczytelne żądanie (np. niepoprawny JSON).
       content:
@@ -282,6 +433,88 @@ components:
           examples:
             down: {externalValue: examples/error_storage_unavailable.json}
   schemas:
+    ImportStatus:
+      type: string
+      enum: [queued, running, succeeded, failed]
+    CollectionImport:
+      type: object
+      required: [id, status, created_at, run_id, entries, issues, merges]
+      properties:
+        id: {type: string}
+        status: {$ref: "#/components/schemas/ImportStatus"}
+        created_at: {type: string, format: date-time}
+        run_id: {type: [string, "null"]}
+        stage: {type: string}
+        error: {type: string}
+        upload_ids: {type: array, items: {type: string}}
+        entries: {type: array, items: {type: object}}
+        issues: {type: array, items: {type: object}}
+        merges: {type: array, items: {type: object}}
+        archive:
+          type: object
+          properties:
+            loaded: {type: integer}
+            skipped: {type: integer}
+            metadata: {type: integer}
+    Collection:
+      type: object
+      required: [version, run_id, graph, max_upload_bytes, sources, imports]
+      properties:
+        version: {type: integer}
+        run_id: {type: [string, "null"]}
+        graph:
+          type: [object, "null"]
+          description: >-
+            Widok przebiegu kolekcji. `investigation.artifacts[]` ma pola `kind` (domain, tracker, image, script),
+            `label`, `material_ids` oraz dla `image` opcjonalne `preview` (schemat Preview), gdy obraz jest w magazynie.
+        max_upload_bytes: {type: integer}
+        max_analysis_upload_bytes: {type: integer}
+        default_profile: {type: string, enum: [demo, jury]}
+        sources: {type: object}
+        imports: {type: array, items: {type: object}}
+    MonitorSource:
+      type: object
+      required: [kind, name, available, synthetic]
+      properties:
+        kind: {type: string, enum: [json-export]}
+        name: {type: string}
+        available: {type: boolean}
+        synthetic: {type: boolean, description: "true = syntetyczny przykład z repozytorium."}
+    MonitorStatus:
+      type: object
+      required: [source, state]
+      properties:
+        source: {$ref: "#/components/schemas/MonitorSource"}
+        state: {type: object, description: "cursor, pending, totals, last_run, last_error; pusty przed pierwszym skanem."}
+    MonitorScan:
+      type: object
+      required: [ok, source]
+      properties:
+        ok: {type: boolean}
+        source: {$ref: "#/components/schemas/MonitorSource"}
+        error: {type: [string, "null"]}
+        new: {type: integer}
+        updated: {type: integer}
+        duplicate: {type: integer}
+        rejected: {type: integer}
+        exhausted: {type: boolean}
+        payer_groups_touched: {type: integer}
+        state: {type: object}
+    CollectionUpload:
+      type: object
+      required: [id, filename, label, size, created_at, archived, downloadable, import_id, status, materials, members]
+      properties:
+        id: {type: string}
+        filename: {type: string}
+        label: {type: string}
+        size: {type: [integer, "null"]}
+        created_at: {type: string, format: date-time}
+        archived: {type: boolean}
+        downloadable: {type: boolean}
+        import_id: {type: [string, "null"]}
+        status: {$ref: "#/components/schemas/ImportStatus"}
+        materials: {type: array, items: {type: object}}
+        members: {type: array, items: {type: object}}
     Id:
       type: string
       pattern: "^[A-Za-z0-9][A-Za-z0-9_.:\\-]{0,127}$"
@@ -715,6 +948,7 @@ components:
       required: [artifact_id, role]
       properties:
         artifact_id: {$ref: "#/components/schemas/Id"}
+        sha256: {type: string, pattern: "^[0-9a-f]{64}$", description: "Zapisany skrót SHA-256 artefaktu źródłowego."}
         role: {$ref: "#/components/schemas/ArtifactSummary/properties/role"}
         media_type: {type: [string, "null"]}
         display_url: {oneOf: [{$ref: "#/components/schemas/PublicUrl"}, {type: "null"}]}

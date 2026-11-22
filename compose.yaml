@@ -4,12 +4,17 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+      args:
+        EXTRAS: ${METHADATA_EXTRAS:-web,media,pdf,perceptual}
+        WITH_FFMPEG: ${METHADATA_WITH_FFMPEG:-0}
     environment:
       METHADATA_DATA_DIR: /data
+      METHADATA_COLLECTION_MODELS: ${METHADATA_COLLECTION_MODELS:-0}
       METHADATA_HOST: 0.0.0.0
       METHADATA_PORT: "8000"
     volumes:
       - methadata-data:/data
+      - ./data/reference_figures:/app/data/reference_figures:ro
     ports:
       - "127.0.0.1:8000:8000"
     healthcheck:

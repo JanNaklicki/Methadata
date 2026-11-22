@@ -134,14 +134,23 @@ def _cause(a, b):
     return f"status {a['status']} -> {b['status']}"
 
 
-def collect_corpus_evidence(observations, store, adapters, *, extractors, methods, dataset_version, seed, threshold):
+def collect_corpus_evidence(observations, store, adapters, *, extractors, methods, dataset_version, seed, threshold, cached=None):
     """Ekstrakcja i porównania rodzin ze statystykami całego korpusu (F06 i profil jury)."""
     base = {"dataset_version": dataset_version, "seed": seed, "extractors": list(extractors), "comparators": [],
             "clusterer": "components-threshold-v1", "relation": "campaign_candidate",
             "cluster_config": {"threshold": threshold, "similarity_version": "fusion-eval-inputs",
                                "method_id": "fusion-v1", "dataset_version": dataset_version,
                                "relation": "campaign_candidate"}}
-    ext = run_experiment(base, observations, adapters, reader=store)   # tylko cechy, pary liczymy niżej
+    previous = {o.observation_id: o for o in cached.observations} if cached else {}
+    known = {o.observation_id for o in observations if previous.get(o.observation_id) == o}
+    pending = [o for o in observations if o.observation_id not in known]
+    ext = run_experiment(base, pending, adapters, reader=store)  # tylko cechy, pary liczymy niżej
+    if cached is not None:
+        ext["bundle"] = ext["bundle"].model_copy(update={
+            "observations": list(observations),
+            "features": [*(f for f in cached.features if f.observation_id in known), *ext["bundle"].features],
+            "statuses": [*(s for s in cached.statuses if s.observation_id in known), *ext["bundle"].statuses],
+        })
     obs = ext["bundle"].observations
     by_obs: dict[str, list] = {}
     for f in ext["bundle"].features:

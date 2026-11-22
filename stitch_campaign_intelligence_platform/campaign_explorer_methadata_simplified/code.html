@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-dim": "#0a0e17",
+            "background": "#0a0e17",
+            "surface": "#0f131c",
+            "surface-container-lowest": "#070a10",
+            "surface-container-low": "#131722",
+            "surface-container": "#181d2a",
+            "surface-container-high": "#222736",
+            "surface-container-highest": "#2c3244",
+            "on-surface": "#e2e6f0",
+            "on-surface-variant": "#8e99aa",
+            "outline": "#333d52",
+            "outline-variant": "#222938",
+            "primary": "#47d6ff",
+            "primary-container": "#004e60",
+            "secondary": "#4fdbc8",
+            "tertiary": "#8cb4ff",
+            "error": "#ff6b6b",
+            "error-subtle": "rgba(255, 107, 107, 0.12)"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Hanken Grotesk", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#0a0e17] text-[#e2e6f0] font-sans antialiased min-h-screen">
+<!-- Top Navigation Header -->
+<header class="fixed top-0 left-0 right-0 z-50 h-14 bg-[#0a0e17]/95 backdrop-blur border-b border-outline-variant flex items-center justify-between px-6">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<span class="font-mono text-xs font-semibold tracking-wider text-primary">METHADATA</span>
+<span class="text-outline">/</span>
+<span class="text-xs text-on-surface-variant">Campaign Intelligence Platform</span>
+<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant border border-outline-variant">NASK CERT</span>
+</div>
+<div class="hidden md:flex items-center gap-2 pl-4 border-l border-outline-variant text-xs text-on-surface-variant font-mono">
+<span>Dataset: <span class="text-on-surface">PL-FIN-SCAMS-2024</span></span>
+<span class="text-outline">·</span>
+<span class="text-secondary flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Engine v1.4 synced</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative w-64 hidden sm:flex items-center">
+<span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant text-[16px]">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-md pl-8 pr-8 py-1 text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary/60 transition-colors font-mono" placeholder="Query hash, domain, seed..." type="text"/>
+<kbd class="absolute right-2 text-[10px] text-on-surface-variant font-mono px-1 rounded bg-surface-container">⌘K</kbd>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-1" title="Notifications">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+<div class="flex items-center gap-2 pl-3 border-l border-outline-variant">
+<span class="text-xs font-mono text-on-surface">K. Thorne</span>
+<div class="w-6 h-6 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-[10px] font-mono text-primary font-medium">KT</div>
+</div>
+</div>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-14 bottom-0 w-56 bg-[#0a0e17] border-r border-outline-variant flex flex-col justify-between py-5 px-3 z-40">
+<div class="space-y-6">
+<div class="px-3">
+<div class="text-[10px] font-mono tracking-widest text-on-surface-variant uppercase">Operations</div>
+</div>
+<nav class="space-y-0.5">
+<a class="flex items-center gap-3 px-3 py-2 rounded-md bg-surface-container text-primary font-medium text-xs border border-primary/20" href="#">
+<span class="material-symbols-outlined text-[17px]">grid_view</span>
+<span>Campaign Explorer</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-xs" href="#">
+<span class="material-symbols-outlined text-[17px]">hub</span>
+<span>Investigation Graph</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-xs" href="#">
+<span class="material-symbols-outlined text-[17px]">policy</span>
+<span>Evidence Inspector</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-xs" href="#">
+<span class="material-symbols-outlined text-[17px]">timeline</span>
+<span>Timeline</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-xs" href="#">
+<span class="material-symbols-outlined text-[17px]">tune</span>
+<span>Engine Config</span>
+</a>
+</nav>
+</div>
+<!-- Quiet Node Telemetry Footer -->
+<div class="px-3 py-3 rounded border border-outline-variant/60 bg-surface-container-lowest/50 text-[11px] font-mono text-on-surface-variant space-y-1">
+<div class="flex items-center justify-between text-[10px]">
+<span>NODE GW-09</span>
+<span class="text-secondary">HEALTHY</span>
+</div>
+<div class="text-[10px] text-on-surface-variant/70 truncate">cert-pol-gw-09.nask.pl</div>
+</div>
+</aside>
+<!-- Main Content Layout -->
+<div class="pl-56 pt-14 min-h-screen">
+<main class="max-w-[1560px] mx-auto px-8 py-8 space-y-8">
+<!-- Calm Page Header + Intentional Actions -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-outline-variant">
+<div class="space-y-1">
+<div class="flex items-center gap-2 text-[11px] font-mono text-on-surface-variant">
+<span>CSIRT OPS</span>
+<span>·</span>
+<span>SESSION #PL-SURV-88219</span>
+<span>·</span>
+<span class="text-on-surface">LEIDEN MODULARITY Q=0.742</span>
+</div>
+<h1 class="text-2xl font-display font-semibold text-white tracking-tight">Campaign Explorer</h1>
+<p class="text-xs text-on-surface-variant">Discovered adversary infrastructure, multi-signal ad clusters, and takedown tracking.</p>
+</div>
+<div class="flex items-center gap-2 text-xs">
+<button class="px-3 py-1.5 rounded-md border border-outline-variant text-on-surface hover:bg-surface-container transition-colors font-mono">
+            Import OCR Batch
+          </button>
+<button class="px-3 py-1.5 rounded-md border border-outline-variant text-on-surface hover:bg-surface-container transition-colors font-mono">
+            Re-run Correlation
+          </button>
+<button class="px-3.5 py-1.5 rounded-md bg-primary text-[#002833] font-semibold hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[15px]">download</span>
+<span>Export Intel Report</span>
+</button>
+</div>
+</div>
+<!-- Clean Top Stats: Editorial Summary Ribbon (No bulky cards) -->
+<section class="flex flex-wrap items-center justify-between gap-4 py-3 px-5 rounded-lg bg-surface-container-low border border-outline-variant text-xs font-mono">
+<div class="flex flex-wrap items-center gap-6">
+<div>
+<span class="text-white font-semibold text-sm">124</span>
+<span class="text-on-surface-variant ml-1.5">Advertisements</span>
+<span class="text-[10px] text-secondary ml-1">(+12 queued)</span>
+</div>
+<span class="text-outline">·</span>
+<div>
+<span class="text-white font-semibold text-sm">18</span>
+<span class="text-on-surface-variant ml-1.5">Domains</span>
+<span class="text-[10px] text-error ml-1 font-medium">(6 flagged for takedown)</span>
+</div>
+<span class="text-outline">·</span>
+<div>
+<span class="text-white font-semibold text-sm">3</span>
+<span class="text-on-surface-variant ml-1.5">Active Clusters</span>
+<span class="text-[10px] text-on-surface-variant ml-1">(14 unlinked orphans)</span>
+</div>
+<span class="text-outline">·</span>
+<div>
+<span class="text-white font-semibold text-sm">84.2%</span>
+<span class="text-on-surface-variant ml-1.5">Multi-signal Confidence</span>
+<span class="text-[10px] text-on-surface-variant ml-1">(Vision + OCR + DOM)</span>
+</div>
+</div>
+<!-- Quiet Inline Filter -->
+<div class="flex items-center gap-3 text-xs">
+<span class="text-on-surface-variant">Threshold θ:</span>
+<div class="flex items-center gap-2">
+<input class="w-24 h-1 bg-surface-container-high rounded appearance-none cursor-pointer accent-primary" id="confidenceRange" max="100" min="0" type="range" value="65"/>
+<span class="text-primary font-mono text-xs w-9" id="confidenceVal">≥65%</span>
+</div>
+</div>
+</section>
+<!-- Main Two-Column Asymmetric Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Primary Campaigns (8 cols) -->
+<section class="lg:col-span-8 space-y-6">
+<!-- Filter / Sort Toolbar (Quiet editorial styling) -->
+<div class="flex items-center justify-between text-xs pb-1">
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant font-mono uppercase tracking-wider text-[11px]">Identified Clusters (3)</span>
+</div>
+<div class="flex items-center gap-1 font-mono text-xs text-on-surface-variant">
+<span class="px-2 py-1 rounded text-on-surface bg-surface-container">All Vectors</span>
+<span class="px-2 py-1 hover:text-on-surface cursor-pointer">Investment</span>
+<span class="px-2 py-1 hover:text-on-surface cursor-pointer">Crypto</span>
+<span class="px-2 py-1 hover:text-on-surface cursor-pointer">Commerce</span>
+</div>
+</div>
+<!-- CAMPAIGN 1: Baltic Pipe Impersonation -->
+<article class="p-6 rounded-lg bg-surface border border-outline-variant hover:border-outline transition-colors space-y-5">
+<!-- Header Row -->
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+<div class="space-y-1">
+<div class="flex items-center gap-2.5">
+<span class="font-mono text-xs font-semibold text-primary">#PL-409</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-mono text-error font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Critical Severity
+                  </span>
+<span class="text-outline">·</span>
+<span class="text-[11px] font-mono text-on-surface-variant">94.6% match confidence</span>
+</div>
+<h2 class="text-base font-semibold text-white tracking-tight">Investment Scam Network: State Energy Impersonation</h2>
+<p class="text-xs text-on-surface-variant">Coordinated campaign impersonating Baltic Pipe dividends and Orlen energy projects targeting Polish retail investors.</p>
+</div>
+<!-- Quick Single Action -->
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface-container text-xs font-medium text-white hover:bg-surface-container-high transition-colors border border-outline-variant shrink-0" href="#">
+<span>Open Investigation</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<!-- Quiet Metrics Row -->
+<div class="grid grid-cols-4 gap-4 py-2.5 px-3.5 rounded bg-surface-container-lowest/60 border border-outline-variant/60 text-xs font-mono">
+<div>
+<span class="text-on-surface-variant block text-[10px]">CAPTURED ADS</span>
+<span class="text-white font-medium">52 instances</span>
+</div>
+<div>
+<span class="text-on-surface-variant block text-[10px]">LINKED DOMAINS</span>
+<span class="text-white font-medium">8 domains (4 active)</span>
+</div>
+<div>
+<span class="text-on-surface-variant block text-[10px]">SHARED ARTIFACTS</span>
+<span class="text-white font-medium">GTM-M7X92, FB:884019</span>
+</div>
+<div>
+<span class="text-on-surface-variant block text-[10px]">OBSERVED INFRA</span>
+<span class="text-white font-medium truncate block">Keitaro TDS / Cloudflare</span>
+</div>
+</div>
+<!-- Sample Visual Evidence Thumbnails -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<div class="relative h-32 rounded bg-surface-container-lowest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Screenshot of Polish financial scam ad showing fake news layout with fabricated state energy company logo Orlen, Polish currency notes 100 and 200 zloty, urgent red alert banner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7oz7_2CuS342PDryfSLlnB8cXzL6j88ggcClRzDJDuqa8C_OMzljJBuqK_CpMDUAzT4mgUlTWZO1UwwKi1fB_9R8wFd5wItXCwIH8NEisRzkBEosJkKzPYlZXnyMA2bd8tnHqUExVBZPpa-ZoBeo-9TUzAkBGvBhl61bLbtg_bJyQX3sqNeHhJUchvI4udKyyRTB5JLEM-QACUsrRlfkkUAQ7qWDNlUFjrEgMZ9A"/>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-on-surface-variant px-0.5">
+<span class="truncate">ad_fb_9021811.png</span>
+<span class="text-secondary">CLIP 91%</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<div class="relative h-32 rounded bg-surface-container-lowest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Screenshot of fraudulent investment landing page mimicking Polish government portal with Polish eagle seal watermark, fake login form asking for PESEL national identity number" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNhe8hgKCq8oZvJmgyzv9HdiCUxeDp3j0P_iXhCJCD6WEQYXojs1ZIuXpQI2w7n0ipDUNcJrzwMGj-XS4KPvHbaQK8FAKhF5s02VrVy_agp6a7mgoLZ5qXkblidWh2t04fqX-tlHDZmlk_1UJBxQeXHtH8oRaN5bPj7y9BmFNbr2UgLWQr4XdGLL9CbEt-KzWjs5C44O0eXf1_UmdQwYAa98nrkLFUyjyvh_9HK-k"/>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-on-surface-variant px-0.5">
+<span class="truncate">dom_orlen-profit.site</span>
+<span class="text-error">DOM Match 95%</span>
+</div>
+</div>
+</div>
+<!-- Lead OCR Quote snippet -->
+<div class="text-xs text-on-surface-variant border-l-2 border-outline-variant pl-3 py-0.5 italic">
+              “Gwarantowany zysk 14 800 PLN miesięcznie z projektu Baltic Pipe. Każdy obywatel ma prawo do dywidendy...”
+            </div>
+</article>
+<!-- CAMPAIGN 2: Crypto Giveaway Syndicate -->
+<article class="p-6 rounded-lg bg-surface border border-outline-variant hover:border-outline transition-colors space-y-5">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+<div class="space-y-1">
+<div class="flex items-center gap-2.5">
+<span class="font-mono text-xs font-semibold text-secondary">#PL-288</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-mono text-secondary font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> High Severity
+                  </span>
+<span class="text-outline">·</span>
+<span class="text-[11px] font-mono text-on-surface-variant">88.1% match confidence</span>
+</div>
+<h2 class="text-base font-semibold text-white tracking-tight">Crypto Giveaway Syndicate: Deepfake &amp; VIP Impersonation</h2>
+<p class="text-xs text-on-surface-variant">Synthetic media videos spoofing European executives leading to automated Telegram seed phrase extraction funnels.</p>
+</div>
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface-container text-xs font-medium text-white hover:bg-surface-container-high transition-colors border border-outline-variant shrink-0" href="#">
+<span>Open Investigation</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-4 gap-4 py-2.5 px-3.5 rounded bg-surface-container-lowest/60 border border-outline-variant/60 text-xs font-mono">
+<div>
+<span class="text-on-surface-variant block text-[10px]">CAPTURED ADS</span>
+<span class="text-white font-medium">43 instances</span>
+</div>
+<div>
+<span class="text-on-surface-variant block text-[10px]">LINKED DOMAINS</span>
+<span class="text-white font-medium">6 domains</span>
+</div>
+<div>
+<span class="text-on-surface-variant block text-[10px]">BOT FUNNEL</span>
+<span class="text-white font-medium">@pl_invest_robot</span>
+</div>
+<div>
+<span class="text-on-surface-variant block text-[10px]">MUTATION RATIO</span>
+<span class="text-white font-medium">1:8 crop variants</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<div class="relative h-32 rounded bg-surface-container-lowest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Screenshot of an artificial intelligence deepfake video preview featuring high profile European entrepreneur with fake subtitles offering 5000 USDT cryptocurrency airdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIyzKK7aEb2-IYc3zDPz7B7DJkrUGZU8ZkBfPU-VpXcA8ushSwWwpVbszOt6SZbhieoYGY24LaDbN8os7-3za86kl61fl8b7r7Ueli4tn1fkg7plxMLmkeLpCwL5sI6KOedQK5oLLrmMg5rg-B3A3i4wRVCD3TlMpkrnx4JcvAbv6ev6BcBsoxsFIQGypPdNznBjypYFPtzfWjKh4kmhACavFS7HjxvgBqqGslR2c"/>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-on-surface-variant px-0.5">
+<span class="truncate">deepfake_vid_chunk.mp4</span>
+<span class="text-secondary">pHash 0.89</span>
+</div>
+</div>
+<div class="p-3.5 rounded bg-surface-container-low border border-outline-variant/60 flex flex-col justify-between text-xs font-mono space-y-2">
+<div class="space-y-1">
+<div class="text-[10px] text-on-surface-variant uppercase tracking-wider">Tactical Signature</div>
+<p class="text-xs text-on-surface font-sans">Meta Ads display network delivering rotated video frames. Final landing phase executes Telegram protocol launch targeting wallet permissions.</p>
+</div>
+<div class="flex items-center gap-2 text-[10px] text-on-surface-variant pt-2 border-t border-outline-variant">
+<span>First seen: 6d ago</span>
+<span>·</span>
+<span class="text-secondary">Active now</span>
+</div>
+</div>
+</div>
+</article>
+<!-- CAMPAIGN 3: Fake Store Network (Compressed Row) -->
+<article class="p-5 rounded-lg bg-surface border border-outline-variant hover:border-outline transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="space-y-1">
+<div class="flex items-center gap-2.5">
+<span class="font-mono text-xs font-semibold text-primary">#PL-105</span>
+<span class="text-[11px] font-mono text-on-surface-variant">Medium Severity</span>
+<span class="text-outline">·</span>
+<span class="text-[11px] font-mono text-on-surface-variant">79.4% confidence</span>
+</div>
+<h2 class="text-sm font-semibold text-white">Fake Store Network: Spoofed Payment Gateway Cloak</h2>
+<p class="text-xs text-on-surface-variant">Seasonal retail goods targeting with injected JS mimicking Polish BLIK/PayU authorization dialogs (29 Ads, 4 Domains).</p>
+</div>
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface-container text-xs font-medium text-white hover:bg-surface-container-high transition-colors border border-outline-variant shrink-0" href="#">
+<span>Inspect (29)</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</article>
+<!-- Clean Unassigned Review Queue (Quiet spacious table) -->
+<div class="pt-6 border-t border-outline-variant space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-sm font-semibold text-white">Unassigned Review Queue</h3>
+<p class="text-xs text-on-surface-variant">14 orphan ads currently below similarity cutoff (θ &lt; 65%).</p>
+</div>
+<span class="text-[11px] font-mono text-on-surface-variant">Awaiting seed assignment</span>
+</div>
+<div class="rounded-lg border border-outline-variant overflow-hidden bg-surface">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="bg-surface-container-low text-[10px] font-mono text-on-surface-variant uppercase tracking-wider border-b border-outline-variant">
+<th class="py-2.5 px-4">Artifact ID</th>
+<th class="py-2.5 px-4">Ingested Target</th>
+<th class="py-2.5 px-4">Best Cluster Match</th>
+<th class="py-2.5 px-4 text-right">Similarity</th>
+<th class="py-2.5 px-4 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-mono">
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 text-primary font-medium">#AD-ORP-091</td>
+<td class="py-3 px-4 text-on-surface truncate max-w-[220px]">polskidobrobyt-inwestycje.club</td>
+<td class="py-3 px-4 text-on-surface-variant">#PL-409 (Baltic Pipe)</td>
+<td class="py-3 px-4 text-right text-secondary">0.612</td>
+<td class="py-3 px-4 text-right">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-white text-[11px] transition-colors border border-outline-variant">Merge</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 text-primary font-medium">#AD-ORP-092</td>
+<td class="py-3 px-4 text-on-surface truncate max-w-[220px]">allegro-outlet-okazja-99.top</td>
+<td class="py-3 px-4 text-on-surface-variant">#PL-105 (Store Phish)</td>
+<td class="py-3 px-4 text-right text-secondary">0.584</td>
+<td class="py-3 px-4 text-right">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-white text-[11px] transition-colors border border-outline-variant">Merge</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4 text-primary font-medium">#AD-ORP-093</td>
+<td class="py-3 px-4 text-on-surface truncate max-w-[220px]">krypto-premier-program.xyz</td>
+<td class="py-3 px-4 text-on-surface-variant">#PL-288 (Deepfake)</td>
+<td class="py-3 px-4 text-right text-secondary">0.641</td>
+<td class="py-3 px-4 text-right">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-white text-[11px] transition-colors border border-outline-variant">Merge</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Right Column: Latest Ingested Evidence Stream (4 cols) -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Evidence Inspection Box -->
+<div class="rounded-lg bg-surface border border-outline-variant p-5 space-y-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h3 class="text-sm font-semibold text-white">Latest Ingested Evidence</h3>
+</div>
+<span class="text-[11px] font-mono text-on-surface-variant">#PL-META-4401</span>
+</div>
+<!-- Captured Artifact Frame -->
+<div class="space-y-2">
+<div class="relative h-44 rounded bg-surface-container-lowest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="High resolution ad capture featuring Polish financial investment deception showing fake stock market graph soaring upwards, gold coins, and photograph of Polish finance minister speaking at podium" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMRSZ15n2N_1UxnrZ2mZ6HLmTaKWdiIWpMaH6crtt-dW1esoNXJYAYE2AcG3Lk_DDFab5ZupZiJWgtCvv_Q75WaXRGZW-mLFydSWbxa7mfc36WV_IzqegciPtt6C52ruaVh7G7LaMZIRXZ2ofsc545eg3cR0rcUPDvcu7TIbdBKg4D3surQWD7NJ64trV5recALUsDMDlc00_OB5jvmjRtREpWSH6cbWjFwgifIF0"/>
+</div>
+<div class="flex items-center justify-between text-[10px] font-mono text-on-surface-variant">
+<span>SHA256: e8b941...c24e</span>
+<span>pHASH: 0x8F9C42E1</span>
+</div>
+</div>
+<!-- Clean Multi-Signal Breakdown (Calm Progress Bars) -->
+<div class="space-y-3 pt-2 border-t border-outline-variant">
+<div class="flex items-center justify-between text-xs font-mono">
+<span class="text-on-surface-variant">Multi-Signal Score</span>
+<span class="text-white font-medium">0.863</span>
+</div>
+<!-- Signal 1 -->
+<div class="space-y-1">
+<div class="flex justify-between text-[11px] font-mono">
+<span class="text-on-surface-variant">Text Semantics (OCR)</span>
+<span class="text-on-surface">0.88</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded overflow-hidden">
+<div class="bg-primary h-full rounded" style="width: 88%;"></div>
+</div>
+</div>
+<!-- Signal 2 -->
+<div class="space-y-1">
+<div class="flex justify-between text-[11px] font-mono">
+<span class="text-on-surface-variant">Infrastructure (DOM / DNS)</span>
+<span class="text-on-surface">0.95</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded overflow-hidden">
+<div class="bg-secondary h-full rounded" style="width: 95%;"></div>
+</div>
+</div>
+<!-- Signal 3 -->
+<div class="space-y-1">
+<div class="flex justify-between text-[11px] font-mono">
+<span class="text-on-surface-variant">Vision (CLIP ViT)</span>
+<span class="text-on-surface">0.76</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded overflow-hidden">
+<div class="bg-tertiary h-full rounded" style="width: 76%;"></div>
+</div>
+</div>
+</div>
+<!-- OCR Text Preview -->
+<div class="p-3 rounded bg-surface-container-low border border-outline-variant/60 text-xs space-y-1.5">
+<div class="flex items-center justify-between text-[10px] font-mono text-on-surface-variant uppercase">
+<span>Extracted Text</span>
+<button class="text-primary hover:underline">Copy</button>
+</div>
+<p class="font-mono text-[11px] text-on-surface leading-relaxed italic">
+                “Nowy program wsparcia finansowego dla obywateli RP. Wypłata zysków w 24 godziny bez podatku Belki... Zarejestruj się na orlen-profit.site”
+              </p>
+</div>
+<!-- Correlated Endpoints -->
+<div class="space-y-2 text-xs font-mono pt-1">
+<div class="flex items-center justify-between py-1 border-b border-outline-variant/60">
+<span class="text-on-surface-variant">Destination</span>
+<span class="text-error truncate max-w-[170px]">orlen-profit.site/pl</span>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-outline-variant/60">
+<span class="text-on-surface-variant">Edge CDN</span>
+<span class="text-on-surface">Cloudflare AS13335</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="text-on-surface-variant">TLS Fingerprint</span>
+<span class="text-on-surface truncate max-w-[170px]">JARM: 28d28d...</span>
+</div>
+</div>
+<!-- Assignment Action Buttons -->
+<div class="flex gap-2 pt-2">
+<button class="flex-1 py-2 rounded-md bg-primary text-[#002833] font-semibold text-xs hover:bg-primary/90 transition-colors">
+                Assign to #PL-409
+              </button>
+<button class="px-3.5 py-2 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container text-xs transition-colors">
+                Dismiss
+              </button>
+</div>
+</div>
+<!-- Quiet Ingestion Stream Activity -->
+<div class="rounded-lg bg-surface border border-outline-variant p-4 space-y-3">
+<div class="flex items-center justify-between text-xs">
+<span class="font-medium text-white">Stream Activity</span>
+<span class="font-mono text-[11px] text-on-surface-variant">4 feeds active</span>
+</div>
+<div class="space-y-2 text-xs font-mono">
+<div class="flex items-center justify-between py-1 text-on-surface-variant">
+<span>Meta Ad Library API</span>
+<span class="text-on-surface">89 ingested</span>
+</div>
+<div class="flex items-center justify-between py-1 text-on-surface-variant">
+<span>TikTok Commercial API</span>
+<span class="text-on-surface">35 ingested</span>
+</div>
+<div class="flex items-center justify-between py-1 text-on-surface-variant">
+<span>CERT Poland PhishFeed</span>
+<span class="text-secondary">Sync 1.2s ago</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<script>
+    const slider = document.getElementById('confidenceRange');
+    const valDisplay = document.getElementById('confidenceVal');
+    if (slider && valDisplay) {
+      slider.addEventListener('input', (e) => {
+        valDisplay.textContent = `≥${e.target.value}%`;
+      });
+    }
+  </script>
+</body></html>

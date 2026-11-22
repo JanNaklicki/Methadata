@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-22T01:31:32Z",
+  "title": "Design System for Methadata",
+  "extensions": {
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Navy canvas",
+        "tonalRamp": [
+          "oklch(15% 0.0205 261.9)",
+          "oklch(26% 0.0205 261.9)",
+          "oklch(37% 0.0205 261.9)",
+          "oklch(48% 0.0205 261.9)",
+          "oklch(59% 0.0205 261.9)",
+          "oklch(70% 0.0205 261.9)",
+          "oklch(82% 0.0205 261.9)",
+          "oklch(95% 0.0205 261.9)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Working panel",
+        "tonalRamp": [
+          "oklch(15% 0.0219 260.5)",
+          "oklch(26% 0.0219 260.5)",
+          "oklch(37% 0.0219 260.5)",
+          "oklch(48% 0.0219 260.5)",
+          "oklch(59% 0.0219 260.5)",
+          "oklch(70% 0.0219 260.5)",
+          "oklch(82% 0.0219 260.5)",
+          "oklch(95% 0.0219 260.5)"
+        ]
+      },
+      "panel-raised": {
+        "role": "neutral",
+        "displayName": "Raised panel",
+        "tonalRamp": [
+          "oklch(15% 0.0275 260.0)",
+          "oklch(26% 0.0275 260.0)",
+          "oklch(37% 0.0275 260.0)",
+          "oklch(48% 0.0275 260.0)",
+          "oklch(59% 0.0275 260.0)",
+          "oklch(70% 0.0275 260.0)",
+          "oklch(82% 0.0275 260.0)",
+          "oklch(95% 0.0275 260.0)"
+        ]
+      },
+      "wash": {
+        "role": "neutral",
+        "displayName": "Selected surface",
+        "tonalRamp": [
+          "oklch(15% 0.0295 259.1)",
+          "oklch(26% 0.0295 259.1)",
+          "oklch(37% 0.0295 259.1)",
+          "oklch(48% 0.0295 259.1)",
+          "oklch(59% 0.0295 259.1)",
+          "oklch(70% 0.0295 259.1)",
+          "oklch(82% 0.0295 259.1)",
+          "oklch(95% 0.0295 259.1)"
+        ]
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Slate divider",
+        "tonalRamp": [
+          "oklch(15% 0.0298 260.5)",
+          "oklch(26% 0.0298 260.5)",
+          "oklch(37% 0.0298 260.5)",
+          "oklch(48% 0.0298 260.5)",
+          "oklch(59% 0.0298 260.5)",
+          "oklch(70% 0.0298 260.5)",
+          "oklch(82% 0.0298 260.5)",
+          "oklch(95% 0.0298 260.5)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Field border",
+        "tonalRamp": [
+          "oklch(15% 0.0366 257.8)",
+          "oklch(26% 0.0366 257.8)",
+          "oklch(37% 0.0366 257.8)",
+          "oklch(48% 0.0366 257.8)",
+          "oklch(59% 0.0366 257.8)",
+          "oklch(70% 0.0366 257.8)",
+          "oklch(82% 0.0366 257.8)",
+          "oklch(95% 0.0366 257.8)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Primary text",
+        "tonalRamp": [
+          "oklch(15% 0.0162 262.8)",
+          "oklch(26% 0.0162 262.8)",
+          "oklch(37% 0.0162 262.8)",
+          "oklch(48% 0.0162 262.8)",
+          "oklch(59% 0.0162 262.8)",
+          "oklch(70% 0.0162 262.8)",
+          "oklch(82% 0.0162 262.8)",
+          "oklch(95% 0.0162 262.8)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Secondary text",
+        "tonalRamp": [
+          "oklch(15% 0.0297 256.5)",
+          "oklch(26% 0.0297 256.5)",
+          "oklch(37% 0.0297 256.5)",
+          "oklch(48% 0.0297 256.5)",
+          "oklch(59% 0.0297 256.5)",
+          "oklch(70% 0.0297 256.5)",
+          "oklch(82% 0.0297 256.5)",
+          "oklch(95% 0.0297 256.5)"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Control cyan",
+        "tonalRamp": [
+          "oklch(15% 0.0738 222.6)",
+          "oklch(26% 0.0738 222.6)",
+          "oklch(37% 0.0738 222.6)",
+          "oklch(48% 0.0738 222.6)",
+          "oklch(59% 0.0738 222.6)",
+          "oklch(70% 0.0738 222.6)",
+          "oklch(82% 0.0738 222.6)",
+          "oklch(95% 0.0738 222.6)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Control cyan on hover",
+        "tonalRamp": [
+          "oklch(15% 0.0413 221.6)",
+          "oklch(26% 0.0413 221.6)",
+          "oklch(37% 0.0413 221.6)",
+          "oklch(48% 0.0413 221.6)",
+          "oklch(59% 0.0413 221.6)",
+          "oklch(70% 0.0413 221.6)",
+          "oklch(82% 0.0413 221.6)",
+          "oklch(95% 0.0413 221.6)"
+        ]
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "Score teal",
+        "tonalRamp": [
+          "oklch(15% 0.1185 186.2)",
+          "oklch(26% 0.1185 186.2)",
+          "oklch(37% 0.1185 186.2)",
+          "oklch(48% 0.1185 186.2)",
+          "oklch(59% 0.1185 186.2)",
+          "oklch(70% 0.1185 186.2)",
+          "oklch(82% 0.1185 186.2)",
+          "oklch(95% 0.1185 186.2)"
+        ]
+      },
+      "graph-stage": {
+        "role": "neutral",
+        "displayName": "Graph canvas",
+        "tonalRamp": [
+          "oklch(15% 0.0229 260.4)",
+          "oklch(26% 0.0229 260.4)",
+          "oklch(37% 0.0229 260.4)",
+          "oklch(48% 0.0229 260.4)",
+          "oklch(59% 0.0229 260.4)",
+          "oklch(70% 0.0229 260.4)",
+          "oklch(82% 0.0229 260.4)",
+          "oklch(95% 0.0229 260.4)"
+        ]
+      },
+      "graph-grid": {
+        "role": "neutral",
+        "displayName": "Graph dot grid",
+        "tonalRamp": [
+          "oklch(15% 0.0403 257.3)",
+          "oklch(26% 0.0403 257.3)",
+          "oklch(37% 0.0403 257.3)",
+          "oklch(48% 0.0403 257.3)",
+          "oklch(59% 0.0403 257.3)",
+          "oklch(70% 0.0403 257.3)",
+          "oklch(82% 0.0403 257.3)",
+          "oklch(95% 0.0403 257.3)"
+        ]
+      },
+      "graph-selected": {
+        "role": "secondary",
+        "displayName": "Selected graph node",
+        "tonalRamp": [
+          "oklch(15% 0.1106 183.6)",
+          "oklch(26% 0.1106 183.6)",
+          "oklch(37% 0.1106 183.6)",
+          "oklch(48% 0.1106 183.6)",
+          "oklch(59% 0.1106 183.6)",
+          "oklch(70% 0.1106 183.6)",
+          "oklch(82% 0.1106 183.6)",
+          "oklch(95% 0.1106 183.6)"
+        ]
+      },
+      "graph-quiet": {
+        "role": "neutral",
+        "displayName": "Muted graph mark",
+        "tonalRamp": [
+          "oklch(15% 0.0382 252.7)",
+          "oklch(26% 0.0382 252.7)",
+          "oklch(37% 0.0382 252.7)",
+          "oklch(48% 0.0382 252.7)",
+          "oklch(59% 0.0382 252.7)",
+          "oklch(70% 0.0382 252.7)",
+          "oklch(82% 0.0382 252.7)",
+          "oklch(95% 0.0382 252.7)"
+        ]
+      },
+      "signal-image": {
+        "role": "tertiary",
+        "displayName": "Graphics and image hashes",
+        "tonalRamp": [
+          "oklch(15% 0.1155 260.2)",
+          "oklch(26% 0.1155 260.2)",
+          "oklch(37% 0.1155 260.2)",
+          "oklch(48% 0.1155 260.2)",
+          "oklch(59% 0.1155 260.2)",
+          "oklch(70% 0.1155 260.2)",
+          "oklch(82% 0.1155 260.2)",
+          "oklch(95% 0.1155 260.2)"
+        ]
+      },
+      "signal-text": {
+        "role": "tertiary",
+        "displayName": "Text and trackers",
+        "tonalRamp": [
+          "oklch(15% 0.0995 75.1)",
+          "oklch(26% 0.0995 75.1)",
+          "oklch(37% 0.0995 75.1)",
+          "oklch(48% 0.0995 75.1)",
+          "oklch(59% 0.0995 75.1)",
+          "oklch(70% 0.0995 75.1)",
+          "oklch(82% 0.0995 75.1)",
+          "oklch(95% 0.0995 75.1)"
+        ]
+      },
+      "signal-html": {
+        "role": "tertiary",
+        "displayName": "HTML structure and script hashes",
+        "tonalRamp": [
+          "oklch(15% 0.1138 301.4)",
+          "oklch(26% 0.1138 301.4)",
+          "oklch(37% 0.1138 301.4)",
+          "oklch(48% 0.1138 301.4)",
+          "oklch(59% 0.1138 301.4)",
+          "oklch(70% 0.1138 301.4)",
+          "oklch(82% 0.1138 301.4)",
+          "oklch(95% 0.1138 301.4)"
+        ]
+      },
+      "accepted-surface": {
+        "role": "secondary",
+        "displayName": "Accepted pair surface",
+        "tonalRamp": [
+          "oklch(15% 0.0346 213.8)",
+          "oklch(26% 0.0346 213.8)",
+          "oklch(37% 0.0346 213.8)",
+          "oklch(48% 0.0346 213.8)",
+          "oklch(59% 0.0346 213.8)",
+          "oklch(70% 0.0346 213.8)",
+          "oklch(82% 0.0346 213.8)",
+          "oklch(95% 0.0346 213.8)"
+        ]
+      },
+      "accepted-text": {
+        "role": "secondary",
+        "displayName": "Accepted pair text",
+        "tonalRamp": [
+          "oklch(15% 0.0997 185.9)",
+          "oklch(26% 0.0997 185.9)",
+          "oklch(37% 0.0997 185.9)",
+          "oklch(48% 0.0997 185.9)",
+          "oklch(59% 0.0997 185.9)",
+          "oklch(70% 0.0997 185.9)",
+          "oklch(82% 0.0997 185.9)",
+          "oklch(95% 0.0997 185.9)"
+        ]
+      },
+      "insufficient-surface": {
+        "role": "tertiary",
+        "displayName": "Insufficient evidence surface",
+        "tonalRamp": [
+          "oklch(15% 0.0155 71.4)",
+          "oklch(26% 0.0155 71.4)",
+          "oklch(37% 0.0155 71.4)",
+          "oklch(48% 0.0155 71.4)",
+          "oklch(59% 0.0155 71.4)",
+          "oklch(70% 0.0155 71.4)",
+          "oklch(82% 0.0155 71.4)",
+          "oklch(95% 0.0155 71.4)"
+        ]
+      },
+      "insufficient-border": {
+        "role": "tertiary",
+        "displayName": "Insufficient evidence border",
+        "tonalRamp": [
+          "oklch(15% 0.0439 78.2)",
+          "oklch(26% 0.0439 78.2)",
+          "oklch(37% 0.0439 78.2)",
+          "oklch(48% 0.0439 78.2)",
+          "oklch(59% 0.0439 78.2)",
+          "oklch(70% 0.0439 78.2)",
+          "oklch(82% 0.0439 78.2)",
+          "oklch(95% 0.0439 78.2)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Collection title",
+        "purpose": "Current collection view."
+      },
+      "title": {
+        "displayName": "Panel title",
+        "purpose": "Section and panel headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Explanations, source material, and metadata."
+      },
+      "label": {
+        "displayName": "Field label",
+        "purpose": "Filters and pair selectors."
+      },
+      "action": {
+        "displayName": "Action text",
+        "purpose": "Buttons and rail controls."
+      },
+      "score": {
+        "displayName": "Comparison score",
+        "purpose": "Prominent saved score in pair evidence."
+      },
+      "timestamp": {
+        "displayName": "Timeline timestamp",
+        "purpose": "Recorded event date and time."
+      }
+    },
+    "motion": [
+      {
+        "name": "control-transition",
+        "value": ".16s ease-out",
+        "purpose": "Button and top-navigation background and border changes when motion is permitted."
+      },
+      {
+        "name": "evidence-reveal",
+        "value": ".22s ease-out",
+        "purpose": "Opacity .7 to 1 and vertical offset 5px to 0 when motion is permitted."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "rail-sticky-min",
+        "value": "1051px"
+      },
+      {
+        "name": "rail-wrap-max",
+        "value": "1050px"
+      },
+      {
+        "name": "analysis-compact-max",
+        "value": "840px"
+      },
+      {
+        "name": "collection-stacked-max",
+        "value": "800px"
+      },
+      {
+        "name": "comparison-stacked-max",
+        "value": "660px"
+      },
+      {
+        "name": "rail-two-columns-max",
+        "value": "520px"
+      },
+      {
+        "name": "header-and-form-stacked-max",
+        "value": "430px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The primary collection action.",
+      "html": "<button type=\"button\" class=\"ds-primary\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>Dodaj materiały</button>",
+      "css": ".ds-primary { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-height: 44px; padding: .62rem .9rem; border: 1px solid transparent; border-radius: 7px; font: 690 .9rem Inter, system-ui, sans-serif; cursor: pointer; background: var(--primary, #a5e7ff); color: var(--canvas, #0b1019); } .ds-primary:hover:not(:disabled) { background: #cef2ff; } .ds-primary:focus-visible { outline: 3px solid var(--primary, #a5e7ff); outline-offset: 3px; } .ds-primary:disabled { color: var(--muted, #a4b1c3); border-color: var(--line, #283140); background: #202a37; cursor: default; } @media (prefers-reduced-motion: no-preference) { .ds-primary { transition: background-color .16s ease-out, border-color .16s ease-out; } }"
+    },
+    {
+      "name": "Outline button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary actions within a panel or toolbar.",
+      "html": "<button type=\"button\" class=\"ds-outline\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 10a8 8 0 1 0-1 7m1-13v6h-6\"/></svg>Odśwież bazę</button>",
+      "css": ".ds-outline { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-height: 44px; padding: .62rem .9rem; border: 1px solid transparent; border-radius: 7px; font: 690 .9rem Inter, system-ui, sans-serif; cursor: pointer; border-color: #394659; background: var(--paper, #131923); color: var(--ink, #e3e9f4); } .ds-outline:hover:not(:disabled) { background: var(--wash, #1b2432); border-color: var(--primary, #a5e7ff); } .ds-outline:focus-visible { outline: 3px solid var(--primary, #a5e7ff); outline-offset: 3px; } .ds-outline:disabled { color: var(--muted, #a4b1c3); border-color: var(--line, #283140); background: #202a37; cursor: default; } @media (prefers-reduced-motion: no-preference) { .ds-outline { transition: background-color .16s ease-out, border-color .16s ease-out; } }"
+    },
+    {
+      "name": "Collection filter",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "A visible label and native select for filtering collection data.",
+      "html": "<label class=\"ds-filter\">Domena<select class=\"ds-filter-field\"><option>Każda domena</option></select></label>",
+      "css": ".ds-filter { display: grid; gap: .35rem; min-width: 0; color: var(--muted, #a4b1c3); font: 650 .83rem Inter, system-ui, sans-serif; } .ds-filter-field { width: 100%; min-width: 0; min-height: 44px; padding: .55rem .75rem; border: 1px solid #394659; border-radius: 7px; color: var(--ink, #e3e9f4); background: var(--paper, #131923); caret-color: var(--primary, #a5e7ff); font: inherit; color-scheme: dark; } .ds-filter-field:focus-visible { outline: 3px solid var(--primary, #a5e7ff); outline-offset: 3px; }"
+    },
+    {
+      "name": "Current collection view",
+      "kind": "nav",
+      "refersTo": "navigation-item-current",
+      "description": "The selected view in the investigation rail.",
+      "html": "<nav class=\"ds-rail-nav\" aria-label=\"Widoki bazy materiałów\"><button aria-current=\"page\" type=\"button\" class=\"ds-rail\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z\"/></svg>Baza materiałów</button><button type=\"button\" class=\"ds-rail\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10 12h4M5 7l5 4m4 0 5-4M5 17l5-4m4 0 5 4M3 3h4v4H3zM17 3h4v4h-4zM3 17h4v4H3zM17 17h4v4h-4zM10 10h4v4h-4z\"/></svg>Graf śledczy</button></nav>",
+      "css": ".ds-rail-nav { display: grid; grid-auto-rows: min-content; gap: .25rem; align-content: start; padding: 1.2rem .75rem; border-right: 1px solid var(--line, #283140); } .ds-rail { min-height: 44px; padding: .62rem .9rem; border: 1px solid transparent; border-radius: 7px; font: 690 .9rem Inter, system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: .65rem; width: 100%; padding: .55rem .65rem; text-align: left; background: transparent; color: var(--muted, #a4b1c3); } .ds-rail svg { flex: none; } .ds-rail:hover { background: var(--wash, #1b2432); color: var(--ink, #e3e9f4); } .ds-rail[aria-current] { background: var(--wash, #1b2432); border-color: #344a62; color: var(--primary, #a5e7ff); } .ds-rail:focus-visible { outline: 3px solid var(--primary, #a5e7ff); outline-offset: 3px; } @media (max-width: 1050px) { .ds-rail-nav { display: flex; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--line, #283140); padding: .4rem .75rem; } .ds-rail { width: auto; flex: none; } } @media (max-width: 520px) { .ds-rail-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .ds-rail { width: 100%; padding-inline: .5rem; font-size: .84rem; } } @media (prefers-reduced-motion: no-preference) { .ds-rail { transition: background-color .16s ease-out, border-color .16s ease-out; } }"
+    },
+    {
+      "name": "Accepted relationship",
+      "kind": "chip",
+      "refersTo": "status-accepted",
+      "description": "Compact status label for an accepted pair.",
+      "html": "<span class=\"ds-accepted\">Powiązanie w grupie</span>",
+      "css": ".ds-accepted { display: inline-block; border-radius: 4px; padding: .15rem .35rem; background: #173238; color: #79e2d6; font: 650 .8rem Inter, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Collection group card",
+      "kind": "card",
+      "refersTo": "campaign-card",
+      "description": "A group heading and its measured collection metrics.",
+      "html": "<article class=\"ds-campaign\"><h3>Grupa 1</h3><dl><div><dt>Materiały</dt><dd>2</dd></div><div><dt>Domeny</dt><dd>1</dd></div><div><dt>Wspólne artefakty</dt><dd>1</dd></div><div><dt>Najbliższa para</dt><dd>85%</dd></div></dl></article>",
+      "css": ".ds-campaign { min-width: 0; padding: 1.1rem; background: var(--paper, #131923); border: 1px solid var(--line, #283140); border-radius: var(--radius, 12px); color: var(--ink, #e3e9f4); font-family: Inter, system-ui, sans-serif; } .ds-campaign h3 { margin: 0; font-size: 1.1rem; line-height: 1.14; } .ds-campaign dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr)); gap: .65rem; margin-block: .9rem; padding: .7rem; background: var(--canvas, #0b1019); border-radius: 6px; } .ds-campaign dt { color: var(--muted, #a4b1c3); font-size: .75rem; } .ds-campaign dd { margin: .25rem 0 0; font: 600 .93rem var(--mono, ui-monospace, SFMono-Regular, Consolas, monospace); }"
+    },
+    {
+      "name": "Saved pair score",
+      "kind": "custom",
+      "refersTo": "evidence-score",
+      "description": "Prominent score in the evidence inspector.",
+      "html": "<div class=\"ds-score\"><span>Wynik podobieństwa</span><strong>85%</strong></div>",
+      "css": ".ds-score { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; margin-top: .75rem; padding: .65rem .8rem; border-radius: 7px; background: var(--panel-raised, #19212e); color: var(--ink, #e3e9f4); font: .9rem Inter, system-ui, sans-serif; } .ds-score strong { color: var(--accent, #52dacd); font: 650 1.6rem var(--mono, ui-monospace, SFMono-Regular, Consolas, monospace); font-variant-numeric: tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "overview": "Methadata is a Polish-language investigation workspace for comparing saved pages and ads. Analysts need to see which pairs met the grouping criteria, trace the result to source material, and recognize when the available input cannot support a conclusion.\n\nThe collection uses a dark navy shell and a navigation rail. Place counts, relationships, captures, and provenance where analysts need them to follow a result from the collection to the source. The supplied Stitch series covers the [explorer](docs/stitch/explorer.png), [graph](docs/stitch/graph.png), [evidence inspector](docs/stitch/evidence.png), and [timeline and simulator](docs/stitch/timeline.png). The HTML companions sit beside the PNGs. The running interface uses saved collection data and the tokens in [the frontend stylesheet](frontend/src/styles.css).",
+    "dos": [
+      "Do keep outcome and relationship state labels visible alongside their color cues.",
+      "Do keep focus visible and restore it when an evidence panel closes.",
+      "Do display missing source captures, dates, or scores using the available empty states."
+    ]
+  }
+}

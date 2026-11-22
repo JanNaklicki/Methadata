@@ -1,4 +1,7 @@
 # surowe dane źródłowe i sekrety – nie wersjonujemy
+.env
+.env.*
+!.env.example
 BACKUP/
 PAKIET_DLA_MODELI.zip
 scam_links.enc
@@ -11,3 +14,8 @@ __pycache__/
 var/
 tests/web-e2e/node_modules/
 tests/web-e2e/node_modules
+
+# system i zrzuty z materiałami organizatora (nie wolno ich publikować)
+.DS_Store
+docs/design-review/before/
+docs/design-review/after/

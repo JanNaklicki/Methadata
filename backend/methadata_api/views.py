@@ -221,7 +221,7 @@ def build_evidence(run_id: str, bundle: Bundle, view: Mapping[str, Any], evidenc
             loc = ref.locator.model_dump(mode="json") if ref.locator else None
             ex = _excerpt(store, art, loc) if loc else None
             items.append({"artifact_id": art.artifact_id, "role": art.role.value, "media_type": art.media_type,
-                          "display_url": art.display_url, "locator": loc, "text_excerpts": [ex] if ex else [],
+                          "sha256": art.sha256, "display_url": art.display_url, "locator": loc, "text_excerpts": [ex] if ex else [],
                           "preview": ensure_preview(store, art, f"Grafika z materiału {m['label']}", previews_dir)})
         sides.append({"material_id": cid, "label": m["label"], "display_url": m.get("display_url"), "items": items})
     if not available:

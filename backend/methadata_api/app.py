@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import logging
+import uuid
+from dataclasses import replace
 import re
 import tempfile
 from contextlib import asynccontextmanager
@@ -20,16 +22,18 @@ from methadata.ingest.detect import sniff
 from methadata.intake import submit_files, submit_url
 
 from . import engine as engine_mod
+from .collection import METHOD_LABELS, Collection
 from .errors import ApiError, safe_text, storage_unavailable, validation
+from .monitor import SourceMonitor
 from .runs import RUN_ID, RunManager
 from .scenarios import RunScenarios
 from .settings import API_VERSION, PROFILES, Settings
-from .storage import Storage
+from .storage import Storage, read_json
 from .views import PREVIEW_NAME, build_evidence, default_label, observation_display_url
 
 log = logging.getLogger("methadata_api")
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:\-]{0,127}$")
-ALLOWED_UPLOAD = {"zip", "har", "json", "html", "mhtml", "png", "jpeg", "webp", "gif", "mp4", "mp3"}
+ALLOWED_UPLOAD = {"zip", "har", "json", "html", "mhtml", "png", "jpeg", "webp", "gif", "pdf", "mp4", "webm", "mp3", "wav", "ogg"}
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9._\-]")
 MAX_JSON_BYTES = 1 << 20
 MAX_ARTIFACTS_LISTED = 200
@@ -60,12 +64,16 @@ async def _read_json_body(request: Request) -> Any:
 
 
 def _validate_url(url: Any) -> str:
-    msg = "Podany adres jest niepoprawny. Wpisz pełny adres zaczynający się od http:// lub https://."
+    msg = "Podany adres jest niepoprawny. Wpisz domenę lub pełny adres http(s)://."
     if not isinstance(url, str) or not url.strip():
         raise validation(msg, "url", "Podaj adres.")
     url = url.strip()
-    if len(url) > 2048:
-        raise validation(msg, "url", "Adres jest za długi (limit 2048 znaków).")
+    if len(url) > 16384:
+        raise validation(msg, "url", "Adres jest za długi (limit 16 384 znaków).")
+    if any(ch.isspace() for ch in url):
+        raise validation(msg, "url", "Adres nie może zawierać spacji.")
+    if "://" not in url:
+        url = "https://" + url
     try:
         parts = urlsplit(url)
         host = parts.hostname
@@ -74,7 +82,8 @@ def _validate_url(url: Any) -> str:
         raise validation(msg, "url", "Adres jest niepoprawny.")
     if parts.scheme.lower() not in ("http", "https") or not re.match(r"^https?://\S+$", url, re.I):
         raise validation(msg, "url", "Adres musi zaczynać się od http:// lub https://.")
-    if not host:
+    if not host or "." not in host:
+        raise validation(msg, "url", "Podaj poprawną nazwę domeny.")
         raise validation(msg, "url", "Adres nie zawiera nazwy serwera.")
     return url
 
@@ -98,18 +107,25 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
     storage = Storage(settings)
     manager = RunManager(storage, engine or engine_mod.compute_run)
     scenarios = RunScenarios(manager)
+    collection_storage = Storage(replace(settings, data_dir=settings.data_dir / "collection",
+                                         jury_data_dir=None, default_profile="demo"))
+    collection = Collection(collection_storage, manager)
+    monitor = SourceMonitor(settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         try:
             storage.prepare()
             storage.seed_demo()
+            collection_storage.prepare()
+            collection.prepare()
             n = manager.recover()
             if n:
                 log.warning("oznaczono %d przerwanych przebiegów jako failed", n)
         except Exception:  # noqa: BLE001 - backend startuje, a health i błędy 503 pokażą problem z magazynem
             log.exception("inicjalizacja magazynu nie powiodła się")
         yield
+        collection.shutdown()
         manager.shutdown(wait=True)
 
     app = FastAPI(title="Methadata API", version=API_VERSION, lifespan=lifespan, docs_url=None, redoc_url=None,
@@ -187,8 +203,9 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
         unknown = sorted(set(body) - {"url", "mode", "label"})
         if unknown:
             raise validation("Żądanie zawiera nieznane pola.", unknown[0], "Nieznane pole.")
-        if body.get("mode", "offline") != "offline":
-            raise validation("Obsługiwany jest tylko tryb offline.", "mode", "Dozwolona wartość: offline.")
+        mode = body.get("mode", "offline")
+        if mode not in {"offline", "fetch"}:
+            raise validation("Obsługiwane tryby to offline lub fetch.", "mode", "Dozwolone wartości: offline, fetch.")
         label = body.get("label")
         if label is not None and (not isinstance(label, str) or len(label) > 200):
             raise validation("Etykieta jest niepoprawna.", "label", "Tekst do 200 znaków.")
@@ -198,6 +215,13 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
 
         def work():
             with selected.lock:
+                if mode == "fetch":
+                    from .collection_archive import build_url_observation
+                    obs, _note = build_url_observation(selected.store(), url, fetch=True)
+                    selected.store().save_observation(obs, "url-fetch")
+                    if label:
+                        selected.set_label(obs.observation_id, label)
+                    return obs, True
                 rep = submit_url(url, selected.store())
                 if not rep.entries:
                     raise validation("Podany adres jest niepoprawny.", "url", "Adres nie został przyjęty.")
@@ -216,10 +240,12 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
     async def _observation_from_file(request: Request):
         selected = analysis_storage(settings.default_profile)
         limit = settings.max_upload_bytes
-        cap = limit + (1 << 20)  # nagłówki i pola multipart
+        zip_limit = settings.collection_upload_bytes
+        upload_cap = max(limit, zip_limit)
+        cap = upload_cap + (1 << 20)  # nagłówki i pola multipart
         declared = request.headers.get("content-length")
         if declared and declared.isdigit() and int(declared) > cap:
-            raise _too_large()
+            raise _too_large(upload_cap)
         seen = 0
         orig_receive = request.receive
 
@@ -229,7 +255,7 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
             if msg["type"] == "http.request":
                 seen += len(msg.get("body", b""))
                 if seen > cap:
-                    raise _too_large()
+                    raise _too_large(upload_cap)
             return msg
 
         try:
@@ -245,7 +271,10 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
             label = form.get("label")
             if label is not None and (not isinstance(label, str) or len(label) > 200):
                 raise validation("Etykieta jest niepoprawna.", "label", "Tekst do 200 znaków.")
-            name = _SAFE_NAME.sub("_", Path(up.filename or "").name) or "upload"
+            filename = safe_text(Path(up.filename or "plik").name, 200)
+            name = _SAFE_NAME.sub("_", filename)
+            if name in ("", ".", ".."):
+                name = "upload"
             tmp = tempfile.TemporaryDirectory(prefix="upload-")
             try:
                 path = Path(tmp.name) / name
@@ -253,18 +282,23 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
                 with path.open("wb") as out:
                     while chunk := await up.read(1 << 20):
                         size += len(chunk)
-                        if size > limit:
-                            raise _too_large()
+                        if size > upload_cap:
+                            raise _too_large(upload_cap)
                         if len(head) < 65536:
                             head += chunk[: 65536 - len(head)]
                         out.write(chunk)
                 if size == 0:
                     raise validation("Plik jest pusty.", "file", "Dodaj niepusty plik.")
                 kind = sniff(head, name, size).kind
+                file_limit = zip_limit if kind == "zip" else limit
+                if size > file_limit:
+                    raise _too_large(file_limit)
                 if kind not in ALLOWED_UPLOAD:
                     raise ApiError(415, "unsupported_media_type",
                                    "Ten typ pliku nie jest obsługiwany. Dodaj ZIP, HAR, HTML, obraz, film lub plik audio.",
                                    details=[{"field": "file", "message": f"Nieobsługiwany typ: {sniff(head, name, size).media_type}."}])
+
+                report = await run_in_threadpool(collection.register, [(path, filename, kind, label or filename)])
 
                 def work():
                     with selected.lock:
@@ -276,18 +310,192 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
                         e = rep.entries[0]
                         if label:
                             selected.set_label(e.observation_id, label)
-                        return store.observation(e.observation_id), e.status != "unchanged"
+                        return store.observation(e.observation_id), e.status != "unchanged", e.version
 
-                obs, created = await run_in_threadpool(work)
+                try:
+                    obs, created, version = await run_in_threadpool(work)
+                    await run_in_threadpool(collection.remember_observation, settings.default_profile, obs.observation_id, version)
+                finally:
+                    collection.schedule(report["id"])
             finally:
                 tmp.cleanup()
         finally:
             await form.close()
         return _created(obs, created, label or selected.labels().get(obs.observation_id))
 
-    def _too_large() -> ApiError:
-        return ApiError(413, "payload_too_large", "Plik jest za duży. Maksymalny rozmiar to 50 MiB.",
-                        details=[{"field": "file", "message": f"Przekroczono limit {settings.max_upload_bytes} bajtów."}])
+    def _too_large(limit=None) -> ApiError:
+        limit = settings.max_upload_bytes if limit is None else limit
+        return ApiError(413, "payload_too_large", f"Plik jest za duży. Maksymalny rozmiar to {limit / (1 << 20):g} MiB.",
+                        details=[{"field": "file", "message": f"Przekroczono limit {limit} bajtów."}])
+
+
+    @app.get("/api/v1/collection")
+    def get_collection():
+        return _json(200, {**collection.current(), "max_upload_bytes": settings.collection_upload_bytes,
+                           "default_profile": settings.default_profile, "max_analysis_upload_bytes": settings.max_upload_bytes})
+
+    @app.get("/api/v1/monitor")
+    def get_monitor():
+        return _json(200, monitor.status())
+
+    @app.post("/api/v1/monitor/scan")
+    def scan_monitor():
+        return _json(200, monitor.scan())
+
+    @app.get("/api/v1/collection/uploads")
+    def list_uploads():
+        return _json(200, collection.uploads())
+
+    @app.get("/api/v1/collection/uploads/{upload_id}/download")
+    @app.get("/api/v1/collection/uploads/{upload_id}/members/{member_id}/download")
+    def download(upload_id: str, member_id: str | None = None):
+        result = collection.download(upload_id, member_id)
+        if result is None:
+            raise ApiError(404, "bad_request", "Plik jest niedostępny.")
+        path, filename = result
+        return FileResponse(path, media_type="application/octet-stream", filename=filename)
+
+    async def update_item(request: Request, table: str, item_id: str):
+        changes = await _read_json_body(request)
+        if not isinstance(changes, dict) or not changes or set(changes) - {"label", "archived"}:
+            raise validation("Podaj nazwę lub stan archiwizacji.", "label", "Dozwolone pola: label, archived.")
+        if "label" in changes:
+            value = changes["label"]
+            if not isinstance(value, str) or not value.strip() or len(value) > 200:
+                raise validation("Nazwa jest niepoprawna.", "label", "Podaj od 1 do 200 znaków.")
+            changes["label"] = safe_text(value.strip(), 200)
+            if not changes["label"]:
+                raise validation("Nazwa jest niepoprawna.", "label", "Podaj od 1 do 200 znaków.")
+        if "archived" in changes and type(changes["archived"]) is not bool:
+            raise validation("Stan archiwizacji jest niepoprawny.", "archived", "Podaj wartość logiczną.")
+        result = await run_in_threadpool(collection.update, table, item_id, changes)
+        if result is None:
+            raise ApiError(404, "bad_request", "Nie znaleziono materiału lub pliku.")
+        return _json(200, result)
+
+    @app.post("/api/v1/collection/edges")
+    async def promote_collection_edge(request: Request):
+        body = await _read_json_body(request)
+        if not isinstance(body, dict):
+            raise ApiError(400, "bad_request", "Oczekiwano obiektu JSON.")
+        run_id = body.get("run_id")
+        evidence_id = body.get("evidence_id")
+        if not isinstance(run_id, str) or not run_id.strip() or not isinstance(evidence_id, str) or not evidence_id.strip():
+            raise validation("Podaj run_id oraz evidence_id.", "evidence_id", "Wymagane identyfikatory.")
+        promoted = await run_in_threadpool(collection.promote_edge, run_id.strip(), evidence_id.strip())
+        if promoted is None:
+            raise ApiError(404, "evidence_not_found", "Nie znaleziono wskazanego dopasowania w tym przebiegu.")
+        return _json(200, promoted)
+
+    @app.delete("/api/v1/collection/edges/{evidence_id}")
+    async def unpromote_collection_edge(evidence_id: str):
+        removed = await run_in_threadpool(collection.unpromote_edge, evidence_id)
+        if not removed:
+            raise ApiError(404, "evidence_not_found", "Nie znaleziono ręcznie zatwierdzonego połączenia.")
+        return _json(200, {"removed": evidence_id})
+
+    @app.patch("/api/v1/collection/uploads/{upload_id}")
+    async def update_upload(request: Request, upload_id: str):
+        return await update_item(request, "uploads", upload_id)
+
+    @app.patch("/api/v1/collection/materials/{material_id}")
+    async def update_material(request: Request, material_id: str):
+        return await update_item(request, "materials", material_id)
+
+    @app.post("/api/v1/imports/{import_id}/retry")
+    def retry_import(import_id: str):
+        report = collection.retry(import_id)
+        if report is None:
+            raise ApiError(409, "bad_request", "Tego importu nie można teraz ponowić.")
+        return _json(202, report, {"Location": f"/api/v1/imports/{import_id}"})
+
+    @app.get("/api/v1/imports/{import_id}")
+    def get_import(import_id: str):
+        report = collection.report(import_id)
+        if report is None:
+            raise ApiError(404, "bad_request", "Nie znaleziono importu.")
+        return _json(200, report)
+
+    @app.get("/api/v1/collection/{run_id}/materials/{material_id}/signals")
+    def get_signals(run_id: str, material_id: str):
+        state = _run_state(run_id)
+        bundle = manager.bundle(run_id) if state.get("profile") == "collection" else None
+        if bundle is None or not any(o.canonical_id == material_id for o in bundle.observations):
+            raise ApiError(404, "observation_not_found", "Nie znaleziono materiału w tej wersji kolekcji.")
+        signals = collection.signals(bundle, run_id, material=material_id)
+        return _json(200, sorted(signals, key=lambda signal: -(signal["score"] or 0))[:24])
+
+    @app.post("/api/v1/imports/url")
+    async def create_url_import(request: Request):
+        from .collection_archive import normalize_import_url
+
+        body = await _read_json_body(request)
+        raw = body.get("url")
+        if not isinstance(raw, str) or not raw.strip():
+            raise validation("Podaj adres URL lub domenę.", "url", "Pole nie może być puste.")
+        fetch = body.get("fetch", True)
+        if type(fetch) is not bool:
+            raise validation("Niepoprawna flaga pobierania.", "fetch", "Podaj wartość logiczną.")
+        tokens = [part.strip() for part in raw.splitlines() if part.strip()]
+        if not tokens or len(tokens) > 20:
+            raise validation("Podaj od 1 do 20 adresów URL lub domen.", "url", "Maksymalnie 20 adresów naraz.")
+        items = []
+        for token in tokens:
+            try:
+                norm_url, label = normalize_import_url(token)
+            except ValueError as exc:
+                raise validation(str(exc), "url", str(exc)) from exc
+            items.append((norm_url, safe_text(label, 200), fetch))
+        report = await run_in_threadpool(collection.register_urls, items)
+        collection.schedule(report["id"])
+        return _json(202, report, {"Location": f"/api/v1/imports/{report['id']}"})
+
+    @app.post("/api/v1/imports")
+    async def create_import(request: Request):
+        limit = settings.collection_upload_bytes
+        received = 0
+
+        async def limited():
+            nonlocal received
+            message = await request.receive()
+            if message["type"] == "http.request":
+                received += len(message.get("body", b""))
+                if received > 4 * limit + (1 << 20):
+                    raise ApiError(413, "payload_too_large", "Łączny rozmiar partii jest za duży.")
+            return message
+
+        async with Request(request.scope, limited).form(max_files=32) as form:
+            uploads = form.getlist("files")
+            if not uploads or any(not isinstance(upload, UploadFile) for upload in uploads):
+                raise validation("Wybierz pliki do importu.", "files", "Dodaj co najmniej jeden plik.")
+            with tempfile.TemporaryDirectory(prefix="collection-") as tmp:
+                files = []
+                for upload in uploads:
+                    label = safe_text(Path(upload.filename or "plik").name, 200)
+                    if upload.size is not None and upload.size > limit:
+                        raise ApiError(413, "payload_too_large", f"Plik {label} przekracza limit {limit / (1 << 20):g} MiB.")
+                    head = await upload.read(65536)
+                    kind = sniff(head, label, upload.size).kind
+                    if kind not in ALLOWED_UPLOAD:
+                        raise ApiError(415, "unsupported_media_type", f"Nieobsługiwany plik: {label}.")
+                    path = Path(tmp) / uuid.uuid4().hex
+                    size = len(head)
+                    with path.open("wb") as target:
+                        target.write(head)
+                        while chunk := await upload.read(1 << 20):
+                            size += len(chunk)
+                            if size > limit:
+                                raise ApiError(413, "payload_too_large", f"Plik {label} przekracza limit importu.")
+                            target.write(chunk)
+                    if not size:
+                        raise validation("Plik jest pusty.", "files", "Dodaj niepusty plik.")
+                    files.append((path, label, kind, label))
+                report = await run_in_threadpool(collection.register, files)
+        location = {"Location": f"/api/v1/imports/{report['id']}"}
+        if "respond-async" in request.headers.get("prefer", "").lower():
+            collection.schedule(report["id"])
+            return _json(202, report, {**location, "Preference-Applied": "respond-async"})
+        return _json(201, await run_in_threadpool(collection.process, report["id"]), location)
 
     # ------------------------------------------------------------ przebiegi
     @app.post("/api/v1/runs")
@@ -337,11 +545,22 @@ def create_app(settings: Optional[Settings] = None, *, engine=None) -> FastAPI:
                            retryable=st["status"] in ("queued", "running"))
         bundle, view = manager.bundle(run_id), manager.result(run_id)
         ev = None
-        selected = storage.for_profile(st.get("profile", "demo"))
+        selected = collection_storage if st.get("profile") == "collection" else storage.for_profile(st.get("profile", "demo"))
         if selected is not None and bundle is not None and view is not None and ID_RE.match(evidence_id):
             ev = build_evidence(run_id, bundle, view, evidence_id, selected.store(), settings.previews_dir)
         if ev is None:
             raise ApiError(404, "evidence_not_found", "Nie znaleziono takiego dowodu w tej analizie.")
+        if st.get("profile") == "collection" and ev["method_id"] == "fusion-v1":
+            pair = next(p for p in bundle.pairs if p.pair_evidence_id == evidence_id)
+            families = bundle.runs[0].config["fusion"]["families"]
+            scores = {p.method_id: p.score for p in bundle.pairs if p.pair == pair.pair and p.run_id != run_id}
+            ev["families"] = [{"name": name, "score": scores.get(cfg["method_id"]),
+                               "supports": scores.get(cfg["method_id"]) is not None and scores[cfg["method_id"]] >= cfg["support_min"]}
+                              for name, cfg in families.items()]
+            ev["signals"] = collection.signals(bundle, run_id, pair=pair.pair)
+            record = read_json(manager.run_dir(run_id) / "run.json", {})
+            enabled = record.get("enabled_signals", [])
+            ev["inactive_signals"] = [label for name, label in METHOD_LABELS.items() if name not in enabled]
         return _json(200, ev)
 
     @app.get("/api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios")

@@ -16,7 +16,7 @@ import unicodedata
 import uuid
 import zipfile
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Optional, Sequence
 from urllib.parse import urlsplit, urlunsplit
 
@@ -437,7 +437,7 @@ class FileImporter:
         tags, ctime = [u.kind], None
         if u.kind == TAG_ARCHIVE:
             tags.append("zip_archive" if u.source_ref.startswith("zip:") else "unpacked_archive")
-            extra, ctime = self._archive_meta(store, arts)
+            extra, ctime = self.archive_metadata(store, arts)
             tags += extra
         roles = {a.role for a in arts}
         return Observation(observation_id=oid, canonical_id=cid, source_ref=u.source_ref,
@@ -494,13 +494,15 @@ class FileImporter:
             rep.issues.append(Issue(u.source_ref, "archive_unreadable", str(e), zrec["rel"]))
         return out
 
-    def _archive_meta(self, store: Store, arts: list[Artifact]) -> tuple[list[str], Optional[str]]:
+    @staticmethod
+    def archive_metadata(store: Store, arts: list[Artifact]) -> tuple[list[str], Optional[str]]:
         """Z dokumentów archiwum: czy pobranie zakończyło się błędem HTTP (wyłączenie z korpusu) i czas zapisu."""
         tags: list[str] = []
         ctime = None
         by_origin = {(a.origin or "").split("!/")[-1]: a for a in arts}
+        by_filename = {PurePosixPath(origin).name: art for origin, art in by_origin.items()}
         code = None
-        info = by_origin.get("archive_info.json")
+        info = by_origin.get("archive_info.json") or by_filename.get("archive_info.json")
         if info:
             try:
                 d = json.loads((store.root / info.local_ref).read_text(encoding="utf-8"))
@@ -513,7 +515,7 @@ class FileImporter:
                         ctime = ts
             except (OSError, ValueError, AttributeError):
                 pass
-        har = by_origin.get("network.har")
+        har = by_origin.get("network.har") or by_filename.get("network.har")
         if code is None and har:
             try:
                 d = json.loads((store.root / har.local_ref).read_text(encoding="utf-8"))

@@ -55,6 +55,11 @@ def test_demo_and_cli_parity(tmp_path):
         for i in ids:
             ev = c.get(f"/api/v1/runs/{body['run_id']}/evidence/{i}")
             assert ev.status_code == 200
+            artifacts = [item for side in ev.json()["sides"] for item in side["items"]]
+            assert artifacts
+            for artifact in artifacts:
+                digest = artifact["sha256"]
+                assert len(digest) == 64 and all(char in "0123456789abcdef" for char in digest)
         # /runs liczy od nowa: drugi przebieg ma inny run_id i te same grupy
         b2 = wait(c, start(c, demo["observation_id"]))
         assert b2["run_id"] != body["run_id"] and groups(b2) == groups(body)
@@ -68,8 +73,13 @@ def test_demo_and_cli_parity(tmp_path):
         rep = json.loads((out / "baseline_report.json").read_text(encoding="utf-8"))
         assert [len(g) for g in rep["groups"]] == [2] == [len(g) for g in groups(body)]
         bundle = json.loads((out / "bundle.json").read_text(encoding="utf-8"))
-        cli_edges = {round(e["weight"], 6) for r in bundle["runs"] for e in r["edges"]}
-        assert {round(e["weight"], 6) for e in res["cluster_run"]["edges"]} == cli_edges
+        # Aplikacja liczy podobieństwo ważoną fuzją (grafiki, tekst, DOM), a CLI baseline tylko po grafikach:
+        # wagi krawędzi się różnią, ale obie metody muszą wskazać ten sam skład grupy.
+        assert [r["edges"] for r in bundle["runs"]]
+        labels = {m["material_id"]: m["label"] for m in res["materials"]}
+        web = sorted(sorted(labels[i].split()[1] for i in g) for g in groups(body))   # "Reklama A (…)" -> "A"
+        assert web == sorted(sorted(label[-1].upper() for label in g) for g in rep["groups"])   # "dir:ad-a" -> "A"
+        assert web == [["A", "C"]]
 
 
 def test_restart_reads_result_and_marks_interrupted(tmp_path):

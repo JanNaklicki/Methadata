@@ -24,10 +24,29 @@ def test_spec_and_all_examples_conform():
 
 def test_operations_documented():
     spec = cc.load_spec()
-    ops = {(m.upper(), p) for p, i in spec["paths"].items() for m in i}
-    assert ops == {("GET", "/api/v1/health"), ("POST", "/api/v1/observations"), ("GET", "/api/v1/demo"), ("POST", "/api/v1/runs"),
-                   ("GET", "/api/v1/runs/{run_id}"), ("GET", "/api/v1/runs/{run_id}/evidence/{evidence_id}"),
-                   ("GET", "/api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios")}
+    ops = {(method.upper(), path) for path, item in spec["paths"].items()
+           for method in item if method in {"get", "post", "patch"}}
+    assert ops == {
+        ("GET", "/api/v1/health"),
+        ("POST", "/api/v1/observations"),
+        ("GET", "/api/v1/demo"),
+        ("POST", "/api/v1/runs"),
+        ("GET", "/api/v1/runs/{run_id}"),
+        ("GET", "/api/v1/runs/{run_id}/evidence/{evidence_id}"),
+        ("GET", "/api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios"),
+        ("GET", "/api/v1/monitor"),
+        ("POST", "/api/v1/monitor/scan"),
+        ("GET", "/api/v1/collection"),
+        ("GET", "/api/v1/collection/uploads"),
+        ("PATCH", "/api/v1/collection/uploads/{upload_id}"),
+        ("PATCH", "/api/v1/collection/materials/{material_id}"),
+        ("GET", "/api/v1/collection/uploads/{upload_id}/download"),
+        ("GET", "/api/v1/collection/uploads/{upload_id}/members/{member_id}/download"),
+        ("POST", "/api/v1/imports"),
+        ("GET", "/api/v1/imports/{import_id}"),
+        ("POST", "/api/v1/imports/{import_id}/retry"),
+    }
+
 
 
 def test_required_example_scenarios_present():

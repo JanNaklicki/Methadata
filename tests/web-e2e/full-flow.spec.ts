@@ -61,7 +61,7 @@ async function readApi<T>(request: APIRequestContext, path: string, diagnostics:
 async function checkRun(page: Page, request: APIRequestContext, accepted: RunAccepted, diagnostics: string[]) {
   const path = `/runs/${accepted.run_id}`
   await expect(page).toHaveURL((url) => url.pathname === path)
-  await expect(page.getByRole('heading', { name: /Przebieg/ }).locator('code')).toHaveText(accepted.run_id)
+  await expect(page.locator('.run-id code')).toHaveText(accepted.run_id)
   await expect(page.getByTestId('summary')).toBeVisible()
 
   const run = await readApi<Run>(request, `/api/v1${path}`, diagnostics)
@@ -126,7 +126,7 @@ test('przykład pokazuje grupę i dowód obu stron oraz odtwarza widok po odświ
   await expect(page).toHaveURL((url) => url.pathname === runPath)
   await page.reload()
   await expect(page).toHaveURL((url) => url.pathname === runPath)
-  await expect(page.getByRole('heading', { name: /Przebieg/ }).locator('code')).toHaveText(run.run_id)
+  await expect(page.locator('.run-id code')).toHaveText(run.run_id)
   await expect(summary.getByRole('heading')).toHaveText('Znaleziono grupy')
 })
 
@@ -148,6 +148,7 @@ test('sam URL daje wynik ze skąpymi danymi bez grup i dowodów', async ({ page,
   const url = 'https://example.invalid/w04-url-only'
   await page.goto('/')
   await page.getByLabel('Adres strony lub reklamy').fill(url)
+  await page.getByLabel(/Pobierz stronę/).uncheck()   // tryb offline: zapis samego adresu
   const { run, observation } = await startRun(page, 'observations', () => page.getByRole('button', { name: 'Analizuj adres' }).click())
   expect(observation.input_kind).toBe('url_only')
   const result = await checkRun(page, request, run, diagnostics)
@@ -160,11 +161,11 @@ test('sam URL daje wynik ze skąpymi danymi bez grup i dowodów', async ({ page,
   await expect(page.getByTestId('summary').getByRole('heading')).toHaveText('Za mało danych do rozstrzygnięcia')
   const material = page.locator('li.material').filter({ hasText: url })
   await expect(material).toHaveCount(1)
-  await expect(material.getByText('Tylko adres URL, brak dowodów')).toBeVisible()
+  await expect(material.getByText('Tylko adres URL, bez śladów do porównania')).toBeVisible()
   const urlComparisons = page.getByRole('listitem').filter({ has: page.getByRole('button', { name: /Pokaż dowody: .*example\.invalid/ }) })
   await expect(urlComparisons).toHaveCount(urlPairs.length)
   for (const comparison of await urlComparisons.all()) {
-    await expect(comparison).toContainText('wynik: niewykonalne')
+    await expect(comparison).toContainText('Brak porównywalnych danych')
   }
 })
 
@@ -183,4 +184,13 @@ test('niedostępne API pokazuje błąd z proxy przy zatrzymanym backendzie', asy
   await expect(alert).toContainText(`Serwer zwrócił błąd (HTTP ${status}).`)
   await expect(button).toBeEnabled()
   await expect(page).toHaveURL((url) => url.pathname === '/')
+})
+
+test('martwa domena przy domyślnym pobieraniu nie przerywa analizy', async ({ page, request, diagnostics }) => {
+  await page.goto('/')
+  await page.getByLabel('Adres strony lub reklamy').fill('https://example.invalid/martwa-domena')
+  const { run } = await startRun(page, 'observations', () => page.getByRole('button', { name: 'Analizuj adres' }).click())
+  const result = await checkRun(page, request, run, diagnostics)
+  expect(result.summary.outcome).toBe('insufficient_evidence')   // nic do porównania, ale bez błędu
+  await expect(page.getByTestId('summary').getByRole('heading')).toHaveText('Za mało danych do rozstrzygnięcia')
 })

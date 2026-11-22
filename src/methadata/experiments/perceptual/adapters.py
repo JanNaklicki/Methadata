@@ -83,7 +83,7 @@ class PerceptualExtractor:
                 "artifact_id": art.artifact_id, "phash": None if ph is None else P.to_hex(ph),
                 "width": w, "height": h, "group": group}))
             note = "obraz płaski: brak pHash" if ph is None else None
-            if group == "illustration":
+            if group == "illustration" and self.cfg.get("extract_keypoints", True):
                 try:
                     ks = K.detect(gray, self.cfg)
                 except ImportError as e:

@@ -10,11 +10,14 @@ import shutil
 import subprocess
 import tempfile
 import wave
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 N_BANDS = 17            # pasm -> 16 bitów na ramkę
 VOICE_BANDS = 24
 Transcriber = Callable[[bytes], Sequence[Mapping[str, Any]]]  # WAV -> [{"start_ms","end_ms","text"}]
+SpeakerEmbedder = Callable[[Any, int], Optional[dict[str, Any]]]  # (samples, sr) -> {"mean":[...], "voiced_s":..., "backend":...}
 
 
 class AudioUnsupported(Exception):
@@ -128,13 +131,18 @@ def voice_profile(x, sr: int, cfg: Mapping[str, Any]) -> Optional[dict[str, Any]
             "voiced_s": round(float(voiced.sum() * 0.016), 2), "backend": "spectral-envelope-v1"}
 
 
+@lru_cache(maxsize=2)
+def _load_whisper(model: str, cache_dir: Optional[str]):
+    from faster_whisper import WhisperModel
+    return WhisperModel(model, download_root=cache_dir)
+
+
 def faster_whisper_transcriber(model: str = "tiny", cache_dir: Optional[str] = None) -> Optional[Transcriber]:
     """Opcjonalny backend (faster-whisper); None gdy brak biblioteki. Wagi do katalogu cache poza repo."""
     try:
-        from faster_whisper import WhisperModel
-    except ImportError:
+        m = _load_whisper(model, cache_dir)
+    except Exception:  # noqa: BLE001
         return None
-    m = WhisperModel(model, download_root=cache_dir)
 
     def run(wav: bytes):
         with tempfile.TemporaryDirectory() as d:
@@ -144,4 +152,62 @@ def faster_whisper_transcriber(model: str = "tiny", cache_dir: Optional[str] = N
             segs, _ = m.transcribe(p)
             return [{"start_ms": int(s.start * 1000), "end_ms": int(s.end * 1000), "text": s.text.strip()}
                     for s in segs]
+    return run
+
+
+@lru_cache(maxsize=2)
+def _load_speechbrain(source: str, savedir: str):
+    from speechbrain.inference.speaker import EncoderClassifier
+    return EncoderClassifier.from_hparams(source=source, savedir=savedir)
+
+
+def speechbrain_speaker_embedder(
+    source: str = "speechbrain/spkrec-ecapa-voxceleb",
+    cache_dir: Optional[str] = None,
+) -> Optional[SpeakerEmbedder]:
+    """Opcjonalny backend mówcy (SpeechBrain ECAPA-TDNN, 192-dim); None gdy brak biblioteki lub wag."""
+    savedir = cache_dir or os.environ.get("METHADATA_MODEL_CACHE") or str(Path.home() / ".cache" / "huggingface" / "hub")
+    target = str(Path(savedir) / "speechbrain-ecapa")
+    try:
+        clf = _load_speechbrain(source, target)
+    except Exception:  # noqa: BLE001
+        return None
+
+    def run(x, sr: int) -> Optional[dict[str, Any]]:
+        import numpy as np
+        import torch
+
+        if sr <= 0 or len(x) < int(sr * 1.0):
+            return None
+        # Wylicz orientacyjny czas głośnych ramek (jak w voice_profile).
+        frame = max(1, int(sr * 0.032))
+        hop = max(1, int(sr * 0.016))
+        if len(x) >= frame:
+            starts = np.arange(0, len(x) - frame + 1, hop)
+            rms = np.sqrt(np.array([(x[s:s + frame] ** 2).mean() for s in starts], dtype=np.float32))
+            voiced_s = float((rms > 0.01).sum() * 0.016)
+        else:
+            voiced_s = float(len(x) / sr)
+        if voiced_s < 1.0:
+            return None
+        samples = x.astype(np.float32, copy=False)
+        if sr != 16000:
+            new_len = max(1, int(round(len(samples) * 16000 / sr)))
+            samples = np.interp(
+                np.linspace(0, len(samples) - 1, new_len, dtype=np.float32),
+                np.arange(len(samples), dtype=np.float32),
+                samples,
+            ).astype(np.float32)
+        wav_tensor = torch.from_numpy(samples).unsqueeze(0)
+        with torch.no_grad():
+            emb = clf.encode_batch(wav_tensor).squeeze().detach().cpu().numpy().astype(np.float32)
+        norm = float(np.linalg.norm(emb))
+        if norm > 0:
+            emb = emb / norm
+        return {
+            "mean": [round(float(v), 5) for v in emb.tolist()],
+            "voiced_s": round(voiced_s, 2),
+            "backend": "speechbrain-ecapa-voxceleb",
+        }
+
     return run

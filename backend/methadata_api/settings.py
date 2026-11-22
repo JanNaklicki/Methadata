@@ -21,6 +21,8 @@ class Settings:
     baseline_config: Path = DEFAULT_BASELINE_CONFIG
     max_upload_bytes: int = MAX_UPLOAD_BYTES
     demo_dir: Path = DEMO_DIR
+    collection_upload_bytes: int = 128 << 20
+    collection_models: bool = False
 
     default_profile: str = "demo"
     jury_data_dir: Path | None = None
@@ -39,6 +41,8 @@ class Settings:
         jury_dir = os.environ.get("METHADATA_JURY_DATA_DIR")
         return cls(
             data_dir=Path(os.environ.get("METHADATA_DATA_DIR", "var/methadata-data")).expanduser(),
+            collection_models=os.environ.get("METHADATA_COLLECTION_MODELS") == "1",
+            collection_upload_bytes=max(1, int(os.environ.get("METHADATA_COLLECTION_UPLOAD_BYTES", str(128 << 20)))),
             workers=max(1, int(os.environ.get("METHADATA_WORKERS", "2"))),
             default_profile=os.environ.get("METHADATA_ANALYSIS_PROFILE", "demo"),
             jury_data_dir=Path(jury_dir).expanduser() if jury_dir else None,

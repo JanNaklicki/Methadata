@@ -13,6 +13,7 @@ ArtifactRef z ImageRect.frame_ms (początek i koniec; dla audio prostokąt 1x1 j
 sygnałem (`voice-aux-v1`, relation campaign_candidate) i nigdy nie wchodzi do wyniku innych metod."""
 from __future__ import annotations
 
+import os
 from typing import Any, Mapping, Optional, Sequence
 
 from methadata.contracts import (AdapterKind, AdapterSpec, ArtifactRef, ExtractionState, ExtractionStatus, Feature,
@@ -41,9 +42,20 @@ class VideoAudioExtractor:
                        description="Klatki (pHash) i ujęcia wideo, odcisk audio, profil głosu, opcjonalna transkrypcja",
                        extras=["perceptual"])
 
-    def __init__(self, config: Optional[Mapping[str, Any]] = None, transcriber: Optional[AU.Transcriber] = None):
+    def __init__(
+        self,
+        config: Optional[Mapping[str, Any]] = None,
+        transcriber: Optional[AU.Transcriber] = None,
+        speaker_embedder: Optional[AU.SpeakerEmbedder] = None,
+        enable_models: bool = False,
+    ):
         self.cfg = {**DEFAULTS, **(config or {})}
         self.transcriber = transcriber
+        self.speaker_embedder = speaker_embedder
+        self.enable_models = enable_models
+
+    def _use_models(self) -> bool:
+        return self.enable_models or os.environ.get("METHADATA_COLLECTION_MODELS") == "1" or os.environ.get("METHADATA_ENABLE_SPEECH") == "1"
 
     def _feat(self, oid, art, kind, value):
         return Feature(feature_id=ids.feature_id(oid, FAMILY, kind, EXTRACTOR_VERSION, [art.artifact_id, kind]),
@@ -126,15 +138,30 @@ class VideoAudioExtractor:
         feats.append(self._feat(oid, art, K_AUDIO, {"duration_ms": dur, "source": "wav", **fp}))
         if not any(c == "1" for c in fp["valid"]):
             notes.append("audio ciche: odcisk bez ważnych ramek")
-        vp = AU.voice_profile(x, sr, self.cfg)
+        vp = None
+        embedder = self.speaker_embedder
+        if embedder is None and self._use_models():
+            embedder = AU.speechbrain_speaker_embedder()
+        if embedder is not None:
+            try:
+                vp = embedder(x, sr)
+            except Exception as e:  # noqa: BLE001
+                notes.append(f"embedding mówcy nieudany ({type(e).__name__}); fallback widmowy")
+        if vp is None:
+            vp = AU.voice_profile(x, sr, self.cfg)
         if vp is not None:
             feats.append(self._feat(oid, art, K_VOICE, vp))
         else:
             notes.append("za mało mowy na profil głosu")
-        if self.transcriber is not None:
+        transcriber = self.transcriber
+        transcriber_name = "injected"
+        if transcriber is None and self._use_models():
+            transcriber = AU.faster_whisper_transcriber()
+            transcriber_name = "faster-whisper-tiny"
+        if transcriber is not None:
             try:
-                segs = [dict(s) for s in self.transcriber(wav)]
-                feats.append(self._feat(oid, art, K_TRANSCRIPT, {"backend": "injected", "segments": segs}))
+                segs = [dict(s) for s in transcriber(wav)]
+                feats.append(self._feat(oid, art, K_TRANSCRIPT, {"backend": transcriber_name, "segments": segs}))
             except Exception as e:  # noqa: BLE001 - backend zewnętrzny
                 notes.append(f"transkrypcja nieudana: {type(e).__name__}")
         else:
@@ -322,14 +349,23 @@ class VoiceAuxComparator(_Base):
         best = None
         for x in ia:
             for y in ib:
+                if x.get("backend") != y.get("backend") or len(x["mean"]) != len(y["mean"]):
+                    continue
                 c = M.cosine(x["mean"], y["mean"])
                 if best is None or c > best[0]:
                     best = (c, x, y)
+        if best is None:
+            return None
         c, x, y = best
         sc = max(0.0, c)
-        expl = (f"SYGNAŁ POMOCNICZY (nie dowód tożsamości mówcy): kosinus profili widmowych głosu = {c:.3f} "
-                f"(backend {x['backend']}, mowa A {x['voiced_s']} s, B {y['voiced_s']} s). Podobny głos może wynikać z "
-                f"tego samego lektora lub syntezatora i nie przesądza o jednej kampanii.")
+        if str(x.get("backend", "")).startswith("speechbrain"):
+            expl = (f"Podobieństwo głosu mówcy (SpeechBrain ECAPA-TDNN): kosinus = {c:.3f} "
+                    f"(backend {x['backend']}, mowa A {x['voiced_s']} s, B {y['voiced_s']} s). "
+                    f"Sygnał pomocniczy — wysoki wynik może oznaczać tego samego lektora lub ten sam syntezator głosu.")
+        else:
+            expl = (f"SYGNAŁ POMOCNICZY (nie dowód tożsamości mówcy): kosinus profili widmowych głosu = {c:.3f} "
+                    f"(backend {x['backend']}, mowa A {x['voiced_s']} s, B {y['voiced_s']} s). Podobny głos może wynikać z "
+                    f"tego samego lektora lub syntezatora i nie przesądza o jednej kampanii.")
         return (sc, [ArtifactRef(artifact_id=x["artifact_id"])], [ArtifactRef(artifact_id=y["artifact_id"])], expl)
 
 

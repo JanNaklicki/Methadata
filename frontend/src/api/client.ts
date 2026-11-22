@@ -1,5 +1,5 @@
 import type { ScenarioComparison } from '../counterfactual/types'
-import type { Demo, ErrorBody, Evidence, ObservationCreated, Run, RunAccepted } from './types'
+import type { MonitorScan, MonitorStatus, SupplementalSignal, CollectionData, ImportReport, Upload, Demo, ErrorBody, Evidence, ObservationCreated, Run, RunAccepted } from './types'
 
 export const API_BASE = '/api/v1'
 
@@ -49,6 +49,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       retryable: body?.retryable ?? res.status >= 500,
     })
   }
+  if (data === null) throw new ApiError(res.status, { code: "internal_error", message: "API zwróciło nieprawidłową odpowiedź." })
   return data as T
 }
 
@@ -59,9 +60,32 @@ const json = (body: unknown): RequestInit => ({
 })
 
 export const api = {
+  getImport: (id: string) => request<ImportReport>(`/imports/${encodeURIComponent(id)}`),
+  getCollection: () => request<CollectionData>('/collection', { cache: 'no-store' }),
+  getUploads: () => request<Upload[]>('/collection/uploads', { cache: 'no-store' }),
+  updateCollectionItem: (kind: 'uploads' | 'materials', id: string, changes: { label?: string; archived?: boolean }) =>
+    request(`/collection/${kind}/${encodeURIComponent(id)}`, { ...json(changes), method: 'PATCH' }),
+  downloadUpload: (id: string, memberId?: string) =>
+    `${API_BASE}/collection/uploads/${encodeURIComponent(id)}${memberId ? `/members/${encodeURIComponent(memberId)}` : ''}/download`,
+  retryImport: (id: string) => request<ImportReport>(`/imports/${encodeURIComponent(id)}/retry`, { method: 'POST' }),
+  getMaterialSignals: (runId: string, materialId: string, signal: AbortSignal) =>
+    request<SupplementalSignal[]>(`/collection/${encodeURIComponent(runId)}/materials/${encodeURIComponent(materialId)}/signals`, { signal }),
+  importCollection: (files: FileList | File[]) => {
+    const form = new FormData()
+    Array.from(files).forEach((file) => form.append('files', file))
+    return request<ImportReport>('/imports', { method: 'POST', headers: { Prefer: 'respond-async' }, body: form })
+  },
+  importCollectionUrl: (url: string, fetch = true) =>
+    request<ImportReport>('/imports/url', json({ url, fetch })),
+  promoteEdge: (runId: string, evidenceId: string) =>
+    request('/collection/edges', json({ run_id: runId, evidence_id: evidenceId })),
+  unpromoteEdge: (evidenceId: string) =>
+    request(`/collection/edges/${encodeURIComponent(evidenceId)}`, { method: 'DELETE' }),
+  getMonitor: () => request<MonitorStatus>('/monitor', { cache: 'no-store' }),
+  scanMonitor: () => request<MonitorScan>('/monitor/scan', { method: 'POST' }),
   getDemo: (signal?: AbortSignal) => request<Demo>('/demo', { signal }),
-  createObservationUrl: (url: string, label?: string) =>
-    request<ObservationCreated>('/observations', json({ url, mode: 'offline', ...(label ? { label } : {}) })),
+  createObservationUrl: (url: string, label?: string, mode: 'offline' | 'fetch' = 'offline') =>
+    request<ObservationCreated>('/observations', json({ url, mode, ...(label ? { label } : {}) })),
   createObservationFile: (file: File, label?: string) => {
     const form = new FormData()
     form.append('file', file)

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>Evidence Inspector — Methadata</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #262a34; border-radius: 3px; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-dim": "#0f131c",
+            "background": "#0f131c",
+            "surface": "#0f131c",
+            "surface-container-lowest": "#0a0e17",
+            "surface-container-low": "#141822",
+            "surface-container": "#1a1f2b",
+            "surface-container-high": "#232836",
+            "surface-container-highest": "#2d3444",
+            "surface-bright": "#353c4d",
+            "primary": "#a5e7ff",
+            "primary-container": "#00d2ff",
+            "on-primary": "#003543",
+            "secondary": "#4fdbc8",
+            "secondary-container": "#04b4a2",
+            "on-secondary": "#003731",
+            "tertiary": "#cddef8",
+            "on-surface": "#dfe2ef",
+            "on-surface-variant": "#9ba6b1",
+            "outline": "#65707c",
+            "outline-variant": "#2a313e",
+            "error": "#ffb4ab",
+            "error-container": "#93000a"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Hanken Grotesk", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased min-h-screen selection:bg-primary/20 selection:text-primary">
+<!-- Top App Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 h-14 bg-surface-container-lowest/80 backdrop-blur border-b border-outline-variant/40 px-6 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<span class="font-mono text-xs font-semibold tracking-wider text-primary">METHADATA</span>
+<span class="text-outline-variant text-sm">/</span>
+<span class="font-mono text-[11px] text-on-surface-variant tracking-wide uppercase">Campaign Intelligence</span>
+</div>
+<div class="hidden md:flex items-center gap-2 pl-4 border-l border-outline-variant/50 text-xs text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-mono">PL-FIN-SCAMS-2024</span>
+<span class="text-outline text-[11px]">(124 Ads · 18 Domains)</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:flex items-center">
+<span class="material-symbols-outlined text-outline text-[16px] absolute left-3 pointer-events-none">search</span>
+<input class="w-64 bg-surface-container-low border border-outline-variant/40 rounded px-8 py-1 text-xs text-on-surface placeholder:text-outline focus:outline-none focus:border-primary/50 font-mono" placeholder="Query hash, domain, ad ID..." type="text"/>
+<kbd class="absolute right-2.5 text-[10px] text-outline font-mono">⌘K</kbd>
+</div>
+<div class="flex items-center gap-2.5 pl-3 border-l border-outline-variant/40">
+<span class="font-mono text-xs text-on-surface">K. Thorne</span>
+<span class="text-[10px] font-mono text-outline px-1.5 py-0.5 rounded bg-surface-container-high">CERT/PL</span>
+</div>
+</div>
+</header>
+<!-- Left Sidebar Navigation -->
+<aside class="fixed left-0 top-14 bottom-0 w-60 bg-surface-container-lowest border-r border-outline-variant/40 z-40 flex flex-col justify-between py-5 px-3">
+<div class="flex flex-col gap-6">
+<div class="px-3">
+<span class="text-[10px] font-mono uppercase tracking-widest text-outline">Workspace</span>
+</div>
+<nav class="flex flex-col gap-0.5 text-xs">
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-[17px]">grid_view</span>
+<span>Campaign Explorer</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-[17px]">hub</span>
+<span>Investigation Graph</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded bg-surface-container text-primary font-medium" href="#">
+<span class="material-symbols-outlined text-[17px]">policy</span>
+<span>Evidence Inspector</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-[17px]">timeline</span>
+<span>Timeline Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-[17px]">tune</span>
+<span>Engine Weights</span>
+</a>
+</nav>
+</div>
+<!-- Telemetry Indicator -->
+<div class="p-3 rounded bg-surface-container-low/60 border border-outline-variant/30 flex flex-col gap-1 text-[11px] font-mono">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>GATEWAY</span>
+<span class="text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> live
+        </span>
+</div>
+<div class="text-outline truncate">cert-pol-gw-09</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="pl-60">
+<main class="pt-14 pb-20 px-8 max-w-7xl mx-auto">
+<!-- Calm Biaxial Comparison Header -->
+<section class="py-8 border-b border-outline-variant/30">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 text-xs font-mono text-on-surface-variant">
+<span>BIAXIAL FORENSIC DISCRIMINATOR</span>
+<span class="text-outline">·</span>
+<span class="text-primary">CASE PL-409-EVID</span>
+</div>
+<h1 class="font-display text-2xl font-medium tracking-tight text-on-surface mt-0.5">
+              Evidence Inspector
+            </h1>
+<p class="text-xs text-on-surface-variant mt-1">
+              Comparing reference <span class="font-mono text-on-surface">Ad #1024</span> (Seed · Cluster #PL-409) against candidate <span class="font-mono text-on-surface">Ad #1078</span> (DNS Crawler Ingest).
+            </p>
+</div>
+<!-- Actions & Primary Confirmation -->
+<div class="flex items-center gap-4 flex-wrap">
+<button class="text-xs text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1.5 py-1.5 px-2" id="btn-export">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span>Export Dossier</span>
+</button>
+<button class="text-xs text-on-surface-variant hover:text-error transition-colors flex items-center gap-1.5 py-1.5 px-2" id="btn-flag">
+<span class="material-symbols-outlined text-[16px]">flag</span>
+<span>Flag False Positive</span>
+</button>
+<button class="bg-primary text-on-primary font-medium text-xs rounded px-4 py-2 hover:bg-primary-container transition-colors flex items-center gap-1.5 shadow-sm" id="btn-confirm">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>Confirm Relation to Cluster #PL-409</span>
+</button>
+</div>
+</div>
+<!-- Serene Correlation Summary Bar -->
+<div class="mt-6 pt-5 border-t border-outline-variant/20 flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<div class="flex items-baseline gap-2">
+<span class="font-display text-3xl font-medium text-on-surface tracking-tight">87%</span>
+<span class="text-xs font-medium text-secondary">Multi-Signal Correlation (Strong)</span>
+</div>
+<span class="text-outline-variant">|</span>
+<span class="text-xs text-on-surface-variant">
+              Corroborated by <strong class="text-on-surface font-normal">4 of 5</strong> independent modalities
+            </span>
+</div>
+<div class="flex items-center gap-3 text-xs font-mono text-on-surface-variant">
+<span>P-VALUE: <span class="text-on-surface font-semibold">0.873</span></span>
+<span class="text-outline">·</span>
+<span>MODEL: <span class="text-on-surface font-semibold">HYBRID-ENS-V1.4</span></span>
+</div>
+</div>
+</section>
+<!-- Side-by-Side Ad Comparison -->
+<section class="py-8 border-b border-outline-variant/30">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xs font-mono uppercase tracking-wider text-outline">Side-by-Side Forensic Capture</h2>
+<span class="text-xs text-on-surface-variant">Aligned viewport &amp; normalized OCR stream</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Reference Ad #1024 -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between text-xs pb-2 border-b border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="font-mono font-medium text-on-surface">Ad #1024</span>
+<span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-surface-container-high text-primary">Seed Reference</span>
+</div>
+<span class="font-mono text-xs text-outline">Cluster #PL-409</span>
+</div>
+<!-- Clean visual frame -->
+<div class="relative rounded overflow-hidden bg-surface-container-low aspect-video border border-outline-variant/30">
+<img alt="Fraudelent investment advertisement displaying KNF logo and Baltic pipe imagery" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFonEdeWPLNWWMlliBkkmNwazG9SvNr6vFj3WpUZ8k722P0CXk4-9SUQ47dNRKlvhdhEp9_lwVQm6lQsfm21OZ01_zt_PmA1RkRC-ha46lblYZx_K8sgz04aILKyqhu3oiUa6IBp3diFq8xy1bsBVpSm-dopsgo80Hwx-lb0rT980vgIZAb9q4FziepwxIjJROCOXet24-ubg0icryGcih5lvqCbFkUr3yRk4bZyI"/>
+<div class="absolute top-3 left-3 bg-surface-container-lowest/80 backdrop-blur px-2 py-1 rounded text-[11px] font-mono text-error flex items-center gap-1.5 border border-error/20">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span>Spoofed Entity: KNF (0.98)</span>
+</div>
+</div>
+<!-- OCR Extract -->
+<div class="p-3.5 rounded bg-surface-container-low border border-outline-variant/20 flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-[11px] font-mono text-outline">
+<span>OCR TRANSCRIPTION</span>
+<span>CONF 97.4%</span>
+</div>
+<p class="text-xs leading-relaxed text-on-surface">
+                "<mark class="bg-primary/20 text-primary font-medium px-0.5 rounded">Gwarantowany zysk</mark> <mark class="bg-secondary/20 text-secondary font-medium px-0.5 rounded">14 800 PLN</mark> bez ryzyka dla każdego obywatela. Oficjalna <mark class="bg-primary/20 text-primary font-medium px-0.5 rounded">platforma inwestycyjna</mark> pod patronatem KNF. Szybka <mark class="bg-secondary/20 text-secondary font-medium px-0.5 rounded">wypłata w 24h</mark> oraz stałe wsparcie doradcy."
+              </p>
+</div>
+<!-- Metadata List -->
+<dl class="grid grid-cols-2 gap-y-2 text-xs font-mono pt-1 text-on-surface-variant">
+<div>
+<dt class="text-outline text-[10px]">ORIGIN</dt>
+<dd class="text-on-surface">Meta Ad Library</dd>
+</div>
+<div>
+<dt class="text-outline text-[10px]">INGESTION</dt>
+<dd class="text-on-surface">2024-11-12 14:22 CET</dd>
+</div>
+<div class="col-span-2 pt-1 border-t border-outline-variant/20">
+<dt class="text-outline text-[10px]">RESOLVED DESTINATION</dt>
+<dd class="text-on-surface truncate">https://portal-baltic-inwestycje.pl/auth/lead_gen</dd>
+</div>
+<div>
+<dt class="text-outline text-[10px]">TAG MANAGER</dt>
+<dd class="text-primary">GTM-EXAMPLE1</dd>
+</div>
+<div>
+<dt class="text-outline text-[10px]">EGRESS HOST IP</dt>
+<dd class="text-on-surface">185.196.220.14</dd>
+</div>
+</dl>
+</div>
+<!-- Candidate Ad #1078 -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between text-xs pb-2 border-b border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="font-mono font-medium text-on-surface">Ad #1078</span>
+<span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-surface-container-high text-secondary">Candidate Match</span>
+</div>
+<span class="font-mono text-xs text-secondary">Pending Cluster Link</span>
+</div>
+<!-- Clean visual frame -->
+<div class="relative rounded overflow-hidden bg-surface-container-low aspect-video border border-outline-variant/30">
+<img alt="Mutated candidate scam ad with altered typography and cropped frame" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnJNrFY00KSvMlHwT2b0dOi1Kd5Cfqb47hIvhhPGgW0fJVauZ_qdoe5lqhlU-I6xb2I_Y3B4UVuRvP4TNqOJGD-k1mn2iYPEmXbRnxxHLsoJEBGVQWL7H9w_4jlRZHkCj-8fkAPCdVIOcUez8kdVpKq8huTZtN4J_XJWp0yM3BsvM5v8bDcn0Yea102IRsqZmGXxpbcDdEsYl_iPv96rG7LvlN6D1-5sQ-7VdLBNk"/>
+<div class="absolute top-3 left-3 bg-surface-container-lowest/80 backdrop-blur px-2 py-1 rounded text-[11px] font-mono text-error flex items-center gap-1.5 border border-error/20">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span>Spoofed Entity: KNF (0.94)</span>
+</div>
+</div>
+<!-- OCR Extract -->
+<div class="p-3.5 rounded bg-surface-container-low border border-outline-variant/20 flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-[11px] font-mono text-outline">
+<span>OCR TRANSCRIPTION</span>
+<span>CONF 96.1%</span>
+</div>
+<p class="text-xs leading-relaxed text-on-surface">
+                "Zainwestuj 1000 PLN i zyskaj <mark class="bg-secondary/20 text-secondary font-medium px-0.5 rounded">14 800 PLN</mark> w 7 dni. Nasza <mark class="bg-primary/20 text-primary font-medium px-0.5 rounded">platforma inwestycyjna</mark> posiada akredytację KNF. Zapewniona <mark class="bg-secondary/20 text-secondary font-medium px-0.5 rounded">wypłata w 24h</mark> i indywidualne wsparcie doradcy."
+              </p>
+</div>
+<!-- Metadata List -->
+<dl class="grid grid-cols-2 gap-y-2 text-xs font-mono pt-1 text-on-surface-variant">
+<div>
+<dt class="text-outline text-[10px]">ORIGIN</dt>
+<dd class="text-on-surface">Direct DNS Ingestion</dd>
+</div>
+<div>
+<dt class="text-outline text-[10px]">INGESTION</dt>
+<dd class="text-on-surface">2024-11-15 09:11 CET</dd>
+</div>
+<div class="col-span-2 pt-1 border-t border-outline-variant/20">
+<dt class="text-outline text-[10px]">RESOLVED DESTINATION</dt>
+<dd class="text-on-surface truncate">https://tinyurl-mirror.biz/s/baltic-pl-770</dd>
+</div>
+<div>
+<dt class="text-outline text-[10px]">TAG MANAGER</dt>
+<dd class="text-primary font-bold">GTM-EXAMPLE1 (Match)</dd>
+</div>
+<div>
+<dt class="text-outline text-[10px]">EGRESS HOST IP</dt>
+<dd class="text-secondary font-bold">185.196.220.14 (Match)</dd>
+</div>
+</dl>
+</div>
+</div>
+</section>
+<!-- Lexical & Semantic Diff -->
+<section class="py-8 border-b border-outline-variant/30">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<h2 class="text-xs font-mono uppercase tracking-wider text-outline">Tokenized Lexical Alignment</h2>
+<span class="text-xs text-on-surface-variant">Cosine similarity: <strong class="text-on-surface font-mono">0.842</strong></span>
+</div>
+<span class="text-xs font-mono text-outline">Jaccard Overlap: 68.4%</span>
+</div>
+<div class="p-5 rounded bg-surface-container-low border border-outline-variant/20 text-xs">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<div class="text-[10px] font-mono text-outline mb-2 uppercase">Ad #1024 (Seed Extract)</div>
+<p class="leading-relaxed text-on-surface">
+<mark class="bg-primary/20 text-primary font-medium px-1 rounded">Gwarantowany zysk</mark>
+<mark class="bg-secondary/20 text-secondary font-medium px-1 rounded">14 800 PLN</mark> 
+                bez ryzyka dla każdego obywatela. Oficjalna 
+                <mark class="bg-primary/20 text-primary font-medium px-1 rounded">platforma inwestycyjna</mark> 
+                pod patronatem KNF. Szybka 
+                <mark class="bg-secondary/20 text-secondary font-medium px-1 rounded">wypłata w 24h</mark> 
+                oraz stałe wsparcie doradcy.
+              </p>
+</div>
+<div class="border-t md:border-t-0 md:border-l border-outline-variant/30 pt-4 md:pt-0 md:pl-6">
+<div class="text-[10px] font-mono text-outline mb-2 uppercase">Ad #1078 (Candidate Extract)</div>
+<p class="leading-relaxed text-on-surface">
+                Zainwestuj 1000 PLN i zyskaj 
+                <mark class="bg-secondary/20 text-secondary font-medium px-1 rounded">14 800 PLN</mark> 
+                w 7 dni. Nasza 
+                <mark class="bg-primary/20 text-primary font-medium px-1 rounded">platforma inwestycyjna</mark> 
+                posiada akredytację KNF. Zapewniona 
+                <mark class="bg-secondary/20 text-secondary font-medium px-1 rounded">wypłata w 24h</mark> 
+                i indywidualne wsparcie doradcy.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Explainable Multi-Signal Evidence Matrix -->
+<section class="py-8 border-b border-outline-variant/30">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xs font-mono uppercase tracking-wider text-outline">Multi-Signal Evidence Decomposition</h2>
+<span class="text-xs text-on-surface-variant font-mono">5 Independent Correlation Vectors</span>
+</div>
+<!-- Editorial Scannable Table -->
+<div class="border border-outline-variant/30 rounded overflow-hidden">
+<table class="w-full text-left text-xs">
+<thead class="bg-surface-container-low text-outline text-[10px] font-mono uppercase border-b border-outline-variant/30">
+<tr>
+<th class="py-3 px-4 font-medium w-1/4">Signal Dimension</th>
+<th class="py-3 px-4 font-medium w-1/2">Corroborated Forensic Evidence</th>
+<th class="py-3 px-4 font-medium text-right w-1/8">Weight</th>
+<th class="py-3 px-4 font-medium text-right w-1/8">Score</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 bg-surface">
+<!-- 1. Infrastructure -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">dns</span>
+<span class="font-medium text-on-surface">Infrastructure Similarity</span>
+</div>
+<div class="text-[11px] font-mono text-secondary mt-0.5 pl-6">Critical Overlap</div>
+</td>
+<td class="py-3.5 px-4 align-top font-mono text-[11px] text-on-surface-variant">
+<div>• Identical GTM Container: <span class="text-primary font-semibold">GTM-EXAMPLE1</span> (DOM line 42)</div>
+<div class="mt-0.5">• Identical IP Egress: <span class="text-on-surface">185.196.220.14</span> (AS49870)</div>
+<div class="mt-0.5 text-outline">• JS Payload SHA match: crypto_calc_v2.min.js</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right font-mono text-outline">35%</td>
+<td class="py-3.5 px-4 align-top text-right">
+<span class="font-mono font-medium text-on-surface">0.95</span>
+<div class="w-16 bg-surface-container-high h-1 rounded ml-auto mt-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[95%]"></div>
+</div>
+</td>
+</tr>
+<!-- 2. Textual Semantic -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">article</span>
+<span class="font-medium text-on-surface">Textual &amp; Semantic</span>
+</div>
+<div class="text-[11px] font-mono text-outline mt-0.5 pl-6">High Alignment</div>
+</td>
+<td class="py-3.5 px-4 align-top font-mono text-[11px] text-on-surface-variant">
+<div>• Sentence-BERT Cosine Vector: <span class="text-on-surface">0.842</span></div>
+<div class="mt-0.5 text-outline">• Shared N-grams: "platforma inwestycyjna", "14 800 PLN", "wypłata w 24h"</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right font-mono text-outline">25%</td>
+<td class="py-3.5 px-4 align-top text-right">
+<span class="font-mono font-medium text-on-surface">0.81</span>
+<div class="w-16 bg-surface-container-high h-1 rounded ml-auto mt-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[81%]"></div>
+</div>
+</td>
+</tr>
+<!-- 3. Visual Perceptual -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">image</span>
+<span class="font-medium text-on-surface">Visual Perceptual</span>
+</div>
+<div class="text-[11px] font-mono text-outline mt-0.5 pl-6">Mutation Detected</div>
+</td>
+<td class="py-3.5 px-4 align-top font-mono text-[11px] text-on-surface-variant">
+<div>• pHash Hamming Distance: <span class="text-on-surface">6</span> (threshold ≤ 10)</div>
+<div class="mt-0.5 text-outline">• OpenCLIP ViT-B/32 embedding similarity: 0.812</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right font-mono text-outline">20%</td>
+<td class="py-3.5 px-4 align-top text-right">
+<span class="font-mono font-medium text-on-surface">0.76</span>
+<div class="w-16 bg-surface-container-high h-1 rounded ml-auto mt-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[76%]"></div>
+</div>
+</td>
+</tr>
+<!-- 4. Entity Spoofing -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">badge</span>
+<span class="font-medium text-on-surface">Entity &amp; Brand Spoofing</span>
+</div>
+<div class="text-[11px] font-mono text-error mt-0.5 pl-6">Critical Target</div>
+</td>
+<td class="py-3.5 px-4 align-top font-mono text-[11px] text-on-surface-variant">
+<div>• NER Overlap: <span class="text-error font-medium">KNF, Baltic Pipe, Orlen</span></div>
+<div class="mt-0.5 text-outline">• Playbook FinScam-PL exact match</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right font-mono text-outline">15%</td>
+<td class="py-3.5 px-4 align-top text-right">
+<span class="font-mono font-medium text-on-surface">0.90</span>
+<div class="w-16 bg-surface-container-high h-1 rounded ml-auto mt-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[90%]"></div>
+</div>
+</td>
+</tr>
+<!-- 5. Temporal Velocity -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+<span class="font-medium text-on-surface">Temporal Velocity</span>
+</div>
+<div class="text-[11px] font-mono text-outline mt-0.5 pl-6">Cadence Match</div>
+</td>
+<td class="py-3.5 px-4 align-top font-mono text-[11px] text-on-surface-variant">
+<div>• Interval: <span class="text-on-surface">67.0h</span> (matches 72h campaign rotation pattern)</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right font-mono text-outline">5%</td>
+<td class="py-3.5 px-4 align-top text-right">
+<span class="font-mono font-medium text-on-surface">0.70</span>
+<div class="w-16 bg-surface-container-high h-1 rounded ml-auto mt-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[70%]"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Forensic Audit Trail -->
+<section class="py-8">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<h2 class="text-xs font-mono uppercase tracking-wider text-outline">Forensic Provenance &amp; Cryptographic Audit Trail</h2>
+<span class="text-xs font-mono text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Deterministic
+            </span>
+</div>
+<span class="text-xs font-mono text-outline">SEED: 0x89fa91</span>
+</div>
+<div class="border border-outline-variant/30 rounded overflow-hidden">
+<table class="w-full text-left text-xs font-mono">
+<thead class="bg-surface-container-low text-outline text-[10px] uppercase border-b border-outline-variant/30">
+<tr>
+<th class="py-2.5 px-4 font-medium">Artifact ID</th>
+<th class="py-2.5 px-4 font-medium">Extractor Model</th>
+<th class="py-2.5 px-4 font-medium">Timestamp (CET)</th>
+<th class="py-2.5 px-4 font-medium">SHA-256 Digest</th>
+<th class="py-2.5 px-4 font-medium text-right">Verification</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 bg-surface">
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-2.5 px-4 text-primary font-medium">ART-IMG-1024</td>
+<td class="py-2.5 px-4 text-on-surface-variant">openclip-vit-b32 v2.4</td>
+<td class="py-2.5 px-4 text-outline">14:22:11.042</td>
+<td class="py-2.5 px-4 text-on-surface-variant font-mono">3d81b8509c2a8f94...61d8</td>
+<td class="py-2.5 px-4 text-right text-secondary">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check</span> Validated
+                  </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-2.5 px-4 text-primary font-medium">ART-IMG-1078</td>
+<td class="py-2.5 px-4 text-on-surface-variant">openclip-vit-b32 v2.4</td>
+<td class="py-2.5 px-4 text-outline">09:11:46.881</td>
+<td class="py-2.5 px-4 text-on-surface-variant font-mono">91ea44890c21e0ba...b920</td>
+<td class="py-2.5 px-4 text-right text-secondary">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check</span> Validated
+                  </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-2.5 px-4 text-primary font-medium">ART-OCR-COMB</td>
+<td class="py-2.5 px-4 text-on-surface-variant">tesseract-ocr-pl v5.3.1</td>
+<td class="py-2.5 px-4 text-outline">09:12:02.109</td>
+<td class="py-2.5 px-4 text-on-surface-variant font-mono">c19f5617a228bb18...44a1</td>
+<td class="py-2.5 px-4 text-right text-secondary">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check</span> Validated
+                  </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-2.5 px-4 text-primary font-medium">ART-DNS-PROB</td>
+<td class="py-2.5 px-4 text-on-surface-variant">dns-resolver-async v1.0.8</td>
+<td class="py-2.5 px-4 text-outline">09:12:04.992</td>
+<td class="py-2.5 px-4 text-on-surface-variant font-mono">ee83ab466183cc34...10e2</td>
+<td class="py-2.5 px-4 text-right text-secondary">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check</span> Validated
+                  </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+<!-- Quiet Toast Feedback -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-300 pointer-events-none" id="toast-notify">
+<div class="bg-surface-container-high border border-outline-variant/50 text-xs px-4 py-2.5 rounded shadow-lg flex items-center gap-2 text-on-surface font-mono">
+<span class="material-symbols-outlined text-secondary text-[16px]" id="toast-icon">check_circle</span>
+<span id="toast-message">Evidence updated</span>
+</div>
+</div>
+<script>
+    (function() {
+      const btnConfirm = document.getElementById('btn-confirm');
+      const btnFlag = document.getElementById('btn-flag');
+      const btnExport = document.getElementById('btn-export');
+      const toast = document.getElementById('toast-notify');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+
+      function notify(msg, isError) {
+        toastMsg.textContent = msg;
+        if (isError) {
+          toastIcon.textContent = 'warning';
+          toastIcon.className = 'material-symbols-outlined text-error text-[16px]';
+        } else {
+          toastIcon.textContent = 'check_circle';
+          toastIcon.className = 'material-symbols-outlined text-secondary text-[16px]';
+        }
+        toast.classList.remove('translate-y-12', 'opacity-0');
+        setTimeout(() => {
+          toast.classList.add('translate-y-12', 'opacity-0');
+        }, 2800);
+      }
+
+      if (btnConfirm) {
+        btnConfirm.addEventListener('click', function() {
+          btnConfirm.disabled = true;
+          btnConfirm.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span><span>Linking to #PL-409...</span>';
+          setTimeout(() => {
+            btnConfirm.innerHTML = '<span class="material-symbols-outlined text-[16px]">done</span><span>Linked to Cluster #PL-409</span>';
+            btnConfirm.className = 'bg-secondary text-on-secondary font-medium text-xs rounded px-4 py-2 flex items-center gap-1.5 shadow-sm';
+            notify('Ad #1078 successfully integrated into Cluster #PL-409', false);
+          }, 600);
+        });
+      }
+
+      if (btnFlag) {
+        btnFlag.addEventListener('click', () => {
+          notify('Marked as false positive. Weight dampener logged.', true);
+        });
+      }
+
+      if (btnExport) {
+        btnExport.addEventListener('click', () => {
+          notify('Dossier generated: PL-409-EVID-EXPORT.json', false);
+        });
+      }
+    })();
+  </script>
+</body></html>

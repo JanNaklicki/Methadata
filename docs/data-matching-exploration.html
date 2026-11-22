@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methadata — Data Matching & Exploration Docs</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3450;
+    --accent: #5b8dee;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --text: #e2e8f0;
+    --muted: #8892b0;
+    --radius: 10px;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── layout ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  nav {
+    width: 260px;
+    min-width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  nav .logo {
+    padding: 0 20px 20px;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  nav .logo span { color: var(--muted); font-weight: 400; font-size: 12px; display: block; margin-top: 2px; }
+
+  nav a {
+    display: block;
+    padding: 7px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color .15s, background .15s;
+    border-left: 3px solid transparent;
+  }
+  nav a:hover { color: var(--text); background: var(--surface2); }
+  nav a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(91,141,238,.07); }
+  nav .section-label {
+    padding: 14px 20px 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .content-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  main {
+    width: 100%;
+    max-width: 860px;
+    padding: 48px 32px 120px;
+    margin: 0 auto;
+  }
+
+  /* ── typography ── */
+  h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; color: #fff; }
+  h2 { font-size: 1.45rem; font-weight: 700; margin: 48px 0 14px; color: #fff; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.1rem; font-weight: 600; margin: 28px 0 10px; color: var(--accent); }
+  h4 { font-size: .95rem; font-weight: 600; margin: 20px 0 6px; color: var(--accent2); }
+  p { margin-bottom: 12px; color: var(--text); }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; }
+  li { margin-bottom: 5px; }
+
+  code {
+    font-family: var(--mono);
+    background: rgba(91,141,238,.12);
+    color: #93c5fd;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: .88em;
+  }
+
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+  pre code {
+    background: none;
+    color: #c4d3f0;
+    padding: 0;
+    font-size: .9em;
+    line-height: 1.6;
+  }
+
+  /* ── components ── */
+  .hero-subtitle {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 28px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .badge-green  { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+  .badge-yellow { background: rgba(251,191,36,.12); color: var(--yellow); border: 1px solid rgba(251,191,36,.25); }
+  .badge-red    { background: rgba(248,113,113,.12); color: var(--red);   border: 1px solid rgba(248,113,113,.25); }
+  .badge-blue   { background: rgba(91,141,238,.15); color: var(--accent); border: 1px solid rgba(91,141,238,.3); }
+  .badge-purple { background: rgba(167,139,250,.12); color: var(--accent2); border: 1px solid rgba(167,139,250,.25); }
+
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-left: 4px solid;
+    font-size: .93rem;
+  }
+  .callout-info   { background: rgba(91,141,238,.08); border-color: var(--accent); }
+  .callout-warn   { background: rgba(251,191,36,.08); border-color: var(--yellow); }
+  .callout-danger { background: rgba(248,113,113,.08); border-color: var(--red); }
+  .callout-ok     { background: rgba(52,211,153,.08); border-color: var(--green); }
+
+  .grid { display: grid; gap: 16px; margin: 16px 0; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .card h4 { margin-top: 0; }
+
+  /* ── pipeline flow ── */
+  .pipeline {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    margin: 24px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .pipeline-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    min-width: 150px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .pipeline-step .icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .pipeline-step .label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .pipeline-step .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .pipeline-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 20px;
+    padding-top: 20px;
+    flex-shrink: 0;
+  }
+
+  /* ── method table ── */
+  .method-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .88rem; }
+  .method-table th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  .method-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .method-table tr:last-child td { border-bottom: none; }
+  .method-table tr:hover td { background: rgba(255,255,255,.025); }
+
+  /* ── status pill row ── */
+  .status-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+
+  /* ── anchor offset ── */
+  section[id] { scroll-margin-top: 24px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ───────────────────────── sidebar nav ───────────────────────── -->
+<nav>
+  <div class="logo">Methadata<span>Data Matching & Exploration</span></div>
+
+  <div class="section-label">Overview</div>
+  <a href="#overview">What This System Does</a>
+  <a href="#data-model">Core Data Model</a>
+  <a href="#pipeline">Analysis Pipeline</a>
+
+  <div class="section-label">Ingestion</div>
+  <a href="#ingest-store">Store &amp; Ingestion</a>
+  <a href="#input-kinds">Input Kinds</a>
+
+  <div class="section-label">Extraction</div>
+  <a href="#ext-assets">Asset Hashes (E01)</a>
+  <a href="#ext-lexical">Lexical / TF-IDF (E02)</a>
+  <a href="#ext-dom">DOM Structure (E03)</a>
+  <a href="#ext-perceptual">Perceptual (pHash+ORB)</a>
+  <a href="#ext-other">Other Extractors</a>
+
+  <div class="section-label">Comparison</div>
+  <a href="#cmp-jaccard">Asset Jaccard</a>
+  <a href="#cmp-tfidf">Lexical TF-IDF Cosine</a>
+  <a href="#cmp-dom">DOM Comparators</a>
+  <a href="#cmp-perceptual">Perceptual Comparators</a>
+  <a href="#cmp-other">Experimental Methods</a>
+
+  <div class="section-label">Clustering</div>
+  <a href="#clust-components">K01 — Components</a>
+  <a href="#clust-fusion">K09 — Fusion</a>
+  <a href="#clust-other">Other Clusterers</a>
+
+  <div class="section-label">Backend API</div>
+  <a href="#api-endpoints">HTTP Endpoints</a>
+  <a href="#api-profiles">Analysis Profiles</a>
+  <a href="#api-collection">Collection Mode</a>
+  <a href="#api-scenarios">Scenario / Counterfactual</a>
+
+  <div class="section-label">Implementation Status</div>
+  <a href="#status">Feature Status Matrix</a>
+  <a href="#data-flow">End-to-End Data Flow</a>
+</nav>
+
+<!-- ───────────────────────── main content ───────────────────────── -->
+<div class="content-wrapper">
+<main>
+
+<!-- ══════════════════════ OVERVIEW ══════════════════════ -->
+<section id="overview">
+<h1>Methadata — Data Matching &amp; Exploration</h1>
+<p class="hero-subtitle">Internal reference for the analysis pipeline, data contracts, extraction methods, and HTTP API.</p>
+
+<div class="callout callout-info">
+  <strong>Purpose:</strong> Methadata detects whether a set of advertising materials (web pages, images, HAR archives, ZIP captures) share a common origin — same template, same campaign, or same creator. It does this by extracting multi-modal signals from each material and fusing the per-pair evidence into clusters.
+</div>
+
+<h3>High-Level Architecture</h3>
+<div class="pipeline">
+  <div class="pipeline-step">
+    <div class="icon">📥</div>
+    <div class="label">Ingest</div>
+    <div class="sub">ZIP / HAR / HTML / Image / URL</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">🗄️</div>
+    <div class="label">Store</div>
+    <div class="sub">SHA-256 blobs + JSONL observations</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">🔬</div>
+    <div class="label">Extract</div>
+    <div class="sub">Assets · Text · DOM · Perceptual · …</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">⚖️</div>
+    <div class="label">Compare</div>
+    <div class="sub">All pairs → PairEvidence</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">🔗</div>
+    <div class="label">Cluster</div>
+    <div class="sub">Fusion + Components</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">📊</div>
+    <div class="label">View</div>
+    <div class="sub">ClusterRunView + Evidence</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════ DATA MODEL ══════════════════════ -->
+<section id="data-model">
+<h2>Core Data Model</h2>
+<p>All records are Pydantic v2 models in <code>src/methadata/contracts/models.py</code>. Schema version is <strong>"1"</strong>.</p>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h4>Observation</h4>
+    <p>A single captured material. Contains one or more <strong>Artifacts</strong>. Identified by:</p>
+    <ul>
+      <li><code>observation_id</code> — unique import ID</li>
+      <li><code>canonical_id</code> — content-based identity (deduplication key)</li>
+      <li><code>input_kind</code> — <code>full_capture | url_only | creative_only</code></li>
+      <li><code>source_ref</code> — original path / URL</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Artifact</h4>
+    <p>A file within an Observation. Roles:</p>
+    <ul>
+      <li><code>landing_html / landing_dom</code> — page source / rendered DOM</li>
+      <li><code>landing_screenshot</code> — screenshot PNG</li>
+      <li><code>creative_image</code> — ad image</li>
+      <li><code>resource</code> — network resource (images, scripts…)</li>
+      <li><code>har</code> — HTTP Archive</li>
+      <li><code>video / audio / document / archive / other</code></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Feature</h4>
+    <p>An extracted signal from one Observation. Fields: <code>family</code>, <code>kind</code>, <code>value_type</code>, <code>value</code>, <code>evidence_refs</code> (ArtifactRef list).</p>
+    <p>Examples: <code>asset/image_sha256</code>, <code>lexical/text_field</code>, <code>dom_struct/dom_sequence</code>, <code>perceptual/phash</code>.</p>
+  </div>
+  <div class="card">
+    <h4>PairEvidence</h4>
+    <p>A similarity score between exactly two materials (by <code>canonical_id</code>). Fields:</p>
+    <ul>
+      <li><code>pair</code> — sorted tuple of two canonical_ids</li>
+      <li><code>method_id</code> — which comparator produced it</li>
+      <li><code>relation</code> — <code>shared_template | shared_narrative | campaign_candidate</code></li>
+      <li><code>score</code> — 0–1 or <code>null</code> (comparison not possible)</li>
+      <li><code>evidence_refs</code> — per-side artifact references</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Bundle</h4>
+    <p>A self-contained result package: <code>observations</code>, <code>features</code>, <code>pairs</code>, <code>runs</code>. Stored per run. Reloaded for evidence display and counterfactuals.</p>
+  </div>
+  <div class="card">
+    <h4>ClusterRun</h4>
+    <p>The clustering result: <code>assignments</code> (each material → cluster or singleton/noise), <code>edges</code> (accepted PairEvidence IDs), <code>config</code>, <code>dataset_version</code>, <code>seed</code>.</p>
+    <p>Assignment statuses: <code>grouped | singleton | noise | insufficient_data</code>.</p>
+  </div>
+</div>
+
+<h3>Locators</h3>
+<p>ArtifactRef can optionally carry a <strong>Locator</strong> that pins the evidence to a specific position inside an artifact:</p>
+<table class="method-table">
+  <tr><th>Type</th><th>Fields</th><th>Use case</th></tr>
+  <tr><td><code>text_span</code></td><td>start, end (char offsets)</td><td>Shared text in HTML body</td></tr>
+  <tr><td><code>image_rect</code></td><td>x, y, width, height, frame_ms</td><td>Matched region in image / video frame</td></tr>
+  <tr><td><code>har_entry</code></td><td>index</td><td>HAR log entry</td></tr>
+  <tr><td><code>byte_range</code></td><td>start, end</td><td>MHTML part byte range</td></tr>
+</table>
+</section>
+
+<!-- ══════════════════════ PIPELINE ══════════════════════ -->
+<section id="pipeline">
+<h2>Analysis Pipeline</h2>
+
+<p>The core runner is <code>src/methadata/runner/run.py :: run_experiment()</code>. It is deterministic: same config + same observations → same run_id (SHA-256 of config + dataset_version + sorted canonical_ids).</p>
+
+<pre><code># Simplified runner flow
+obs = dedupe(observations)          # one canonical_id = one Observation
+feats = extract_all(obs, extractors)
+pairs = compare_all_pairs(obs, feats, comparators)
+result = clusterer.cluster(obs, pairs, config)
+# → {record: {...}, bundle: Bundle}</code></pre>
+
+<div class="callout callout-info">
+  <strong>Deduplication:</strong> When multiple imports produce the same <code>canonical_id</code>, only one Observation participates in the run (chosen by smallest <code>observation_id</code>). Features are keyed by content, not observation — re-running with the same data is a no-op.
+</div>
+
+<h3>Two Operating Profiles</h3>
+<div class="grid grid-2">
+  <div class="card">
+    <h4>🧪 Demo / Baseline profile</h4>
+    <p>Uses <code>configs/baseline/baseline.json</code>. Comparators: <strong>asset Jaccard only</strong>. Clustering: K01 connected components. Fast, no ML models required.</p>
+    <p>Summary message: <em>"X materials share common images."</em></p>
+  </div>
+  <div class="card">
+    <h4>⚖️ Jury profile</h4>
+    <p>Uses <code>configs/demo/jury.json</code>. Comparators: <strong>asset Jaccard + lexical TF-IDF + DOM structure</strong>. Clustering: K09 Fusion → K01 Components. Full evidence fusion with per-family ablation.</p>
+    <p>Summary message: <em>"Campaign hypothesis based on narrative similarity and page template."</em></p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════ INGESTION ══════════════════════ -->
+<section id="ingest-store">
+<h2>Store &amp; Ingestion</h2>
+
+<p>Implementation: <code>src/methadata/ingest/store.py</code> (<code>Store</code> class) and <code>src/methadata/ingest/importer.py</code> (<code>FileImporter</code>).</p>
+
+<h3>On-disk layout</h3>
+<pre><code>var/methadata-data/
+  store/
+    blobs/&lt;aa&gt;/&lt;sha256&gt;        # raw file bytes, content-addressed
+    observations/&lt;oid&gt;.jsonl   # append-only Observation versions
+    derived/                   # extracted artifacts (DOM, screenshots)
+    tmp/
+  runs/&lt;run_id&gt;/
+    run.json                   # engine record
+    bundle.json                # full Bundle (observations + features + pairs + clusterrun)
+  previews/&lt;sha256prefix&gt;.{png|jpg|gif|webp}
+  meta/
+    index.json                 # corpus index (observation_ids, target, dataset_name…)
+    labels.json                # observation_id → human label</code></pre>
+
+<h3>Atomic writes</h3>
+<p>All writes use <code>tempfile.mkstemp</code> + <code>os.replace</code> for crash-safety. A <code>threading.RLock</code> serialises mutations within one process. Blobs are content-addressed: writing the same file twice is idempotent.</p>
+
+<h3>Supported upload types</h3>
+<div class="status-row">
+  <span class="badge badge-green">ZIP</span>
+  <span class="badge badge-green">HAR</span>
+  <span class="badge badge-green">HTML / MHTML</span>
+  <span class="badge badge-green">PNG / JPEG / WebP / GIF</span>
+  <span class="badge badge-green">MP4 / MP3</span>
+  <span class="badge badge-green">URL (offline)</span>
+</div>
+</section>
+
+<section id="input-kinds">
+<h3>Input Kinds</h3>
+<table class="method-table">
+  <tr><th>Kind</th><th>What's captured</th><th>Available comparisons</th></tr>
+  <tr>
+    <td><code>full_capture</code></td>
+    <td>ZIP with HTML + images, or HAR</td>
+    <td>All: assets, text, DOM, perceptual</td>
+  </tr>
+  <tr>
+    <td><code>creative_only</code></td>
+    <td>Standalone image file</td>
+    <td>Asset hashes, perceptual</td>
+  </tr>
+  <tr>
+    <td><code>url_only</code></td>
+    <td>Bare URL string (not fetched)</td>
+    <td><span class="badge badge-yellow">Limited</span> URL-based signals only</td>
+  </tr>
+</table>
+</section>
+
+<!-- ══════════════════════ EXTRACTORS ══════════════════════ -->
+<section id="ext-assets">
+<h2>Extractors</h2>
+<h3>E01 — Asset Hash Extractor <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/assets/adapters.py :: AssetHashExtractor</code></p>
+<p>Produces two feature kinds:</p>
+<ul>
+  <li><code>asset/image_sha256</code> — one feature per <code>creative_image</code> or <code>resource image/*</code> artifact (SHA-256 string value).</li>
+  <li><code>asset/screenshot_sha256</code> — SHA-256 of the <code>landing_screenshot</code> (not used for grouping, tracking only).</li>
+</ul>
+<div class="callout callout-warn">
+  An Observation with zero images produces an empty set. This is <strong>not</strong> a zero score — it means comparison is impossible (<code>score=null</code>).
+</div>
+</section>
+
+<section id="ext-lexical">
+<h3>E02 — Lexical Text Extractor <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/lexical/text.py :: LexicalTextExtractor</code> + <code>adapters.py</code></p>
+<p>Parses HTML/DOM and segments text into <strong>fields</strong>:</p>
+<ul>
+  <li><code>title</code> — <code>&lt;title&gt;</code> and <code>&lt;h1&gt;</code></li>
+  <li><code>body</code> — main content text, stripped of nav/footer/script</li>
+  <li><code>cta</code> — call-to-action elements (buttons, links with action verbs)</li>
+  <li><code>comments</code> — user comments (tracked separately; can be merged)</li>
+</ul>
+<p>Feature family/kind: <code>lexical/text_field</code>. Value is <code>{field, text, refs}</code> (the refs are ArtifactRef + TextSpan locators for excerpt display).</p>
+</section>
+
+<section id="ext-dom">
+<h3>E03 — DOM Structure Extractor <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/dom/adapters.py :: DomStructureExtractor</code></p>
+<p>Reads <code>landing_dom</code> or <code>landing_html</code> (MHTML supported). Produces a normalised token sequence:</p>
+<pre><code>[depth, tag, open_start_offset, end_offset]
+# text nodes replaced with synthetic '#t' token
+# &lt;head&gt;, &lt;script&gt;, &lt;style&gt; excluded</code></pre>
+<p>Feature family/kind: <code>dom_struct/dom_sequence</code>. Value: <code>{tokens, capture, chars}</code>.</p>
+</section>
+
+<section id="ext-perceptual">
+<h3>Perceptual Extractor (E09) <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/perceptual/adapters.py :: PerceptualExtractor</code></p>
+<p>For each image (<code>creative_image</code> or <code>resource image/*</code>):</p>
+<ul>
+  <li><strong>pHash</strong> (<code>perceptual/phash</code>) — 64-bit perceptual hash, group classification: <code>icon</code> (max side ≤ threshold, skipped by comparators) or <code>illustration</code>.</li>
+  <li><strong>Keypoints</strong> (<code>perceptual/keypoints</code>) — ORB descriptors for <code>illustration</code> images only. Contains <code>pts</code> (keypoint coords) and <code>desc</code> (binary descriptors).</li>
+</ul>
+<div class="callout callout-warn">
+  Requires <strong>optional extras</strong> (<code>extras=["perceptual"]</code>). The extractor is listed as a supplemental extractor in Collection mode: <code>SUPPLEMENTAL_EXTRACTORS = ("perceptual-extractor", ...)</code>.
+</div>
+</section>
+
+<section id="ext-other">
+<h3>Other Extractors</h3>
+<table class="method-table">
+  <tr><th>Module</th><th>ID</th><th>Family/Kind</th><th>Status</th></tr>
+  <tr>
+    <td>URL &amp; HAR</td>
+    <td><code>url-har-extractor</code></td>
+    <td><code>url_har/*</code></td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td>OCR Layout</td>
+    <td><code>ocr-layout-extractor</code></td>
+    <td><code>ocr_layout/sentences</code></td>
+    <td><span class="badge badge-yellow">Model required</span></td>
+  </tr>
+  <tr>
+    <td>Visual Embedding</td>
+    <td><code>visual-embedding-extractor</code></td>
+    <td><code>visual/embedding</code></td>
+    <td><span class="badge badge-yellow">Model required (OpenCLIP)</span></td>
+  </tr>
+  <tr>
+    <td>Near Copy</td>
+    <td>(shingle-based)</td>
+    <td><code>near_copy/*</code></td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td>Production Kit</td>
+    <td><code>extract-code</code></td>
+    <td><code>code/*</code></td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td>Video / Audio</td>
+    <td><code>video-audio-extractor</code></td>
+    <td><code>video_audio/*</code></td>
+    <td><span class="badge badge-yellow">FFmpeg required</span></td>
+  </tr>
+  <tr>
+    <td>Semantic (MiniLM)</td>
+    <td><code>semantic-minilm-extractor</code></td>
+    <td><code>semantic/embedding</code></td>
+    <td><span class="badge badge-yellow">Model required</span></td>
+  </tr>
+  <tr>
+    <td>Rare Motifs</td>
+    <td><code>rare-motifs-extractor</code></td>
+    <td><code>rare_motifs/*</code></td>
+    <td><span class="badge badge-blue">Experimental</span></td>
+  </tr>
+  <tr>
+    <td>Narrative Slots</td>
+    <td><code>narrative-slots-extractor</code></td>
+    <td><code>narrative_slots/*</code></td>
+    <td><span class="badge badge-blue">Experimental</span></td>
+  </tr>
+  <tr>
+    <td>People &amp; Entities</td>
+    <td><code>people-entities-extractor</code></td>
+    <td><code>people_entities/*</code></td>
+    <td><span class="badge badge-blue">Experimental</span></td>
+  </tr>
+  <tr>
+    <td>Temporal</td>
+    <td><code>temporal-extractor</code></td>
+    <td><code>temporal/*</code></td>
+    <td><span class="badge badge-blue">Experimental</span></td>
+  </tr>
+</table>
+<p>Model-required extractors are gated behind <code>METHADATA_COLLECTION_MODELS=1</code> in Collection mode (<code>MODEL_EXTRACTORS</code> list in <code>collection.py</code>).</p>
+</section>
+
+<!-- ══════════════════════ COMPARATORS ══════════════════════ -->
+<section id="cmp-jaccard">
+<h2>Comparators</h2>
+<h3>Asset Jaccard <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/assets/adapters.py</code></p>
+<p>Operates on the <code>asset/image_sha256</code> feature set.</p>
+
+<pre><code># Standard Jaccard
+score = |A ∩ B| / |A ∪ B|
+
+# Weighted Jaccard (corpus-aware)
+score = Σ w(h) for h in A∩B / Σ w(h) for h in A∪B
+        where w(h) = 1 / max(1, corpus_frequency[h])</code></pre>
+
+<table class="method-table">
+  <tr><th>Method ID</th><th>Relation</th><th>Notes</th></tr>
+  <tr>
+    <td><code>assets-jaccard-v1</code></td>
+    <td><code>shared_template</code></td>
+    <td>Standard Jaccard — equal weight to all images</td>
+  </tr>
+  <tr>
+    <td><code>assets-weighted-jaccard-v1</code></td>
+    <td><code>shared_template</code></td>
+    <td>Rare images count more; common images (logos, icons) discounted</td>
+  </tr>
+</table>
+
+<div class="callout callout-info">
+  When both sets are empty, or one side is empty, <code>score=null</code>. The explanation distinguishes these cases clearly.
+</div>
+</section>
+
+<section id="cmp-tfidf">
+<h3>Lexical TF-IDF Cosine <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/lexical/adapters.py :: LexicalTfidfComparator</code></p>
+<p>Compares text field-by-field using two analyzers (word n-grams and character n-grams) then combines with cosine similarity:</p>
+
+<pre><code>Default field weights: title=0.2, body=0.6, cta=0.2, comments=0.0
+
+For each field (title, body, cta):
+  word_score = cosine(TF-IDF word vectors)
+  char_score = cosine(TF-IDF char-ngram vectors)
+  field_score = average(word_score, char_score)
+
+final_score = Σ (field_score × weight) / Σ weights_used</code></pre>
+
+<table class="method-table">
+  <tr><th>Method ID</th><th>Relation</th><th>Notes</th></tr>
+  <tr>
+    <td><code>lexical-tfidf-v1</code></td>
+    <td><code>shared_narrative</code></td>
+    <td>Full title + body + CTA</td>
+  </tr>
+  <tr>
+    <td><code>lexical-tfidf-notitle-v1</code></td>
+    <td><code>shared_narrative</code></td>
+    <td>Body + CTA only (title hidden)</td>
+  </tr>
+</table>
+
+<div class="callout callout-warn">
+  <strong>IDF source:</strong> When no pre-fitted model is provided, IDF is computed from the current run's corpus. For the jury profile this is correct (full corpus available). For single-pair comparisons in FusionComparator, IDF is computed from just the two observations — this is noted in the explanation.
+</div>
+</section>
+
+<section id="cmp-dom">
+<h3>DOM Structure Comparators <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/dom/adapters.py</code></p>
+<p>All operate on the <code>dom_struct/dom_sequence</code> feature. Text content and identifiers are replaced by markers before comparison.</p>
+
+<table class="method-table">
+  <tr><th>Method ID</th><th>Technique</th><th>Relation</th></tr>
+  <tr>
+    <td><code>dom-paths-jaccard-v1</code></td>
+    <td>Jaccard of tag-path sets (e.g. <code>div&gt;section&gt;p</code>)</td>
+    <td><code>shared_template</code></td>
+  </tr>
+  <tr>
+    <td><code>dom-sequence-edit-v1</code></td>
+    <td><code>1 − Levenshtein(token_seq_A, token_seq_B) / max(|A|,|B|)</code></td>
+    <td><code>shared_template</code></td>
+  </tr>
+  <tr>
+    <td><code>dom-sections-v1</code></td>
+    <td>Edit distance on structural landmark sequence (header, nav, main, h1–h3…)</td>
+    <td><code>shared_template</code></td>
+  </tr>
+</table>
+</section>
+
+<section id="cmp-perceptual">
+<h3>Perceptual Comparators <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/experiments/perceptual/adapters.py</code></p>
+
+<table class="method-table">
+  <tr><th>Method ID</th><th>Technique</th><th>Relation</th></tr>
+  <tr>
+    <td><code>perceptual-phash-v1</code></td>
+    <td>Hamming distance between 64-bit pHashes; threshold-based score</td>
+    <td><code>shared_template</code></td>
+  </tr>
+  <tr>
+    <td><code>perceptual-keypoints-v1</code></td>
+    <td>ORB keypoint matching across illustration images; score = ratio of matched keypoints</td>
+    <td><code>shared_template</code></td>
+  </tr>
+</table>
+
+<div class="callout callout-warn">
+  <code>icon</code>-group images (small logos/favicons) are excluded from both comparators to avoid false positives from common decorative elements.
+</div>
+</section>
+
+<section id="cmp-other">
+<h3>Experimental / Additional Methods</h3>
+<table class="method-table">
+  <tr><th>Method ID</th><th>Technique</th><th>Status</th></tr>
+  <tr>
+    <td><code>near-copy-jaccard-v1</code></td>
+    <td>Shingling (character n-grams) → Jaccard on shingle sets</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>url-har-v1</code></td>
+    <td>Shared URL patterns, redirects, CDN fingerprints from HAR</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>shared-script-v1</code></td>
+    <td>Identical script hash shared across pages</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>ocr-sentences-v1</code></td>
+    <td>Sentence-level text match from OCR output</td>
+    <td><span class="badge badge-yellow">Model required</span></td>
+  </tr>
+  <tr>
+    <td><code>semantic-minilm-v1</code></td>
+    <td>Cosine similarity of MiniLM sentence embeddings</td>
+    <td><span class="badge badge-yellow">Model required</span></td>
+  </tr>
+  <tr>
+    <td><code>visual-embedding-v1</code></td>
+    <td>OpenCLIP image embeddings cosine</td>
+    <td><span class="badge badge-yellow">Model required</span></td>
+  </tr>
+  <tr>
+    <td><code>fusion-v1</code></td>
+    <td>Weighted average fusion across multiple method families (K09)</td>
+    <td><span class="badge badge-green">Working (jury only)</span></td>
+  </tr>
+</table>
+</section>
+
+<!-- ══════════════════════ CLUSTERING ══════════════════════ -->
+<section id="clust-components">
+<h2>Clustering</h2>
+<h3>K01 — Connected Components (Threshold Graph) <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/clustering/components/core.py</code></p>
+<p><strong>Method ID:</strong> <code>components-threshold</code></p>
+
+<p>Builds an undirected graph where an edge exists between two materials if their <code>PairEvidence.score ≥ threshold</code>. Groups are the connected components of this graph.</p>
+
+<ul>
+  <li>Deterministic regardless of observation order</li>
+  <li>When multiple PairEvidence for the same pair: picks highest score (tie-break: smallest evidence ID)</li>
+  <li>Assignment status: <code>grouped</code> (≥2), <code>singleton</code> (all comparisons below threshold), <code>insufficient_data</code> (all scores null)</li>
+</ul>
+
+<pre><code># Config keys
+{
+  "threshold": 0.5,            # edge acceptance threshold (0, 1]
+  "similarity_version": "...", # version fingerprint (invalidates cached results)
+  "dataset_version": "...",    # corpus version fingerprint
+  "relation": "shared_template",
+  "method_id": null            # null = auto-detect single method
+}</code></pre>
+</section>
+
+<section id="clust-fusion">
+<h3>K09 — Evidence Fusion <span class="badge badge-green">Working</span></h3>
+<p>Source: <code>src/methadata/clustering/fusion/core.py :: fuse_and_cluster()</code></p>
+<p><strong>Method ID:</strong> <code>fusion-v1</code></p>
+<p><strong>Relation:</strong> <code>campaign_candidate</code></p>
+
+<p>Fuses multiple independent evidence families into a single fused score per pair, then runs K01 on those fused scores.</p>
+
+<h4>Key Concepts</h4>
+<div class="grid grid-3">
+  <div class="card">
+    <h4>Similarity</h4>
+    <p>Weighted average of available origin scores. Each family has a weight; families with the same <code>origin</code> are merged (count as one source).</p>
+  </div>
+  <div class="card">
+    <h4>Coverage</h4>
+    <p>Σ weight of available comparisons / Σ weight of all configured families. Must be ≥ <code>coverage_min</code> (default 0.5) for a valid score.</p>
+  </div>
+  <div class="card">
+    <h4>Support</h4>
+    <p>Number of distinct origins whose score ≥ <code>support_min</code>. Must be ≥ <code>min_support</code> (default 2). Without enough support, score is clipped below threshold.</p>
+  </div>
+</div>
+
+<h4>Fusion Config Structure</h4>
+<pre><code>{
+  "threshold": 0.5,
+  "coverage_min": 0.5,
+  "min_support": 2,
+  "similarity_version": "fusion-eval-v1(campaign)",
+  "dataset_version": "...",
+  "families": {
+    "content-image": {
+      "method_id": "assets-jaccard-v1",
+      "weight": 1.0,
+      "origin": "content-image",
+      "support_min": 0.1
+    },
+    "content-text": {
+      "method_id": "lexical-tfidf-v1",
+      "weight": 0.8,
+      "origin": "content-text",
+      "support_min": 0.2
+    },
+    "dom-structure": {
+      "method_id": "dom-paths-jaccard-v1",
+      "weight": 0.8,
+      "origin": "dom-structure",
+      "support_min": 0.1
+    }
+  }
+}</code></pre>
+
+<h4>Fusion Outcomes per Pair</h4>
+<table class="method-table">
+  <tr><th>Status</th><th>Condition</th><th>Score</th></tr>
+  <tr>
+    <td><code>ok</code></td>
+    <td>Coverage OK + Support OK</td>
+    <td>Weighted average [0, 1]</td>
+  </tr>
+  <tr>
+    <td><code>insufficient_coverage</code></td>
+    <td>Too few families returned a score</td>
+    <td><code>null</code></td>
+  </tr>
+  <tr>
+    <td><code>insufficient_support</code></td>
+    <td>Not enough origins above support_min</td>
+    <td>Clipped just below threshold (not null)</td>
+  </tr>
+  <tr>
+    <td><code>no_evidence</code></td>
+    <td>No families returned any score</td>
+    <td><code>null</code></td>
+  </tr>
+</table>
+
+<h4>Per-family Ablation</h4>
+<p>For every configured family, the fusion is re-run with that family disabled (<code>ablation</code> dict on FusionResult). This powers the scenario/counterfactual API endpoint.</p>
+</section>
+
+<section id="clust-other">
+<h3>Other Clusterers <span class="badge badge-blue">Experimental / Research</span></h3>
+<table class="method-table">
+  <tr><th>Module</th><th>Algorithm</th><th>Notes</th></tr>
+  <tr><td><code>leiden</code></td><td>Leiden community detection</td><td>Graph-based, overlapping communities</td></tr>
+  <tr><td><code>bicluster</code></td><td>Biclustering</td><td>Co-clusters materials and features</td></tr>
+  <tr><td><code>density</code></td><td>Density-based (DBSCAN-like)</td><td></td></tr>
+  <tr><td><code>medoids</code></td><td>k-Medoids</td><td>Requires k parameter</td></tr>
+  <tr><td><code>linkage</code></td><td>Agglomerative linkage</td><td></td></tr>
+  <tr><td><code>spectral</code></td><td>Spectral clustering</td><td></td></tr>
+  <tr><td><code>consensus</code></td><td>Ensemble consensus</td><td>Aggregates multiple clusterings</td></tr>
+  <tr><td><code>incremental</code></td><td>Incremental update</td><td>Adds new materials without full rerun</td></tr>
+  <tr><td><code>overlapping</code></td><td>Overlapping clusters</td><td>Materials can belong to multiple clusters</td></tr>
+  <tr><td><code>soft_membership</code></td><td>Soft membership</td><td>Probabilistic cluster assignments</td></tr>
+  <tr><td><code>graph_walk</code></td><td>Graph random walk</td><td></td></tr>
+  <tr><td><code>network_fusion</code></td><td>Similarity Network Fusion</td><td>Multi-view integration</td></tr>
+</table>
+<div class="callout callout-warn">
+  None of the experimental clusterers are wired into the production backend. Only <code>components-threshold</code> (K01) and <code>fusion-v1</code> (K09) are used in the two production profiles.
+</div>
+</section>
+
+<!-- ══════════════════════ API ══════════════════════ -->
+<section id="api-endpoints">
+<h2>HTTP API Endpoints</h2>
+<p>Defined in <code>contracts/http/openapi.yaml</code>. Implemented in <code>backend/methadata_api/app.py</code>. Base URL: <code>http://localhost:8000</code></p>
+
+<table class="method-table">
+  <tr><th>Method</th><th>Path</th><th>Purpose</th><th>Status</th></tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/health</code></td>
+    <td>API + storage readiness check</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/demo</code></td>
+    <td>Returns the seeded demo observation + dataset metadata</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>POST</code></td>
+    <td><code>/api/v1/observations</code></td>
+    <td>Add a material: JSON <code>{url}</code> or multipart file upload</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>POST</code></td>
+    <td><code>/api/v1/runs</code></td>
+    <td>Queue an analysis run for an observation</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/runs/{run_id}</code></td>
+    <td>Poll run status; on success returns full <code>ClusterRunView</code></td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/runs/{run_id}/evidence/{evidence_id}</code></td>
+    <td>Detailed evidence for a material pair (images, text excerpts)</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios</code></td>
+    <td>Counterfactual: what happens if family X is disabled?</td>
+    <td><span class="badge badge-green">Jury profile only</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/collection</code></td>
+    <td>Collection state + limits</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>POST</code></td>
+    <td><code>/api/v1/imports</code></td>
+    <td>Batch import files into the collection</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/imports/{import_id}</code></td>
+    <td>Import job status</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>POST</code></td>
+    <td><code>/api/v1/imports/{import_id}/retry</code></td>
+    <td>Retry a failed import</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/collection/uploads</code></td>
+    <td>List uploaded files</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>PATCH</code></td>
+    <td><code>/api/v1/collection/uploads/{upload_id}</code></td>
+    <td>Rename / archive an upload</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>PATCH</code></td>
+    <td><code>/api/v1/collection/materials/{material_id}</code></td>
+    <td>Rename / archive a material</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/api/v1/collection/{run_id}/materials/{material_id}/signals</code></td>
+    <td>Top signals for a material in a collection run</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td><code>/static/previews/{name}</code></td>
+    <td>Serve cached image preview (immutable, long cache)</td>
+    <td><span class="badge badge-green">Working</span></td>
+  </tr>
+</table>
+
+<h4>Run Lifecycle</h4>
+<pre><code>POST /api/v1/runs  →  202 { run_id, status: "queued" }
+GET  /api/v1/runs/{id}  →  200 { status: "queued" | "running" | "succeeded" | "failed" }
+                          succeeded: contains full "result" (ClusterRunView)
+                          failed: contains "error" object</code></pre>
+
+<div class="callout callout-info">
+  <strong>Polling:</strong> Poll every 1–2 seconds. <code>succeeded</code> with <code>outcome=insufficient_evidence</code> is a valid result, not an error — it means there weren't enough signals to compare the target material.
+</div>
+</section>
+
+<section id="api-profiles">
+<h3>Analysis Profiles</h3>
+<table class="method-table">
+  <tr><th>Profile</th><th>Comparators used</th><th>Clustering</th><th>When available</th></tr>
+  <tr>
+    <td><code>demo</code> (default)</td>
+    <td>Asset Jaccard only</td>
+    <td>K01 Components</td>
+    <td>Always (seeded at startup)</td>
+  </tr>
+  <tr>
+    <td><code>jury</code></td>
+    <td>Asset Jaccard + Lexical TF-IDF + DOM Structure</td>
+    <td>K09 Fusion → K01</td>
+    <td>Requires <code>METHADATA_JURY_DATA_DIR</code> + pre-built index</td>
+  </tr>
+</table>
+<p>Profile is passed in <code>POST /api/v1/runs</code> body: <code>{"observation_id": "...", "profile": "jury"}</code></p>
+</section>
+
+<section id="api-collection">
+<h3>Collection Mode</h3>
+<p>Source: <code>backend/methadata_api/collection.py</code></p>
+<p>Collection is a persistent SQLite-backed store of uploaded materials. It:</p>
+<ul>
+  <li>Accepts batch ZIP imports with multiple members</li>
+  <li>Deduplicates by content (<code>canonical_id</code>-based)</li>
+  <li>Runs the full fusion pipeline on the whole collection and publishes periodic snapshots</li>
+  <li>Exposes signals per material pair (top-24 by score)</li>
+  <li>Supports optional model-based extractors when <code>METHADATA_COLLECTION_MODELS=1</code></li>
+</ul>
+
+<p><strong>Supplemental extractors</strong> (always available):</p>
+<div class="status-row">
+  <span class="badge badge-green">perceptual-extractor</span>
+  <span class="badge badge-green">url-har-extractor</span>
+  <span class="badge badge-green">extract-code (near-copy)</span>
+</div>
+
+<p><strong>Model-gated extractors</strong> (<code>METHADATA_COLLECTION_MODELS=1</code>):</p>
+<div class="status-row">
+  <span class="badge badge-yellow">ocr-layout-extractor</span>
+  <span class="badge badge-yellow">visual-embedding-extractor</span>
+</div>
+
+<p><strong>Collection evidence fields</strong> (returned on <code>GET /evidence/{id}</code> for <code>fusion-v1</code> in collection profile):</p>
+<ul>
+  <li><code>families</code> — per-family name, score, and whether it supports the edge</li>
+  <li><code>signals</code> — top supplemental signals for the pair</li>
+  <li><code>inactive_signals</code> — labels of disabled method families</li>
+</ul>
+</section>
+
+<section id="api-scenarios">
+<h3>Scenario / Counterfactual API <span class="badge badge-blue">Jury only</span></h3>
+<p>Source: <code>backend/methadata_api/scenarios.py :: RunScenarios</code></p>
+<p>Endpoint: <code>GET /api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios?disabled=family_name</code></p>
+
+<p>Given a completed jury run and a fusion-v1 evidence pair, re-runs the fusion with one or more evidence families disabled (counterfactual). Returns:</p>
+<ul>
+  <li><code>baseline</code> — original run result for the pair + group membership</li>
+  <li><code>scenario</code> — result with the specified families disabled</li>
+  <li><code>edge_changes</code> — which pairs changed status (new edges, removed edges)</li>
+  <li><code>indirect_paths</code> — shortest paths between pair members through the graph</li>
+  <li><code>minimal_masks</code> — the smallest set of families whose removal breaks the connection</li>
+</ul>
+
+<div class="callout callout-info">
+  Results are computed on frozen evidence from the saved bundle. The graph is re-clustered but no new extraction/comparison is performed. LRU-cached per (run_id, observation_id) pair.
+</div>
+</section>
+
+<!-- ══════════════════════ STATUS ══════════════════════ -->
+<section id="status">
+<h2>Feature Status Matrix</h2>
+
+<table class="method-table">
+  <tr>
+    <th>Feature / Component</th>
+    <th>Status</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td><strong>Blob store + observations (F02)</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Atomic writes, SHA-256 content addressing</td>
+  </tr>
+  <tr>
+    <td><strong>File ingestion (ZIP, HAR, HTML, images)</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>MHTML also supported</td>
+  </tr>
+  <tr>
+    <td><strong>URL-only observations</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Limited signals; no fetch</td>
+  </tr>
+  <tr>
+    <td><strong>Asset hash extraction + Jaccard</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Both plain and weighted variants</td>
+  </tr>
+  <tr>
+    <td><strong>Lexical TF-IDF text comparison</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Word + char ngrams, field-weighted</td>
+  </tr>
+  <tr>
+    <td><strong>DOM structure comparison</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Three variants: path Jaccard, edit distance, section order</td>
+  </tr>
+  <tr>
+    <td><strong>Perceptual pHash</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Supplemental in collection mode</td>
+  </tr>
+  <tr>
+    <td><strong>Perceptual ORB keypoints</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Supplemental in collection mode</td>
+  </tr>
+  <tr>
+    <td><strong>Near-copy (shingling)</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Supplemental in collection mode</td>
+  </tr>
+  <tr>
+    <td><strong>URL/HAR analysis</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Supplemental in collection mode</td>
+  </tr>
+  <tr>
+    <td><strong>K01 component clustering</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Both profiles</td>
+  </tr>
+  <tr>
+    <td><strong>K09 fusion clustering</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Jury + collection profiles</td>
+  </tr>
+  <tr>
+    <td><strong>Demo profile (baseline)</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Auto-seeded at startup</td>
+  </tr>
+  <tr>
+    <td><strong>Jury profile</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Requires <code>METHADATA_JURY_DATA_DIR</code></td>
+  </tr>
+  <tr>
+    <td><strong>Collection mode</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>SQLite-backed, snapshot publishing</td>
+  </tr>
+  <tr>
+    <td><strong>Scenario / counterfactual</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Jury only; LRU-cached</td>
+  </tr>
+  <tr>
+    <td><strong>Evidence display (images + text excerpts)</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Locator-driven excerpt extraction</td>
+  </tr>
+  <tr>
+    <td><strong>Image previews</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>Content-addressed, immutably cached</td>
+  </tr>
+  <tr>
+    <td><strong>OCR layout / sentences</strong></td>
+    <td><span class="badge badge-yellow">⚠ Model required</span></td>
+    <td>Needs <code>METHADATA_COLLECTION_MODELS=1</code></td>
+  </tr>
+  <tr>
+    <td><strong>Visual embedding (OpenCLIP)</strong></td>
+    <td><span class="badge badge-yellow">⚠ Model required</span></td>
+    <td>Needs <code>METHADATA_COLLECTION_MODELS=1</code></td>
+  </tr>
+  <tr>
+    <td><strong>Semantic similarity (MiniLM)</strong></td>
+    <td><span class="badge badge-yellow">⚠ Model required</span></td>
+    <td>Not wired to production API yet</td>
+  </tr>
+  <tr>
+    <td><strong>Video / audio comparison</strong></td>
+    <td><span class="badge badge-yellow">⚠ FFmpeg required</span></td>
+    <td>Not wired to production API</td>
+  </tr>
+  <tr>
+    <td><strong>Narrative slots, rare motifs, people entities</strong></td>
+    <td><span class="badge badge-blue">🔬 Experimental</span></td>
+    <td>Not in any production profile</td>
+  </tr>
+  <tr>
+    <td><strong>Leiden, Bicluster, Medoids, Spectral, … clusterers</strong></td>
+    <td><span class="badge badge-blue">🔬 Experimental</span></td>
+    <td>Implemented but not wired to backend</td>
+  </tr>
+  <tr>
+    <td><strong>Privacy / PII masking</strong></td>
+    <td><span class="badge badge-green">✓ Working</span></td>
+    <td>URL click IDs masked via <code>mask_url()</code>; <code>pii.key</code> in <code>var/</code></td>
+  </tr>
+  <tr>
+    <td><strong>Monitor / alerts</strong></td>
+    <td><span class="badge badge-blue">🔬 Present</span></td>
+    <td><code>src/methadata/monitor/</code> — not exposed via API</td>
+  </tr>
+</table>
+</section>
+
+<!-- ══════════════════════ DATA FLOW ══════════════════════ -->
+<section id="data-flow">
+<h2>End-to-End Data Flow</h2>
+
+<pre><code># 1. INGEST
+POST /api/v1/observations  (file or URL)
+  → FileImporter.import_sources([path], store)
+  → store.put_stream(fh)              # write blob under sha256
+  → Observation + Artifact records    # written atomically as JSONL
+  → returns ObservationCreated {observation_id, canonical_id, input_kind, artifacts[]}
+
+# 2. QUEUE RUN
+POST /api/v1/runs {observation_id, profile}
+  → RunManager.create(oid, profile)   # saves state file, enqueues
+  → returns {run_id, status: "queued"}
+
+# 3. EXECUTE (background thread)
+engine.compute_run(storage, run_id, observation_id, profile, progress)
+  → selected = storage.for_profile(profile)   # demo or jury Storage
+  → store = selected.store()
+  → idx = selected.index()                    # {observation_ids, target_...}
+  → wanted = idx.observation_ids + [observation_id]
+  → observations = [store.observation(i) for i in wanted]
+  
+  if profile == "jury":
+    → fusion_run(settings, observations, store, adapters, dataset_version, run_id)
+       → collect_corpus_evidence(...)          # extract + compare all pairs
+       → fuse_and_cluster(obs, raw, fusion_cfg)
+       → rekey(bundle, run_id)
+  else:  # demo / baseline
+    → run_experiment(config, observations, adapters, reader=store)
+       → extract features for each observation
+       → compare all pairs (asset Jaccard)
+       → cluster (K01 components)
+  
+  → build_view(run_id, bundle, labels, store, previews_dir, observation_id)
+  → save run.json + bundle.json
+
+# 4. POLL
+GET /api/v1/runs/{run_id}
+  → status: succeeded / running / queued / failed
+  → on success: result = ClusterRunView {summary, materials[], clusters[], pair_evidence[]}
+
+# 5. EXPLORE EVIDENCE
+GET /api/v1/runs/{run_id}/evidence/{evidence_id}
+  → build_evidence(run_id, bundle, view, evidence_id, store, previews_dir)
+  → sides[0,1]: {material_id, label, items[{artifact, preview, text_excerpts}]}
+
+# 6. COUNTERFACTUAL (jury only)
+GET /api/v1/runs/{run_id}/evidence/{evidence_id}/scenarios?disabled=family_name
+  → FamilySwitch.scenario(target, disabled)
+  → compare_scenarios(inputs, baseline, scenario)
+  → {baseline, scenario, edge_changes, indirect_paths, minimal_masks}</code></pre>
+
+<h3>Environment Variables</h3>
+<table class="method-table">
+  <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+  <tr><td><code>METHADATA_DATA_DIR</code></td><td><code>var/methadata-data</code></td><td>Main data directory</td></tr>
+  <tr><td><code>METHADATA_ANALYSIS_PROFILE</code></td><td><code>demo</code></td><td>Default analysis profile</td></tr>
+  <tr><td><code>METHADATA_JURY_DATA_DIR</code></td><td>—</td><td>Separate data dir for jury profile</td></tr>
+  <tr><td><code>METHADATA_BASELINE_CONFIG</code></td><td><code>configs/baseline/baseline.json</code></td><td>Path to baseline config JSON</td></tr>
+  <tr><td><code>METHADATA_WORKERS</code></td><td><code>2</code></td><td>Background analysis worker threads</td></tr>
+  <tr><td><code>METHADATA_COLLECTION_MODELS</code></td><td><code>0</code></td><td>Set to <code>1</code> to enable model-based extractors</td></tr>
+  <tr><td><code>METHADATA_COLLECTION_UPLOAD_BYTES</code></td><td><code>134217728</code> (128 MiB)</td><td>Max collection upload size</td></tr>
+</table>
+
+<div class="callout callout-ok" style="margin-top:32px;">
+  <strong>Generated:</strong> November 2026 — from live codebase analysis of <code>/Users/jnaklicki/Documents/Hackathon/Methadata</code>
+</div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script>
+// Highlight active nav link based on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+function updateNav() {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 60) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
+</script>
+</body>
+</html>

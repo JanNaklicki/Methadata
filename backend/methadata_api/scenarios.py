@@ -62,18 +62,20 @@ class RunScenarios:
                  if p.run_id == run_id and p.method_id == FUSION_METHOD}
         if run is None or not pairs or not run.config.get("fusion"):
             raise _not_available()
-        raw = [p for p in bundle.pairs if p.run_id != run_id]
+        fusion_methods = {cfg["method_id"] for cfg in run.config["fusion"].get("families", {}).values()}
+        raw = [p for p in bundle.pairs if p.run_id != run_id and (not fusion_methods or p.method_id in fusion_methods)]
         switch = FamilySwitch(Inputs(bundle.observations, raw, seed=run.seed),
                               {**run.config["fusion"], "dataset_version": run.dataset_version})
-        if switch.baseline.run_id != record.get("engine_run_id"):
+        # Migawka kolekcji składa się z wielu importów, więc jej silnik nie ma jednego identyfikatora do porównania.
+        if record.get("profile") != "collection" and switch.baseline.run_id != record.get("engine_run_id"):
             raise _not_available()
         return switch, target, pairs
 
     def compare(self, state: dict, evidence_id: str, disabled: list[str], material_id: str | None) -> dict[str, Any]:
-        if state.get("profile") != "jury":
+        if state.get("profile") not in {"jury", "collection"}:
             raise _not_available()
         with self._lock:
-            switch, submitted, pairs = self._snapshot(state["run_id"], state["observation_id"])
+            switch, submitted, pairs = self._snapshot(state["run_id"], state.get("observation_id") or "")
             pair = pairs.get(evidence_id)
             if pair is None:
                 raise _not_available()

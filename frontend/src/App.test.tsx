@@ -8,31 +8,33 @@ const renderApp = () => render(<App pollMs={10} />)
 const calls = (fn: ReturnType<typeof mockFetch>) => fn.mock.calls.map(([u, i]) => `${(i as RequestInit | undefined)?.method ?? 'GET'} ${String(u)}`)
 
 describe('ekran startowy', () => {
-  it('demo: tworzy przebieg, zapisuje run_id w adresie i pokazuje wynik', async () => {
+  it('URL: wysyła JSON z domyślnym trybem fetch i normalizuje samą domenę', async () => {
     const fetchMock = standardApi([ex.queued, ex.running, ex.succeeded])
     renderApp()
-    await userEvent.click(screen.getByRole('button', { name: 'Uruchom przykład' }))
+    await userEvent.type(screen.getByLabelText(/Adres strony/), 'example.invalid/reklama/1')
+    await userEvent.click(screen.getByRole('button', { name: 'Analizuj adres' }))
     await waitFor(() => expect(window.location.pathname).toBe('/runs/run-demo-0001'))
     expect(await screen.findByText(/Znaleziono grupy/)).toBeInTheDocument()
-    expect(calls(fetchMock).slice(0, 3)).toEqual(['GET /api/v1/demo', 'POST /api/v1/runs', 'GET /api/v1/runs/run-demo-0001'])
-    expect(JSON.parse(fetchMock.mock.calls[1][1]!.body as string)).toEqual({ observation_id: 'obs-9271e8a859000be5', profile: 'demo' })
-  })
-
-  it('URL: wysyła JSON z trybem offline', async () => {
-    const fetchMock = standardApi()
-    renderApp()
-    await userEvent.type(screen.getByLabelText(/Adres strony/), 'https://example.invalid/reklama/1')
-    await userEvent.click(screen.getByRole('button', { name: 'Analizuj adres' }))
-    await screen.findByText(/Znaleziono grupy/)
     const post = fetchMock.mock.calls.find(([u]) => String(u).endsWith('/observations'))!
-    expect(JSON.parse(post[1]!.body as string)).toEqual({ url: 'https://example.invalid/reklama/1', mode: 'offline' })
-    expect(window.location.pathname).toBe('/runs/run-demo-0001')
+    expect(JSON.parse(post[1]!.body as string)).toEqual({ url: 'https://example.invalid/reklama/1', mode: 'fetch' })
   })
 
-  it('URL: odrzuca adres bez http(s) bez zapytania do API', async () => {
+  it('wskazówka: przenosi do bazy z wyszukiwaniem po słowie kluczowym (bez zapytania o analizę)', async () => {
+    window.history.pushState(null, '', '/')
     const fetchMock = standardApi()
     renderApp()
-    await userEvent.type(screen.getByLabelText(/Adres strony/), 'example.com')
+    await userEvent.type(screen.getByLabelText(/Nazwa produktu, osoba, marka/), 'Kardivix')
+    await userEvent.click(screen.getByRole('button', { name: 'Szukaj w bazie' }))
+    await waitFor(() => expect(window.location.pathname).toBe('/collection'))
+    expect(window.location.search).toBe('?q=Kardivix')
+    expect(calls(fetchMock).some((call) => call.includes('/runs'))).toBe(false)
+    window.history.pushState(null, '', '/')
+  })
+
+  it('URL: odrzuca niepoprawny protokół bez zapytania do API', async () => {
+    const fetchMock = standardApi()
+    renderApp()
+    await userEvent.type(screen.getByLabelText(/Adres strony/), 'ftp://example.com')
     await userEvent.click(screen.getByRole('button', { name: 'Analizuj adres' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('http://')
     expect(fetchMock).not.toHaveBeenCalled()
@@ -64,7 +66,8 @@ describe('ekran startowy', () => {
   it('brak połączenia przy starcie: sygnalizuje utratę połączenia', async () => {
     mockFetch(() => 'network')
     renderApp()
-    await userEvent.click(screen.getByRole('button', { name: 'Uruchom przykład' }))
+    await userEvent.type(screen.getByLabelText(/Adres strony/), 'https://x.invalid/a')
+    await userEvent.click(screen.getByRole('button', { name: 'Analizuj adres' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Brak połączenia z serwerem')
   })
 })
@@ -84,7 +87,7 @@ describe('widok przebiegu', () => {
     window.history.pushState(null, '', '/runs/run-demo-0001')
     standardApi()
     renderApp()
-    const group = await screen.findByRole('article', { name: 'Grupa c1' })
+    const group = await screen.findByRole('article', { name: 'Grupa 1' })
     expect(within(group).getByText('Reklama p15 (zapis strony)')).toBeInTheDocument()
     expect(screen.getAllByRole('listitem').length).toBeGreaterThan(4)
     expect(screen.getAllByRole('button', { name: /Pokaż dowody/ })).toHaveLength(2)
@@ -123,7 +126,7 @@ describe('widok przebiegu', () => {
     expect(await screen.findByText('Za mało danych do rozstrzygnięcia')).toBeInTheDocument()
     expect(screen.getByText(/Za mało dowodów: dodano sam adres URL/)).toBeInTheDocument()
     expect(screen.getByText('Brak grup w tym wyniku.')).toBeInTheDocument()
-    expect(screen.getAllByText(/Tylko adres URL, brak dowodów/)).toHaveLength(2)
+    expect(screen.getAllByText(/Tylko adres URL, bez śladów do porównania/)).toHaveLength(2)
     await userEvent.click(screen.getByRole('button', { name: /Pokaż dowody/ }))
     expect(await screen.findByText('Porównanie niewykonalne.')).toBeInTheDocument()
     expect(screen.getAllByText('Brak dowodów po tej stronie.')).toHaveLength(2)
@@ -189,4 +192,22 @@ describe('widok przebiegu', () => {
     expect(fetchMock.mock.calls.length).toBe(n)
     vi.unstubAllGlobals()
   })
+})
+
+it('graf pokazuje bezpośrednie krawędzie i otwiera dowód wybranej pary', async () => {
+  window.history.pushState(null, '', '/runs/run-demo-0001')
+  const fetchMock = standardApi()
+  renderApp()
+  await userEvent.click(await screen.findByRole('button', { name: 'Graf' }))
+  const graph = screen.getByRole('region', { name: 'Graf powiązań' })
+  expect(within(graph).getByText(/nie obsługuje WebGL 2/)).toBeVisible()
+  const relations = within(graph).getByRole('region', { name: 'Powiązania w grafie' })
+  expect(within(relations).getAllByRole('button')).toHaveLength(ex.succeeded.result.cluster_run.edges.length)
+  const edge = ex.succeeded.result.cluster_run.edges[0]
+  const material = ex.succeeded.result.materials.find((m) => m.material_id === edge.source)!
+  await userEvent.click(within(graph).getByRole('button', { name: material.label }))
+  const target = ex.succeeded.result.materials.find((m) => m.material_id === edge.target)!
+  await userEvent.click(within(graph).getByRole('button', { name: (name) => name.startsWith(`Dowody: ${target.label} `) }))
+  expect(await screen.findByRole('region', { name: 'Dowód' })).toBeInTheDocument()
+  await waitFor(() => expect(calls(fetchMock)).toContain(`GET /api/v1/runs/run-demo-0001/evidence/${edge.pair_evidence_id}`))
 })

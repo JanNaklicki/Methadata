@@ -1,0 +1,9 @@
+# Zdjęcia referencyjne nie trafiają do repozytorium bez świadomej decyzji (prawa autorskie, dane organizatora).
+# Wyjątek: trzy zdjęcia na wolnych licencjach opisane w SOURCES.md.
+*.jpg
+*.jpeg
+*.png
+*.webp
+!Karol_Nawrocki.jpg
+!Tomasz_Sekielski.jpg
+!Rafał_Brzoska.jpg

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..700;1,300..700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 14px;
+      width: 14px;
+      border-radius: 9999px;
+      background: #a5e7ff;
+      cursor: pointer;
+      margin-top: -5px;
+      box-shadow: 0 0 8px rgba(0, 210, 255, 0.4);
+      border: 2px solid #0f131c;
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      background: #262a34;
+      border-radius: 9999px;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#0f131c",
+            "background": "#0f131c",
+            "secondary": "#4fdbc8",
+            "on-primary-fixed-variant": "#004e60",
+            "on-secondary-container": "#003f38",
+            "on-error": "#690005",
+            "primary": "#a5e7ff",
+            "on-secondary-fixed": "#00201c",
+            "outline-variant": "#3c494e",
+            "inverse-surface": "#dfe2ef",
+            "on-tertiary": "#213145",
+            "surface": "#0f131c",
+            "tertiary-container": "#b2c2dc",
+            "on-primary-fixed": "#001f28",
+            "secondary-container": "#04b4a2",
+            "on-tertiary-container": "#405065",
+            "on-primary": "#003543",
+            "surface-container-highest": "#31353f",
+            "on-primary-container": "#00566a",
+            "tertiary-fixed-dim": "#b7c8e1",
+            "surface-container-high": "#262a34",
+            "on-tertiary-fixed-variant": "#38485d",
+            "on-secondary-fixed-variant": "#005048",
+            "primary-container": "#00d2ff",
+            "surface-bright": "#353943",
+            "on-surface-variant": "#bbc9cf",
+            "inverse-on-surface": "#2c303a",
+            "primary-fixed-dim": "#47d6ff",
+            "surface-tint": "#47d6ff",
+            "surface-variant": "#31353f",
+            "on-surface": "#dfe2ef",
+            "on-background": "#dfe2ef",
+            "on-secondary": "#003731",
+            "error": "#ffb4ab",
+            "inverse-primary": "#00677f",
+            "surface-container": "#1c1f29",
+            "error-container": "#93000a",
+            "secondary-fixed-dim": "#4fdbc8",
+            "secondary-fixed": "#71f8e4",
+            "tertiary": "#cddef8",
+            "surface-container-low": "#181b25",
+            "tertiary-fixed": "#d3e4fe",
+            "surface-container-lowest": "#0a0e17",
+            "primary-fixed": "#b6ebff",
+            "on-error-container": "#ffdad6",
+            "outline": "#859399",
+            "on-tertiary-fixed": "#0b1c30"
+          },
+          "fontFamily": {
+            "headline": ["Hanken Grotesk", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen selection:bg-primary-container/30 selection:text-primary">
+<!-- Minimal Precision App Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 h-14 bg-surface-container-lowest/80 backdrop-blur-md border-b border-surface-container-high/60 flex items-center justify-between px-6">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<img alt="Methadata Logo" class="h-6 w-auto object-contain opacity-90" src="https://lh3.googleusercontent.com/aida/ALJJyrAcrr99dCOzK8YRNIjoUrpNw8ff5vWVJi8YE9Xuq4wQPh0hR4lr68NjFtnsftZlNbKkF133t4Vb7pwEeGrLCKJ8QvrvrtHxwiJJie6u9cnr-x9gGKAWMWP3sjWifRIs0gR8R_bmMwEUBMwHoo1TN9nyer82VeMcWao9JQ-VojgBEeqOl-N1M0xrt5gW8VveRd3sK14rME-Q3yIF4_jgRYJf0vSrtfBlOncB2bBJFyeJ"/>
+<span class="font-mono text-xs font-semibold tracking-wider text-on-surface">METHADATA</span>
+<span class="text-outline-variant font-mono text-xs">/</span>
+<span class="font-mono text-xs text-on-surface-variant">PL-FIN-SCAMS-2024</span>
+</div>
+<div class="hidden md:flex items-center gap-2 font-mono text-[11px] text-outline">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>ENGINE v1.4 LIVE</span>
+</div>
+</div>
+<!-- Search & Profile -->
+<div class="flex items-center gap-4">
+<div class="relative w-64 hidden sm:flex items-center bg-surface-container-low rounded-md px-2.5 py-1 text-xs border border-surface-container-highest/60 focus-within:border-primary/50 transition">
+<span class="material-symbols-outlined text-outline text-[16px] mr-2">search</span>
+<input class="w-full bg-transparent font-mono text-xs text-on-surface placeholder:text-outline/60 focus:outline-none" placeholder="Search clusters, hashes..." type="text"/>
+<kbd class="font-mono text-[10px] text-outline px-1 rounded bg-surface-container-highest">⌘K</kbd>
+</div>
+<div class="flex items-center gap-3 pl-3 border-l border-surface-container-high/60">
+<div class="text-right hidden sm:block">
+<div class="font-body text-xs font-medium text-on-surface">K. Thorne</div>
+<div class="font-mono text-[10px] text-outline">Cyber Intelligence</div>
+</div>
+<img alt="Profile" class="w-7 h-7 rounded-full object-cover ring-1 ring-outline/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvh73gv1E4QH5auzdzGLm7gw3dXDRwv0rEoOrR909GSJL3V-0NXwonn_n2BSlYi_6yGGLI_-1Bk8GmLRbWS1-UVVW3Hgoih_B_q3gmMx-rchkrabSJH-ENbi40ui5IK-EaWDNlWCzkM74idl5K_0xecQqnOlvy3J36NDomBOUHGnhNLFwvgufHH2twawmAoDlvllkSOvgy0oGihQl-kTkzIjb06f0ckPUr9hb_HdA"/>
+</div>
+</div>
+</header>
+<!-- Left Sidebar -->
+<aside class="fixed left-0 top-14 bottom-0 w-60 bg-surface-container-lowest border-r border-surface-container-high/50 z-40 flex flex-col justify-between p-3">
+<div class="flex flex-col gap-1">
+<div class="px-3 py-2 text-[10px] font-mono tracking-widest text-outline uppercase">Navigation</div>
+<nav class="flex flex-col gap-0.5">
+<a class="flex items-center gap-3 px-3 py-2 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition" href="#">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+<span>Campaign Explorer</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition" href="#">
+<span class="material-symbols-outlined text-[18px]">hub</span>
+<span>Investigation Graph</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition" href="#">
+<span class="material-symbols-outlined text-[18px]">policy</span>
+<span>Evidence Inspector</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-xs font-medium bg-surface-container-high text-primary" href="#">
+<span class="material-symbols-outlined text-[18px] text-primary">timeline</span>
+<span>Timeline &amp; Engine</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition" href="#">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span>Config &amp; Scoring</span>
+</a>
+</nav>
+</div>
+<!-- Cluster Pill Meta -->
+<div class="p-3 rounded bg-surface-container-low/70 border border-surface-container-highest/40 flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-[10px] font-mono text-outline">
+<span>ACTIVE CLUSTER</span>
+<span class="text-primary font-semibold">#PL-409</span>
+</div>
+<div class="text-xs font-medium text-on-surface truncate">Retail Gas Subsidy Spoofs</div>
+<div class="text-[11px] font-mono text-outline">14 Ads · 3 Apex Domains</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<div class="pl-60">
+<main class="pt-14 min-h-screen w-full px-8 py-8 flex flex-col gap-8 max-w-7xl mx-auto">
+<!-- Calm Editorial Header -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-surface-container-high/60">
+<div>
+<div class="flex items-center gap-2 font-mono text-xs text-outline mb-1.5">
+<span>CLUSTER #PL-409</span>
+<span>·</span>
+<span>POLISH RETAIL FIN-SCAM VORTEX</span>
+</div>
+<h1 class="font-headline text-2xl font-semibold tracking-tight text-on-surface">Temporal Lineage &amp; Scoring Simulator</h1>
+<p class="text-xs text-on-surface-variant mt-1 font-body">Correlate campaign mutation phases against algorithmic similarity weights.</p>
+</div>
+<div class="flex items-center gap-2.5">
+<div class="font-mono text-xs text-on-surface-variant bg-surface-container-low px-3 py-1.5 rounded border border-surface-container-high/50 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Window: 10–22 Nov 2024</span>
+</div>
+<button class="font-mono text-xs text-on-surface hover:text-primary bg-surface-container-high px-3 py-1.5 rounded border border-surface-container-highest flex items-center gap-1.5 transition" id="btn-export-spec">
+<span class="material-symbols-outlined text-[15px]">file_download</span>
+<span>Export JSON</span>
+</button>
+</div>
+</section>
+<!-- Balanced Two-Column Workstation Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT COLUMN: Campaign Evolution Timeline (7 COLS) -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<!-- Section Label + Clean Filter Bar -->
+<div class="flex items-center justify-between">
+<h2 class="font-headline text-sm font-semibold tracking-wide uppercase text-on-surface-variant">Campaign Evolution</h2>
+<div class="flex items-center gap-1 font-mono text-[11px]" id="timeline-filters">
+<button class="timeline-filter-btn px-2.5 py-1 rounded text-primary font-medium bg-surface-container-high" data-filter="all">All (4)</button>
+<button class="timeline-filter-btn px-2.5 py-1 rounded text-outline hover:text-on-surface transition" data-filter="creative">Creatives</button>
+<button class="timeline-filter-btn px-2.5 py-1 rounded text-outline hover:text-on-surface transition" data-filter="domain">Domains</button>
+<button class="timeline-filter-btn px-2.5 py-1 rounded text-outline hover:text-on-surface transition" data-filter="infra">Infra</button>
+<button class="timeline-filter-btn px-2.5 py-1 rounded text-outline hover:text-on-surface transition" data-filter="engine">Engine</button>
+</div>
+</div>
+<!-- Vertical Lineage Timeline with Generous Breathing Room -->
+<div class="relative pl-8 space-y-9 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-px before:bg-surface-container-high">
+<!-- PHASE 01 -->
+<div class="timeline-item relative group" data-category="infra">
+<span class="absolute -left-8 top-1 w-6 h-6 rounded-full bg-surface-container-low border border-surface-container-highest flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition">
+<span class="material-symbols-outlined text-[13px]">satellite_alt</span>
+</span>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-semibold text-primary">PHASE 01</span>
+<h3 class="font-headline text-sm font-medium text-on-surface">Initial Seed Launch on Social Ads</h3>
+</div>
+<time class="font-mono text-[11px] text-outline whitespace-nowrap">10 Nov 2024 · 08:14</time>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                  First malicious campaign vector identified targeting Polish retail investors with deepfake gas subsidies. The seed creative funnels direct traffic to a newly registered registrar apex.
+                </p>
+<!-- Evidence Callout -->
+<div class="mt-2 text-[11px] font-mono text-outline flex flex-wrap items-center gap-x-4 gap-y-1 py-2 px-3 rounded bg-surface-container-low/60 border border-surface-container-high/40">
+<div>Apex: <span class="text-on-surface font-medium">invest-safe-24.pl</span></div>
+<div>Container: <span class="text-on-surface font-medium">GTM-EXAMPLE1</span></div>
+<div>Target: <span class="text-on-surface">PL_RETAIL_EQUITY</span></div>
+</div>
+</div>
+</div>
+<!-- PHASE 02 -->
+<div class="timeline-item relative group" data-category="domain">
+<span class="absolute -left-8 top-1 w-6 h-6 rounded-full bg-surface-container-low border border-surface-container-highest flex items-center justify-center text-outline group-hover:border-secondary group-hover:text-secondary transition">
+<span class="material-symbols-outlined text-[13px]">alt_route</span>
+</span>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-semibold text-secondary">PHASE 02</span>
+<h3 class="font-headline text-sm font-medium text-on-surface">Evasive Domain Pivoting Post-Blacklist</h3>
+</div>
+<time class="font-mono text-[11px] text-outline whitespace-nowrap">12 Nov 2024 · 19:42</time>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                  Following CERT Polska registrar suspension, threat actors executed rapid CNAME shifting to offshore TLDs while retaining structural telemetry tags.
+                </p>
+<!-- Domain Shift Comparison -->
+<div class="mt-2 text-[11px] font-mono py-2 px-3 rounded bg-surface-container-low/60 border border-surface-container-high/40 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-outline line-through">invest-safe-24.pl</span>
+<span class="material-symbols-outlined text-[13px] text-secondary">arrow_forward</span>
+<span class="text-on-surface font-medium">invest-pro-pl.top</span>
+</div>
+<div class="text-outline">GTM Match: <span class="text-secondary font-medium">1.00 Identity</span></div>
+</div>
+</div>
+</div>
+<!-- PHASE 03 -->
+<div class="timeline-item relative group" data-category="creative">
+<span class="absolute -left-8 top-1 w-6 h-6 rounded-full bg-surface-container-low border border-surface-container-highest flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition">
+<span class="material-symbols-outlined text-[13px]">brush</span>
+</span>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-semibold text-primary">PHASE 03</span>
+<h3 class="font-headline text-sm font-medium text-on-surface">Creative Mutation to Bypass Ad Moderation</h3>
+</div>
+<time class="font-mono text-[11px] text-outline whitespace-nowrap">15 Nov 2024 · 02:18</time>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                  Ad copy and banner visuals were altered to circumvent automated classifiers. Perceptual hashing confirms near-identical layout geometry despite chromatic shifts.
+                </p>
+<!-- Clean Mutated Ad Preview Comparison -->
+<div class="mt-2 grid grid-cols-2 gap-3 pt-1">
+<div class="space-y-1">
+<div class="flex items-center justify-between text-[10px] font-mono text-outline">
+<span>SEED #1024</span>
+<span class="text-error">BANNED</span>
+</div>
+<div class="h-24 rounded overflow-hidden bg-surface-container-high border border-surface-container-highest/60 relative">
+<img class="w-full h-full object-cover filter brightness-90 hover:brightness-100 transition" data-alt="Seed Polish fraudulent investment advertisement" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDApz6bBT5skOiCRGbaLHNbbpkX5U9yBwDMWJkgU4m8fT7NeT5wGDNwPxzhZwNAiqpoX7HGbO4YhkmLgd4Xd0Qwx_4OAg51jXwjMrnI_51WhC_uazBnIThHMjccWxEQdzMHRcsNkuOJHCQk6qLufHp8kR2uyZ6-EsWPTzyVxxqymKBCA8uylPArv98zzWUHRYegmxxNHUQyvGxzlIcX7IR-HoMthCYGgpp0-AklMNw"/>
+<span class="absolute bottom-1 left-1.5 text-[9px] font-mono text-outline bg-surface-container-lowest/80 px-1 rounded">MD5: a812..</span>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center justify-between text-[10px] font-mono text-outline">
+<span>MUTATED #1078</span>
+<span class="text-secondary">ACTIVE</span>
+</div>
+<div class="h-24 rounded overflow-hidden bg-surface-container-high border border-surface-container-highest/60 relative">
+<img class="w-full h-full object-cover filter brightness-90 hover:brightness-100 transition" data-alt="Mutated variant Polish investment ad" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB50fCmBcdlpepD-waQfGrKLwpxBiFIzVD4lKdoquLDF6d8kv1ViesWYhGXgXM1pbaKquiU9uMorL_viP9af0JuCPC_S50BdmMI6YSGH_v06nOa0nzkxXDnWLg6zvj2wvLkYxkQ3rL1VWqzZtwzM-naRAaZRr-Fy46cDi2uF_igsDhoQ8oKR2H_o_5qjSQ-0xwnc4lxHKXKVmoR2QYqAUEOxRWCgQN0gus5b5K_Uvo"/>
+<span class="absolute bottom-1 left-1.5 text-[9px] font-mono text-outline bg-surface-container-lowest/80 px-1 rounded">MD5: e741..</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-outline pt-1">
+<span>pHash Distance: <strong class="text-secondary font-medium">6</strong> (Near-Exact)</span>
+<span>CLIP Cosine: <strong class="text-primary font-medium">0.81</strong></span>
+</div>
+</div>
+</div>
+<!-- PHASE 04 -->
+<div class="timeline-item relative group" data-category="engine">
+<span class="absolute -left-8 top-1 w-6 h-6 rounded-full bg-surface-container-low border border-surface-container-highest flex items-center justify-center text-outline group-hover:border-tertiary group-hover:text-tertiary transition">
+<span class="material-symbols-outlined text-[13px]">auto_fix_high</span>
+</span>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-semibold text-tertiary">PHASE 04</span>
+<h3 class="font-headline text-sm font-medium text-on-surface">Multi-Signal Cluster Synthesis</h3>
+</div>
+<time class="font-mono text-[11px] text-outline whitespace-nowrap">18 Nov 2024 · 14:03</time>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                  Correlation engine processed mutated Ad #1078 against the graph. Multi-signal affinity breached threshold, automatically appending it to Cluster #PL-409.
+                </p>
+<!-- Synthesis Affinity Bar -->
+<div class="mt-2 py-2 px-3 rounded bg-surface-container-low/60 border border-surface-container-high/40 flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-[11px] font-mono">
+<span class="text-outline">Fusion Affinity</span>
+<span class="text-secondary font-medium">87.2% Match (Merged)</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[87.2%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Signal Weight Simulator & Engine Evaluation (5 COLS) -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<!-- Section Label + Math Formulation Header -->
+<div class="flex items-center justify-between">
+<h2 class="font-headline text-sm font-semibold tracking-wide uppercase text-on-surface-variant">Scoring Engine Simulator</h2>
+<button class="font-mono text-[11px] text-outline hover:text-primary transition" id="btn-reset-weights">Reset Baseline</button>
+</div>
+<!-- Crisp Formula Card -->
+<div class="p-3.5 rounded bg-surface-container-low border border-surface-container-high/60 flex items-center justify-between font-mono">
+<div class="text-xs text-on-surface">
+<span class="text-primary font-medium">S(A, B)</span> = ∑ (w<sub>i</sub> · s<sub>i</sub>) / ∑ w<sub>i</sub>
+</div>
+<div class="text-[10px] text-outline">Leiden Modularity</div>
+</div>
+<!-- Tactile Sliders for 5 Signal Weights -->
+<div class="p-5 rounded bg-surface-container-low border border-surface-container-high/60 flex flex-col gap-4">
+<!-- Infrastructure Slider -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-xs font-mono">
+<span class="text-on-surface-variant">Infrastructure (GTM, ASN, CNAME)</span>
+<span class="text-primary font-medium" id="label-w-infra">35%</span>
+</div>
+<input class="w-full" id="slider-infra" max="100" min="0" type="range" value="35"/>
+</div>
+<!-- Text Semantic Slider -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-xs font-mono">
+<span class="text-on-surface-variant">Textual Semantic (Polish RoBERTa)</span>
+<span class="text-primary font-medium" id="label-w-text">25%</span>
+</div>
+<input class="w-full" id="slider-text" max="100" min="0" type="range" value="25"/>
+</div>
+<!-- Visual Similarity Slider -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-xs font-mono">
+<span class="text-on-surface-variant">Visual Embedding (CLIP + pHash)</span>
+<span class="text-primary font-medium" id="label-w-visual">20%</span>
+</div>
+<input class="w-full" id="slider-visual" max="100" min="0" type="range" value="20"/>
+</div>
+<!-- Entity Impersonation Slider -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-xs font-mono">
+<span class="text-on-surface-variant">Entity &amp; Impersonation Target</span>
+<span class="text-primary font-medium" id="label-w-entity">15%</span>
+</div>
+<input class="w-full" id="slider-entity" max="100" min="0" type="range" value="15"/>
+</div>
+<!-- Temporal Decay Slider -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-xs font-mono">
+<span class="text-on-surface-variant">Temporal Proximity (Δt Decay)</span>
+<span class="text-primary font-medium" id="label-w-temp">5%</span>
+</div>
+<input class="w-full" id="slider-temp" max="100" min="0" type="range" value="5"/>
+</div>
+<!-- Total Mass Footnote -->
+<div class="pt-2 border-t border-surface-container-high/60 flex items-center justify-between text-[11px] font-mono text-outline">
+<span>Aggregate Mass:</span>
+<span class="text-secondary font-medium" id="total-weight-indicator">100% Normalized</span>
+</div>
+</div>
+<!-- Validation Benchmark Evaluator (Quiet Comparison Pairs) -->
+<div class="space-y-2.5">
+<div class="text-[10px] font-mono tracking-wider text-outline uppercase">Validation Benchmarks</div>
+<!-- True Positive Pair -->
+<div class="p-3.5 rounded bg-surface-container-low border border-surface-container-high/50 flex flex-col gap-2">
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2 font-mono">
+<span class="text-secondary font-medium">TP</span>
+<span class="text-on-surface">#1024 vs #1078</span>
+</div>
+<span class="font-mono text-xs font-semibold text-secondary" id="tp-score-pill">87.2%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full transition-all duration-300" id="tp-score-bar" style="width: 87.2%;"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-outline">
+<span class="text-secondary" id="tp-status">Strong Similarity (Merged)</span>
+<span>Truth: 1</span>
+</div>
+</div>
+<!-- Hard Negative Pair -->
+<div class="p-3.5 rounded bg-surface-container-low border border-surface-container-high/50 flex flex-col gap-2">
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2 font-mono">
+<span class="text-outline font-medium">HN</span>
+<span class="text-on-surface">#1024 vs #2004 (Bank Spoof)</span>
+</div>
+<span class="font-mono text-xs font-semibold text-outline" id="hn-score-pill">38.4%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-surface-bright h-full transition-all duration-300" id="hn-score-bar" style="width: 38.4%;"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-outline">
+<span class="text-outline" id="hn-status">Rejected (&lt; 0.45 threshold)</span>
+<span>Truth: 0</span>
+</div>
+</div>
+</div>
+<!-- Clean MVP Scorecard: 3 KPI Numbers Without Clutter -->
+<div class="grid grid-cols-3 gap-3 pt-2">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline">Recall@5</span>
+<span class="font-headline text-lg font-semibold text-secondary mt-0.5">84.6%</span>
+<span class="text-[10px] font-mono text-outline/80">Target ≥80%</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline">Pairwise F1</span>
+<span class="font-headline text-lg font-semibold text-primary mt-0.5">0.89</span>
+<span class="text-[10px] font-mono text-outline/80">Baseline 0.68</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline">Determinism</span>
+<span class="font-headline text-lg font-semibold text-on-surface mt-0.5">100%</span>
+<span class="text-[10px] font-mono text-outline/80">Deterministic</span>
+</div>
+</div>
+<!-- Distinct Purposeful Actions -->
+<div class="flex items-center gap-2.5 pt-2">
+<button class="flex-1 py-2 px-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-medium rounded transition flex items-center justify-center gap-1.5" id="btn-save-cfg">
+<span class="material-symbols-outlined text-[15px]">save</span>
+<span>Save Config v1.5</span>
+</button>
+<button class="flex-1 py-2 px-3 bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold rounded transition flex items-center justify-center gap-1.5" id="btn-recompute-graph">
+<span class="material-symbols-outlined text-[15px]">hub</span>
+<span>Recompute Clusters</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quiet 3-Stat Summary Footer -->
+<footer class="mt-4 pt-6 border-t border-surface-container-high/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-outline">
+<div>
+<span>Campaign Lifespan: <strong class="text-on-surface font-medium">8d 06h</strong></span>
+<span class="mx-3 text-outline-variant">·</span>
+<span>Velocity: <strong class="text-on-surface font-medium">4.6 nodes/day</strong></span>
+<span class="mx-3 text-outline-variant">·</span>
+<span>Detection Lead: <strong class="text-secondary font-medium">-34h</strong></span>
+</div>
+<div class="text-[11px] text-outline/70">
+          Methadata Research · Leiden Community Detection Active
+        </div>
+</footer>
+<!-- Toast Container -->
+<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none" id="toast-container"></div>
+</main>
+</div>
+<script>
+    (function initSimulator() {
+      const pairTP = [0.98, 0.72, 0.81, 0.95, 0.88];
+      const pairHN = [0.20, 0.44, 0.12, 0.65, 0.30];
+
+      const sliderInfra = document.getElementById('slider-infra');
+      const sliderText = document.getElementById('slider-text');
+      const sliderVisual = document.getElementById('slider-visual');
+      const sliderEntity = document.getElementById('slider-entity');
+      const sliderTemp = document.getElementById('slider-temp');
+
+      const lblInfra = document.getElementById('label-w-infra');
+      const lblText = document.getElementById('label-w-text');
+      const lblVisual = document.getElementById('label-w-visual');
+      const lblEntity = document.getElementById('label-w-entity');
+      const lblTemp = document.getElementById('label-w-temp');
+      const lblTotal = document.getElementById('total-weight-indicator');
+
+      const tpScorePill = document.getElementById('tp-score-pill');
+      const tpScoreBar = document.getElementById('tp-score-bar');
+      const tpStatus = document.getElementById('tp-status');
+
+      const hnScorePill = document.getElementById('hn-score-pill');
+      const hnScoreBar = document.getElementById('hn-score-bar');
+      const hnStatus = document.getElementById('hn-status');
+
+      function recompute() {
+        const w1 = parseFloat(sliderInfra.value) || 0;
+        const w2 = parseFloat(sliderText.value) || 0;
+        const w3 = parseFloat(sliderVisual.value) || 0;
+        const w4 = parseFloat(sliderEntity.value) || 0;
+        const w5 = parseFloat(sliderTemp.value) || 0;
+
+        lblInfra.textContent = w1 + '%';
+        lblText.textContent = w2 + '%';
+        lblVisual.textContent = w3 + '%';
+        lblEntity.textContent = w4 + '%';
+        lblTemp.textContent = w5 + '%';
+
+        const sumWeights = w1 + w2 + w3 + w4 + w5;
+        lblTotal.textContent = sumWeights + '% ' + (sumWeights === 100 ? 'Normalized' : 'Scaled');
+
+        if (sumWeights <= 0) return;
+
+        const scoreTP = (w1 * pairTP[0] + w2 * pairTP[1] + w3 * pairTP[2] + w4 * pairTP[3] + w5 * pairTP[4]) / sumWeights * 100;
+        const scoreHN = (w1 * pairHN[0] + w2 * pairHN[1] + w3 * pairHN[2] + w4 * pairHN[3] + w5 * pairHN[4]) / sumWeights * 100;
+
+        tpScorePill.textContent = scoreTP.toFixed(1) + '%';
+        tpScoreBar.style.width = Math.min(100, Math.max(0, scoreTP)) + '%';
+        if (scoreTP >= 75) {
+          tpStatus.textContent = 'Strong Similarity (Merged)';
+          tpStatus.className = 'text-secondary';
+          tpScorePill.className = 'font-mono text-xs font-semibold text-secondary';
+          tpScoreBar.className = 'bg-secondary h-full transition-all duration-300';
+        } else if (scoreTP >= 45) {
+          tpStatus.textContent = 'Moderate Affinity (Flagged)';
+          tpStatus.className = 'text-primary';
+          tpScorePill.className = 'font-mono text-xs font-semibold text-primary';
+          tpScoreBar.className = 'bg-primary h-full transition-all duration-300';
+        } else {
+          tpStatus.textContent = 'False Negative (Separated)';
+          tpStatus.className = 'text-error';
+          tpScorePill.className = 'font-mono text-xs font-semibold text-error';
+          tpScoreBar.className = 'bg-error h-full transition-all duration-300';
+        }
+
+        hnScorePill.textContent = scoreHN.toFixed(1) + '%';
+        hnScoreBar.style.width = Math.min(100, Math.max(0, scoreHN)) + '%';
+        if (scoreHN < 45) {
+          hnStatus.textContent = 'Rejected (< 0.45 threshold)';
+          hnStatus.className = 'text-outline';
+          hnScoreBar.className = 'bg-surface-bright h-full transition-all duration-300';
+        } else {
+          hnStatus.textContent = 'False Positive Risk';
+          hnStatus.className = 'text-error font-medium';
+          hnScoreBar.className = 'bg-error h-full transition-all duration-300';
+        }
+      }
+
+      [sliderInfra, sliderText, sliderVisual, sliderEntity, sliderTemp].forEach(sl => {
+        sl.addEventListener('input', recompute);
+      });
+
+      document.getElementById('btn-reset-weights')?.addEventListener('click', () => {
+        sliderInfra.value = 35;
+        sliderText.value = 25;
+        sliderVisual.value = 20;
+        sliderEntity.value = 15;
+        sliderTemp.value = 5;
+        recompute();
+        showToast('Weights reverted to engine baseline');
+      });
+
+      // Filter Logic
+      const filterButtons = document.querySelectorAll('.timeline-filter-btn');
+      const timelineItems = document.querySelectorAll('.timeline-item');
+
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filter = btn.getAttribute('data-filter');
+          filterButtons.forEach(b => {
+            b.classList.remove('bg-surface-container-high', 'text-primary', 'font-medium');
+            b.classList.add('text-outline');
+          });
+          btn.classList.add('bg-surface-container-high', 'text-primary', 'font-medium');
+          btn.classList.remove('text-outline');
+
+          timelineItems.forEach(item => {
+            if (filter === 'all' || item.getAttribute('data-category') === filter) {
+              item.style.display = 'block';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      function showToast(message) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto bg-surface-container-highest text-on-surface px-3 py-2 rounded text-xs font-mono shadow-md border border-surface-container-high flex items-center gap-2 transition-opacity duration-300';
+        toast.innerHTML = '<span class="material-symbols-outlined text-[15px] text-secondary">check</span><span>' + message + '</span>';
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 300);
+        }, 2500);
+      }
+
+      document.getElementById('btn-save-cfg')?.addEventListener('click', () => {
+        showToast('Scoring configuration snapshot saved');
+      });
+
+      document.getElementById('btn-recompute-graph')?.addEventListener('click', () => {
+        showToast('Recomputing Leiden clusters...');
+      });
+
+      document.getElementById('btn-export-spec')?.addEventListener('click', () => {
+        const payload = {
+          campaign: "PL-409",
+          weights: {
+            infra: sliderInfra.value,
+            text: sliderText.value,
+            visual: sliderVisual.value,
+            entity: sliderEntity.value,
+            temp: sliderTemp.value
+          },
+          recall_at_5: 0.846,
+          f1: 0.89,
+          timestamp: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'methadata-scoring-benchmark.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Benchmark JSON exported');
+      });
+    })();
+  </script>
+</body></html>

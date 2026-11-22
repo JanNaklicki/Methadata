@@ -61,10 +61,49 @@ export interface PairEvidenceView {
   explanation: string
   evidence_url: string
 }
-export interface ClusterView { cluster_id: string; material_ids: string[]; relation: Relation; summary?: string }
+export interface ClusterView { index?: number; cluster_id: string; material_ids: string[]; relation: Relation; summary?: string }
 export type Outcome = 'grouped' | 'no_groups' | 'insufficient_evidence'
+export interface SharedArtifact {
+  kind: 'domain' | 'tracker' | 'image' | 'script' | 'person' | 'brand' | 'contact' | 'affiliate' | 'infrastructure'
+  label: string
+  material_ids: string[]
+  /** Tylko `image`: podgląd obrazu, gdy jest w magazynie. */
+  preview?: Preview | null
+}
+export interface DomainMeta {
+  ips?: string[]
+  tls_issuer?: string
+  tls_not_before?: string
+  registrar?: string
+  created?: string
+  nameservers?: string[]
+}
+export interface SuggestedEdge {
+  source: string
+  target: string
+  pair_evidence_id: string
+  score: number
+  method_id: string
+  label: string
+  explanation: string
+}
 export interface ClusterRunView {
-  cluster_run: Record<string, unknown>
+  investigation?: {
+    artifacts: SharedArtifact[]
+    domains: Record<string, string[]>
+    domain_meta?: Record<string, DomainMeta>
+    /** Zwięzły indeks treści materiału (małe litery) do wyszukiwania po słowach kluczowych. */
+    search_text?: Record<string, string>
+    captured_at: Record<string, string>
+    edge_families: Record<string, string[]>
+    suggested_edges?: SuggestedEdge[]
+    manual_edge_ids?: string[]
+  }
+  collection?: boolean
+  cluster_run: Record<string, unknown> & {
+    edges?: { source: string; target: string; pair_evidence_id: string; weight?: number }[]
+    assignments?: { material_id: string; status: string }[]
+  }
   summary: {
     outcome: Outcome
     material_count: number
@@ -89,6 +128,7 @@ export type Run =
 export interface TextExcerpt { text: string; highlight_start?: number; highlight_end?: number; source_label?: string }
 export interface EvidenceItem {
   artifact_id: string
+  sha256?: string
   role: string
   media_type?: string | null
   display_url?: string | null
@@ -106,5 +146,82 @@ export interface Evidence {
   explanation: string
   available: boolean
   limitations?: string[]
+  families?: {name: string; score: number | null; supports: boolean}[]
+  signals?: SupplementalSignal[]
+  inactive_signals?: string[]
   sides: [EvidenceSide, EvidenceSide]
+}
+
+export interface CollectionData {
+  version: number
+  run_id: string | null
+  graph: ClusterRunView | null
+  max_upload_bytes: number
+  default_profile?: "demo" | "jury"
+  max_analysis_upload_bytes?: number
+  sources: Record<string, { label: string; date: string }[]>
+  imports: Pick<ImportReport, 'id' | 'status' | 'created_at'>[]
+}
+
+export interface ImportReport {
+  id: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+  created_at: string
+  run_id: string | null
+  entries: { label: string; status: 'added' | 'duplicate' | 'skipped'; material_id?: string; reason?: string }[]
+  issues: { label: string; reason: string }[]
+  merges: { previous: string[][]; cluster_id: string; material_ids: string[] }[]
+  stage?: string
+  archive?: { loaded: number; skipped: number; metadata: number }
+  upload_ids?: string[]
+  first_material?: boolean
+  error?: string
+}
+
+
+export interface SupplementalSignal {
+  evidence_id: string
+  pair: [string, string]
+  label: string
+  score: number | null
+  status: 'missing' | 'scored'
+  explanation: string
+}
+
+export interface ManagedMaterial {
+  id: string
+  label: string
+  archived: boolean
+  analysable: boolean
+  source_labels: string[]
+}
+
+export interface Upload {
+  id: string
+  filename: string
+  label: string
+  size: number | null
+  created_at: string
+  archived: boolean
+  downloadable: boolean
+  import_id: string | null
+  status: ImportReport['status']
+  materials: ManagedMaterial[]
+  members: { id: string; path: string; size: number; material_id: string | null }[]
+}
+
+export interface MonitorSource { kind: 'json-export'; name: string; available: boolean; synthetic: boolean }
+export interface MonitorState { cursor?: string | null; pending?: string[]; totals?: Record<string, number>; last_run?: string | null; last_error?: string | null }
+export interface MonitorStatus { source: MonitorSource; state: MonitorState | Record<string, never> }
+export interface MonitorScan {
+  ok: boolean
+  source: MonitorSource
+  error?: string | null
+  new?: number
+  updated?: number
+  duplicate?: number
+  rejected?: number
+  exhausted?: boolean
+  payer_groups_touched?: number
+  state?: MonitorState
 }
