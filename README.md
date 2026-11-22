@@ -1,5 +1,7 @@
 # Methadata
 
+Przewodnik: [Walkthrough.html](Walkthrough.html) — uruchomienie krok po kroku oraz przepływ szukania, kategoryzowania i grupowania materiałów wraz z listą technologii.
+
 ## Start (Docker)
 
 Wymagany Docker z Compose v2 (Docker Desktop albo Engine + wtyczka compose). Nie trzeba pliku `.env`, prywatnego

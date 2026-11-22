@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methadata — Walkthrough</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3450;
+    --accent: #5b8dee;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --text: #e2e8f0;
+    --muted: #8892b0;
+    --radius: 10px;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── layout ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  nav {
+    width: 260px;
+    min-width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  nav .logo {
+    padding: 0 20px 20px;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  nav .logo span { color: var(--muted); font-weight: 400; font-size: 12px; display: block; margin-top: 2px; }
+
+  nav a {
+    display: block;
+    padding: 7px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color .15s, background .15s;
+    border-left: 3px solid transparent;
+  }
+  nav a:hover { color: var(--text); background: var(--surface2); }
+  nav a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(91,141,238,.07); }
+  nav .section-label {
+    padding: 14px 20px 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .content-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  main {
+    width: 100%;
+    max-width: 860px;
+    padding: 48px 32px 120px;
+    margin: 0 auto;
+  }
+
+  /* ── typography ── */
+  h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; color: #fff; }
+  h2 { font-size: 1.45rem; font-weight: 700; margin: 48px 0 14px; color: #fff; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.1rem; font-weight: 600; margin: 28px 0 10px; color: var(--accent); }
+  h4 { font-size: .95rem; font-weight: 600; margin: 20px 0 6px; color: var(--accent2); }
+  p { margin-bottom: 12px; color: var(--text); }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; }
+  li { margin-bottom: 5px; }
+
+  code {
+    font-family: var(--mono);
+    background: rgba(91,141,238,.12);
+    color: #93c5fd;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: .88em;
+  }
+
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+  pre code {
+    background: none;
+    color: #c4d3f0;
+    padding: 0;
+    font-size: .9em;
+    line-height: 1.6;
+  }
+
+  /* ── components ── */
+  .hero-subtitle {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 28px;
+  }
+
+  .muted { color: var(--muted); font-size: .88rem; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .badge-green  { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+  .badge-yellow { background: rgba(251,191,36,.12); color: var(--yellow); border: 1px solid rgba(251,191,36,.25); }
+  .badge-red    { background: rgba(248,113,113,.12); color: var(--red);   border: 1px solid rgba(248,113,113,.25); }
+  .badge-blue   { background: rgba(91,141,238,.15); color: var(--accent); border: 1px solid rgba(91,141,238,.3); }
+  .badge-purple { background: rgba(167,139,250,.12); color: var(--accent2); border: 1px solid rgba(167,139,250,.25); }
+
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-left: 4px solid;
+    font-size: .93rem;
+  }
+  .callout-info   { background: rgba(91,141,238,.08); border-color: var(--accent); }
+  .callout-warn   { background: rgba(251,191,36,.08); border-color: var(--yellow); }
+  .callout-danger { background: rgba(248,113,113,.08); border-color: var(--red); }
+  .callout-ok     { background: rgba(52,211,153,.08); border-color: var(--green); }
+
+  .grid { display: grid; gap: 16px; margin: 16px 0; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .card h4 { margin-top: 0; }
+
+  /* ── pipeline flow ── */
+  .pipeline {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    margin: 24px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .pipeline-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    min-width: 150px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .pipeline-step .icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .pipeline-step .label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .pipeline-step .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .pipeline-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 20px;
+    padding-top: 20px;
+    flex-shrink: 0;
+  }
+
+  /* ── method table ── */
+  .method-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .88rem; }
+  .method-table th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  .method-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .method-table tr:last-child td { border-bottom: none; }
+  .method-table tr:hover td { background: rgba(255,255,255,.025); }
+
+  /* ── status pill row ── */
+  .status-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+
+  /* ── anchor offset ── */
+  section[id] { scroll-margin-top: 24px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ───────────────────────── sidebar nav ───────────────────────── -->
+<nav>
+  <div class="logo">Methadata<span>Walkthrough — start i przepływ pracy</span></div>
+
+  <div class="section-label">Start</div>
+  <a href="#start">Uruchomienie (Docker)</a>
+  <a href="#pierwszy-przebieg">Pierwszy przebieg</a>
+  <a href="#warianty">Warianty uruchomienia</a>
+
+  <div class="section-label">Przepływ</div>
+  <a href="#flow">Potok: od pliku do grupy</a>
+  <a href="#wejscia">Wejścia i ekrany</a>
+
+  <div class="section-label">Praca z materiałami</div>
+  <a href="#szukanie">Szukanie</a>
+  <a href="#kategoryzowanie">Kategoryzowanie</a>
+  <a href="#grupowanie">Grupowanie (fuzja)</a>
+  <a href="#dowody">Dowody i co-jeśli</a>
+
+  <div class="section-label">Technologie</div>
+  <a href="#tech-stack">Stos technologiczny</a>
+  <a href="#tech-sygnaly">Sygnały i modele</a>
+
+  <div class="section-label">Konfiguracja</div>
+  <a href="#prywatnosc">Dane wychodzące</a>
+  <a href="#env">Zmienne środowiskowe</a>
+  <a href="#diagnostyka">Diagnostyka</a>
+</nav>
+
+<!-- ───────────────────────── main content ───────────────────────── -->
+<div class="content-wrapper">
+<main>
+
+<!-- ══════════════════════ START ══════════════════════ -->
+<section id="start">
+<h1>Methadata — Walkthrough</h1>
+<p class="hero-subtitle">Jak uruchomić aplikację oraz jak przebiega szukanie, kategoryzowanie i grupowanie materiałów reklamowych.</p>
+
+<div class="callout callout-info">
+  <strong>Co robi system:</strong> Methadata łączy materiały reklamowe i strony docelowe (zapisy stron, HAR, zrzuty ekranu, PDF, wideo, audio, adresy URL) w <strong>wyjaśnialne grupy kampanii</strong>. Każde połączenie ma uzasadnienie: wynik na rodzinę cech, wspólne ślady i możliwość sprawdzenia, co się stanie po wyłączeniu rodziny.
+</div>
+
+<h2>Uruchomienie (Docker)</h2>
+<p>Jedyny wymagany składnik to Docker z Compose v2. Nie trzeba pliku <code>.env</code>, prywatnego korpusu ani ręcznego importu — backend sam zasiewa syntetyczną próbkę demonstracyjną.</p>
+
+<pre><code>docker compose up --build      # start (pierwsze budowanie pobiera obrazy i zależności)
+docker compose logs -f         # logi obu usług (logs -f backend, logs -f frontend)
+docker compose down            # stop (dane zostają w wolumenie methadata-data)
+docker compose down -v         # stop i usunięcie danych</code></pre>
+
+<div class="grid grid-3">
+  <div class="card">
+    <h4>Interfejs</h4>
+    <p><code>http://localhost:5173</code></p>
+    <p class="muted">żądania <code>/api</code> i <code>/static</code> idą przez proxy Vite do <code>backend:8000</code></p>
+  </div>
+  <div class="card">
+    <h4>API</h4>
+    <p><code>http://localhost:8000</code> (tylko localhost)</p>
+    <p class="muted">health: <code>/api/v1/health</code></p>
+  </div>
+  <div class="card">
+    <h4>Dane</h4>
+    <p>Wolumen <code>methadata-data</code></p>
+    <p class="muted">magazyn i przebiegi przeżywają <code>down</code> i restart</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════ PIERWSZY PRZEBIEG ══════════════════════ -->
+<section id="pierwszy-przebieg">
+<h2>Pierwszy przebieg</h2>
+<ol>
+  <li>Otwórz <code>http://localhost:5173</code> — ekran <strong>Nowa analiza</strong>.</li>
+  <li>Kliknij <strong>Uruchom przykład</strong>. Profil <code>demo</code> używa syntetycznej próbki: materiały <strong>A</strong> i <strong>C</strong> to warianty jednej kampanii i tworzą grupę, <strong>B</strong> (inny temat i szablon) zostaje osobno.</li>
+  <li>W wyniku otwórz <strong>Pokaż dowody</strong> dla pary z grupy — zobaczysz grafiki z obu stron, wynik na rodzinę cech i uzasadnienie.</li>
+  <li>Przejdź do <strong>Baza materiałów</strong> (<code>/collection</code>) i dodaj własny plik lub ZIP przyciskiem <strong>Dodaj do bazy</strong>.</li>
+  <li>Raport importu powie, czy materiał <strong>dołączył do istniejącej grupy</strong>, utworzył <strong>nową grupę</strong> (potencjalna nowa kampania), czy został <strong>bez grupy</strong>.</li>
+</ol>
+
+<div class="callout callout-ok">
+  <strong>Stan widoku żyje w adresie.</strong> <code>/runs/:id</code>, <code>/collection/{graph|evidence|timeline|files}</code> oraz filtry (<code>?q=</code>, <code>?domain=</code>, <code>?period=</code>, <code>?min=</code>, <code>?group=</code>, <code>?material=</code>, <code>?evidence=</code>) są w URL-u, więc „wstecz”, odświeżenie i udostępnienie linku odtwarzają dokładnie ten sam widok.
+</div>
+</section>
+
+<!-- ══════════════════════ WARIANTY ══════════════════════ -->
+<section id="warianty">
+<h2>Warianty uruchomienia</h2>
+
+<h3>Tryb pełny (modele ML, wideo i audio)</h3>
+<p>Domyślny obraz jest lekki: bez modeli ML i bez <code>ffmpeg</code>. Grafiki, tekst, struktura stron, HAR i PDF działają od razu, a wideo/audio i embeddingi są pomijane z jawnym oznaczeniem „brak”. Pełny zestaw:</p>
+<pre><code>METHADATA_EXTRAS='web,media,pdf,ocr,perceptual,semantic,speech,visual-embedding' \
+METHADATA_WITH_FFMPEG=1 METHADATA_COLLECTION_MODELS=1 docker compose up --build</code></pre>
+<p class="muted">Wagi modeli pobierają się przy pierwszym użyciu (kilkaset MB) i wymagają dostępu do sieci.</p>
+
+<h3>Profil jury (lokalny korpus zapisów stron)</h3>
+<pre><code>pip install -e '.[web,media,pdf]'
+python -m methadata_api.prepare_jury --data-dir var/jury
+docker compose -p methadata-jury -f compose.yaml -f configs/demo/compose.jury.yaml up --build -d --wait</code></pre>
+<p>Przygotowanie tworzy indeks i magazyn w <code>var/jury</code> oraz pakiet <code>var/jury/p15.zip</code> (HTML, zasoby strony, HAR, zrzut ekranu) do wgrania na ekranie analizy. Nakładka Compose ustawia <code>METHADATA_ANALYSIS_PROFILE=jury</code> i wskazuje przygotowany magazyn przez <code>METHADATA_JURY_DATA_DIR</code>.</p>
+
+<h3>Rozwój bez Dockera</h3>
+<pre><code># backend (port 8000)
+pip install -e '.[web,media,pdf]'
+METHADATA_DATA_DIR=var/methadata-data python -m methadata_api
+
+# frontend (port 5173, proxy na http://localhost:8000)
+cd frontend &amp;&amp; npm ci &amp;&amp; npm run dev
+
+# testy
+pip install -e '.[test,media,pdf,ocr,web]' &amp;&amp; pytest
+python contracts/http/check_conformance.py --base-url http://localhost:8000</code></pre>
+</section>
+
+<!-- ══════════════════════ FLOW ══════════════════════ -->
+<section id="flow">
+<h2>Potok: od pliku do grupy</h2>
+
+<div class="pipeline">
+  <div class="pipeline-step">
+    <div class="icon">📥</div>
+    <div class="label">Ingest</div>
+    <div class="sub">ZIP · HTML · HAR · PNG · PDF · MP4 · URL</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">🗄️</div>
+    <div class="label">Magazyn</div>
+    <div class="sub">SHA-256 + deduplikacja (canonical_id)</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">🔬</div>
+    <div class="label">Ekstrakcja</div>
+    <div class="sub">grafiki · tekst · DOM · OCR · sieć · AV</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">⚖️</div>
+    <div class="label">Porównanie</div>
+    <div class="sub">wszystkie pary → PairEvidence</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">🔗</div>
+    <div class="label">Fuzja + klastry</div>
+    <div class="sub">pokrycie · wsparcie · próg</div>
+  </div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">
+    <div class="icon">📊</div>
+    <div class="label">Widok</div>
+    <div class="sub">graf · dowody · oś czasu</div>
+  </div>
+</div>
+
+<table class="method-table">
+  <tr><th>Etap</th><th>Co się dzieje</th><th>Kod</th></tr>
+  <tr><td><strong>Ingest</strong></td><td>Rozpoznanie typu (<code>sniff</code>), rozpakowanie ZIP (do 3 poziomów zagnieżdżenia, 5 000 wpisów, 1 GiB), zapis oryginału i wyliczenie <code>canonical_id</code> z ról i hashy artefaktów — ponowny import tego samego zapisu to duplikat, nie nowy węzeł.</td><td><code>src/methadata/ingest/</code>, <code>collection_archive.py</code></td></tr>
+  <tr><td><strong>Ekstrakcja</strong></td><td>Każdy ekstraktor produkuje <code>Feature</code> (<code>family</code>, <code>kind</code>, <code>value</code>, <code>evidence_refs</code>). Materiał bez danej modalności po prostu nie ma tej cechy.</td><td><code>src/methadata/extractors/</code>, <code>experiments/</code></td></tr>
+  <tr><td><strong>Porównanie</strong></td><td>Dla każdej pary materiałów każdy komparator zwraca <code>PairEvidence</code> z wynikiem 0–1 albo <code>null</code> („porównanie niewykonalne”) wraz z odnośnikami do dowodów po obu stronach.</td><td><code>…/experiments/*/compare.py</code></td></tr>
+  <tr><td><strong>Fuzja</strong></td><td>Wyniki rodzin łączone w jedną ocenę pary, z bramkami pokrycia i wsparcia (zob. <a href="#grupowanie">Grupowanie</a>).</td><td><code>clustering/fusion/core.py</code></td></tr>
+  <tr><td><strong>Klastrowanie</strong></td><td>Spójne składowe nad krawędziami, które przeszły próg; dostępne też Leiden, gęstościowe, spektralne, konsensus i nakładające się.</td><td><code>clustering/components/</code>, <code>leiden/</code>, <code>density/</code></td></tr>
+  <tr><td><strong>Prezentacja</strong></td><td>Graf WebGL, lista dowodów z podglądami, oś czasu, raport importu, eksport JSON.</td><td><code>frontend/src/components/</code></td></tr>
+</table>
+
+<div class="callout callout-info">
+  <strong>Determinizm:</strong> <code>run_experiment()</code> liczy <code>run_id</code> jako SHA-256 z konfiguracji, <code>dataset_version</code> i posortowanych <code>canonical_id</code>. Ten sam wsad + ta sama konfiguracja = ten sam przebieg, odtwarzalny po restarcie backendu.
+</div>
+</section>
+
+<!-- ══════════════════════ WEJŚCIA ══════════════════════ -->
+<section id="wejscia">
+<h2>Wejścia i ekrany</h2>
+
+<table class="method-table">
+  <tr><th>Wejście</th><th>Co przyjmuje</th><th>Gdzie trafia wynik</th></tr>
+  <tr><td><strong>Plik</strong></td><td>HTML/MHTML, HAR, PNG/JPEG/WebP, PDF, MP4/WebM, MP3/WAV/OGG, ZIP (także zagnieżdżony)</td><td>przebieg <code>/runs/:id</code> oraz materiał w bazie</td></tr>
+  <tr><td><strong>Adres URL lub domena</strong></td><td>pełny adres albo sama domena, także długie linki reklamowe z trackerami; domyślnie bezpieczne pobranie strony wraz z przekierowaniami</td><td>przebieg; gdy strona nie odpowiada, zapisuje się sam adres i domena, a analiza nie przerywa się</td></tr>
+  <tr><td><strong>Wskazówka</strong></td><td>nazwa produktu, osoba, marka, słowa kluczowe</td><td><code>/collection?q=…</code> — wyszukiwanie w bazie materiałów</td></tr>
+  <tr><td><strong>Import zbiorczy</strong></td><td>wiele plików lub ZIP z wieloma zapisami stron (limit 128 MiB na plik)</td><td>raport importu z postępem i statusem każdego wpisu</td></tr>
+</table>
+
+<h3>Widoki bazy materiałów</h3>
+<div class="status-row">
+  <span class="badge badge-blue">explorer — grupy i ślady</span>
+  <span class="badge badge-purple">graph — graf powiązań</span>
+  <span class="badge badge-green">evidence — dowody pary</span>
+  <span class="badge badge-yellow">timeline — oś czasu</span>
+  <span class="badge badge-blue">files — pliki źródłowe</span>
+</div>
+
+<div class="callout callout-warn">
+  <strong>Brak danych nie zatrzymuje analizy.</strong> Materiał z samym adresem albo bez części modalności jest porównywany tylko tam, gdzie są dane; interfejs pokazuje <strong>„Za mało danych”</strong> zamiast zgadywać wynik.
+</div>
+</section>
+
+<!-- ══════════════════════ SZUKANIE ══════════════════════ -->
+<section id="szukanie">
+<h2>Szukanie</h2>
+<p>Pole <strong>Szukaj</strong> w bazie materiałów (parametr <code>?q=</code>) filtruje lokalnie, bez zapytań do sieci. Jedna fraza — porównywana małymi literami w regułach <code>pl-PL</code> — jest dopasowywana do czterech rzeczy:</p>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h4>Treść materiału</h4>
+    <p>Indeks <code>search_text</code>: zlepek cech <code>lexical/text_field</code> (tytuły i akapity, do 1500 znaków na materiał), budowany przy publikacji migawki grafu.</p>
+  </div>
+  <div class="card">
+    <h4>Nazwa i adres</h4>
+    <p><code>material_id</code>, etykieta materiału oraz <code>display_url</code>.</p>
+  </div>
+  <div class="card">
+    <h4>Domeny</h4>
+    <p>Wszystkie hosty wykryte w materiale (HTML, HAR, łańcuchy przekierowań).</p>
+  </div>
+  <div class="card">
+    <h4>Wspólne ślady</h4>
+    <p>Etykiety śladów (wspólna grafika, domena, tracker, skrypt, kod afiliacyjny…). Trafienie w ślad wybiera wszystkie materiały, które go mają.</p>
+  </div>
+</div>
+
+<p>Fraza zawęża jednocześnie listę materiałów, graf i listę grup: grupa pokazuje tylko tych członków, którzy przeszli filtr, a grupy bez trafień znikają z listy. Przycisk <strong>Eksport JSON</strong> zapisuje aktualny wycinek wraz z użytymi filtrami (<code>query</code>, <code>domain</code>, <code>period_days</code>, <code>minimum_score</code>).</p>
+
+<h3>Z ekranu analizy</h3>
+<p>Kafelek <strong>Wskazówka</strong> („np. nazwa preparatu lub nazwisko”) przenosi frazę do bazy jako <code>/collection?q=…</code>. To ta sama ścieżka co pole Szukaj — nie uruchamia nowego przebiegu analizy.</p>
+</section>
+
+<!-- ══════════════════════ KATEGORYZOWANIE ══════════════════════ -->
+<section id="kategoryzowanie">
+<h2>Kategoryzowanie</h2>
+<p>Poza frazą baza ma cztery filtry porządkujące oraz kategorie nadawane automatycznie przez potok.</p>
+
+<h3>Filtry</h3>
+<table class="method-table">
+  <tr><th>Filtr</th><th>Parametr</th><th>Wartości</th><th>Działanie</th></tr>
+  <tr><td>Domena</td><td><code>domain</code></td><td>lista hostów z bazy</td><td>materiał musi zawierać tę domenę</td></tr>
+  <tr><td>Data importu</td><td><code>period</code></td><td>7 / 30 dni</td><td>najnowsze źródło materiału mieści się w okresie</td></tr>
+  <tr><td>Podobieństwo</td><td><code>min</code></td><td>≥ 65% / ≥ 85%</td><td>zostają tylko pary o wyniku ≥ progu i materiały, które w takiej parze występują</td></tr>
+  <tr><td>Grupa</td><td><code>group</code></td><td>identyfikator klastra</td><td>widok zawężony do jednej grupy kampanii</td></tr>
+</table>
+
+<h3>Kategorie nadawane automatycznie</h3>
+<div class="grid grid-2">
+  <div class="card">
+    <h4>Status materiału</h4>
+    <p>Każdy materiał dostaje przypisanie z klastrowania:</p>
+    <div class="status-row">
+      <span class="badge badge-green">grouped</span>
+      <span class="badge badge-blue">singleton</span>
+      <span class="badge badge-yellow">noise</span>
+      <span class="badge badge-red">insufficient_data</span>
+    </div>
+    <p class="muted">Materiał bez wystarczających podobieństw nie jest dołączany do żadnej kampanii.</p>
+  </div>
+  <div class="card">
+    <h4>Rodzaj relacji</h4>
+    <p>Każdy dowód pary nosi relację, która mówi, <em>co</em> jest wspólne:</p>
+    <div class="status-row">
+      <span class="badge badge-purple">shared_template</span>
+      <span class="badge badge-purple">shared_narrative</span>
+      <span class="badge badge-purple">campaign_candidate</span>
+    </div>
+  </div>
+  <div class="card">
+    <h4>Ślady wspólne (graf artefaktów)</h4>
+    <p><code>?graph=artifacts</code> grupuje materiały wokół konkretnego wspólnego obiektu: identycznej grafiki (SHA-256, z podglądem), domeny, trackera (np. <code>meta_pixel</code>), identycznego skryptu, danych kontaktowych lub kodu afiliacyjnego.</p>
+  </div>
+  <div class="card">
+    <h4>Wzbogacenie domen</h4>
+    <p>DNS / TLS / RDAP dokładają kategorie techniczne: adres IP hostingu, wystawca certyfikatu, rejestrator i wiek domeny — przydatne przy odróżnianiu wspólnej infrastruktury od wspólnej treści.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════ GRUPOWANIE ══════════════════════ -->
+<section id="grupowanie">
+<h2>Grupowanie (fuzja)</h2>
+<p>Grupy powstają z par, nie z globalnego podobieństwa. Dla każdej pary materiałów fuzja (<code>fusion-v1</code>) liczy trzy rozdzielone wielkości:</p>
+
+<div class="grid grid-3">
+  <div class="card">
+    <h4>Podobieństwo</h4>
+    <p>Ważona średnia wyników <strong>dostępnych</strong> źródeł treści.</p>
+  </div>
+  <div class="card">
+    <h4>Pokrycie</h4>
+    <p>Udział wagi źródeł, które dały wynik: <code>Σw dostępnych / Σw skonfigurowanych</code>.</p>
+  </div>
+  <div class="card">
+    <h4>Wsparcie</h4>
+    <p>Liczba <strong>odrębnych</strong> źródeł treści z wynikiem ≥ <code>support_min</code>.</p>
+  </div>
+</div>
+
+<p>Krawędź powstaje tylko wtedy, gdy spełnione są wszystkie trzy warunki:</p>
+<pre><code>pokrycie &gt;= coverage_min   AND   wsparcie &gt;= min_support   AND   fuzja &gt;= threshold</code></pre>
+
+<ul>
+  <li><strong>Brak pokrycia</strong> → <code>score = None</code>, czyli „porównanie niewykonalne” (status <code>insufficient_coverage</code> lub <code>no_evidence</code>).</li>
+  <li><strong>Brak wsparcia</strong> → wynik obcięty tuż poniżej progu i oznaczony w wyjaśnieniu, więc klastrowanie nie połączy pary (<code>insufficient_support</code>).</li>
+  <li>Rodziny o tym samym <code>origin</code> (np. OCR akapitu i ten sam tekst z HTML) to <strong>jedno</strong> źródło treści — wkład liczy się raz i nie podbija ani pokrycia, ani wsparcia.</li>
+</ul>
+
+<h3>Profile grupowania</h3>
+<p>Wagi i progi są parametrami konfiguracji (<code>configs/fusion/eval.json</code>), nie wartościami dopasowanymi do danych: równe wagi, <code>support_min = threshold</code>.</p>
+<table class="method-table">
+  <tr><th>Profil</th><th>Hipoteza</th><th>Rodziny</th><th>min_support</th></tr>
+  <tr><td><code>baseline</code></td><td>szablon</td><td>asset</td><td>1</td></tr>
+  <tr><td><code>tylko-text</code></td><td>narracja</td><td>text</td><td>1</td></tr>
+  <tr><td><code>tylko-dom</code></td><td>szablon</td><td>dom</td><td>1</td></tr>
+  <tr><td><code>szablon</code></td><td>szablon</td><td>asset + dom</td><td>1</td></tr>
+  <tr><td><code>kampania</code> <span class="badge badge-green">domyślny</span></td><td>kampania</td><td>asset + text + dom</td><td>2</td></tr>
+  <tr><td><code>kampania-scisla</code></td><td>kampania</td><td>asset + text + dom</td><td>3</td></tr>
+</table>
+<p class="muted">Profil <code>kampania</code>: <code>threshold = 0,5</code>, <code>coverage_min = 0,5</code>, równe wagi 1,0 dla <code>assets-jaccard-v1</code> (grafiki), <code>lexical-tfidf-v1</code> (tekst) i <code>dom-paths-jaccard-v1</code> (struktura HTML); krawędź wymaga wsparcia <strong>dwóch niezależnych rodzin</strong>. Ustalenie wspólnego nadawcy wymaga osobnych dowodów.</p>
+
+<h3>Od krawędzi do grupy</h3>
+<p>Krawędzie, które przeszły bramki, trafiają do klastrowania przez <strong>spójne składowe</strong> (<code>components-threshold-v1</code>). W repozytorium są też alternatywy: Leiden, gęstościowe, spektralne, medoidy, konsensus, nakładające się, miękkie przypisania, bikastrowanie, przyrostowe i ograniczone (constrained).</p>
+
+<div class="callout callout-warn">
+  <strong>Sugestie przerywane:</strong> pary, które minęły próg o włos lub oparły się na jednej rodzinie, nie są scalane, ale pokazują się jako <em>sugerowane krawędzie</em> (do 40 najlepszych) wraz z wyjaśnieniem — analityk może je potwierdzić ręcznie.
+</div>
+</section>
+
+<!-- ══════════════════════ DOWODY ══════════════════════ -->
+<section id="dowody">
+<h2>Dowody i co-jeśli</h2>
+<ol>
+  <li><strong>Pokaż dowody</strong> otwiera <code>/collection/evidence?evidence=…</code> albo <code>/runs/:id/evidence/:id</code> — zawsze adresowalny link.</li>
+  <li>Panel pokazuje wynik na rodzinę cech, podglądy obu stron i odnośniki <strong>Locator</strong>: <code>text_span</code> (zakres znaków), <code>image_rect</code> (prostokąt w obrazie lub klatce), <code>har_entry</code> (wpis logu), <code>byte_range</code> (fragment MHTML).</li>
+  <li><strong>Scenariusze co-jeśli</strong> (<code>/api/v1/runs/{id}/evidence/{id}/scenarios</code>) przeliczają parę z wyłączoną rodziną cech — widać, czy połączenie trzyma się na grafikach, tekście czy szablonie.</li>
+  <li><strong>Skanuj źródło</strong> (widok Pliki źródłowe) wykonuje jeden przebieg monitora nad eksportem JSON/JSONL i pokazuje, ile reklam jest nowych lub zmienionych od poprzedniego skanu oraz ile grup płatników ma nowe wpisy. Nowe rekordy idą do osobnego magazynu i nie zmieniają grafu kolekcji.</li>
+</ol>
+<p class="muted">Podsumowanie grupy jest domyślnie deterministyczne i liczone bez sieci: liczba materiałów, wspólne rodziny śladów i najwyższe podobieństwo.</p>
+</section>
+
+<!-- ══════════════════════ TECH STACK ══════════════════════ -->
+<section id="tech-stack">
+<h2>Stos technologiczny</h2>
+<table class="method-table">
+  <tr><th>Warstwa</th><th>Technologie</th><th>Rola</th></tr>
+  <tr><td>Frontend</td><td>React 19, Vite, TypeScript, Sigma.js 4 + Graphology + ForceAtlas2 (WebGL 2)</td><td>Ekrany analizy i bazy, graf powiązań, panel dowodów; cały stan widoku w URL-u</td></tr>
+  <tr><td>Backend</td><td>FastAPI, Pydantic v2, Uvicorn, httpx</td><td>HTTP API, kolejka analiz w tle (<code>METHADATA_WORKERS</code>), bezpieczny fetcher URL</td></tr>
+  <tr><td>Rdzeń</td><td>Python 3, pakiet <code>src/methadata/*</code></td><td>Kontrakty danych, ekstraktory, komparatory, fuzja, klastrowanie, ewaluacja</td></tr>
+  <tr><td>Magazyn</td><td>SQLite (rejestr) + pliki blob adresowane SHA-256 + JSONL obserwacji</td><td>Materiały i źródła, oryginały i wpisy ZIP, migawki grafu i przebiegi</td></tr>
+  <tr><td>Kontrakt</td><td>OpenAPI — <code>contracts/http/openapi.yaml</code></td><td>Ścieżki <code>/api/v1/*</code> (health, observations, demo, runs, evidence, scenarios, monitor, collection, imports); test zgodności <code>check_conformance.py</code></td></tr>
+  <tr><td>Uruchomienie</td><td>Docker Compose v2 (backend + frontend, wolumen <code>methadata-data</code>)</td><td>Jedno polecenie startu, dane trwałe między restartami</td></tr>
+  <tr><td>Testy</td><td>pytest, Vitest, Playwright (<code>tests/web-e2e</code>)</td><td>Jednostkowe, komponentowe i scenariusze przeglądarkowe</td></tr>
+</table>
+</section>
+
+<!-- ══════════════════════ TECH SYGNAŁY ══════════════════════ -->
+<section id="tech-sygnaly">
+<h2>Sygnały i modele</h2>
+<p>Rodziny <strong>grafiki / tekst / struktura HTML</strong> decydują o grupowaniu. Pozostałe metody są <strong>sygnałami dodatkowymi</strong>: widać je w panelu materiału i w dowodach, ale nie zmieniają progów grupowania.</p>
+
+<h4>Rodziny decydujące o grupach</h4>
+<table class="method-table">
+  <tr><th>Rodzina</th><th>Metoda</th><th>Technologia</th></tr>
+  <tr><td>Grafiki</td><td><code>assets-jaccard-v1</code></td><td>SHA-256 zasobów, Jaccard na zbiorach hashy</td></tr>
+  <tr><td>Tekst</td><td><code>lexical-tfidf-v1</code></td><td>normalizacja tekstu, TF-IDF, podobieństwo cosinusowe</td></tr>
+  <tr><td>Struktura HTML</td><td><code>dom-paths-jaccard-v1</code></td><td>sekwencje i ścieżki znaczników DOM</td></tr>
+</table>
+
+<h4>Sygnały dodatkowe (bez modeli)</h4>
+<table class="method-table">
+  <tr><th>Sygnał</th><th>Metoda</th><th>Technologia</th></tr>
+  <tr><td>Podobne grafiki</td><td><code>perceptual-phash-v1</code></td><td>pHash 64-bit, odległość Hamminga (Pillow / OpenCV)</td></tr>
+  <tr><td>Wspólne fragmenty tekstu</td><td><code>near-copy-jaccard-v1</code></td><td>5-gramy shingli, Jaccard</td></tr>
+  <tr><td>Adresy i przekierowania</td><td><code>url-har-v1</code></td><td>parser HAR, zagnieżdżone URL w linkach reklamowych, wspólne piksele i trackery</td></tr>
+  <tr><td>Identyczny skrypt</td><td><code>shared-script-v1</code></td><td>SHA-256 plików JS (<code>extract-code</code>: także CSS, fonty, SVG)</td></tr>
+  <tr><td>Osoby, marki, narracja</td><td><code>people-text-mention-v1</code>, <code>people-text-persons-v1</code>, <code>narrative-slots-v1</code></td><td>leksykony encji oraz slots narracji (haczyk / obietnica / CTA)</td></tr>
+  <tr><td>Kontakty, afiliacje, QR</td><td><code>source-contact-compare</code>, <code>source-affiliate-compare</code></td><td>normalizacja telefonów i e-maili + HMAC (PII nie jest zapisywane jawnie), kody afiliacyjne, GTIN, dekodowanie QR (OpenCV)</td></tr>
+  <tr><td>Dokumenty i proweniencja</td><td><code>extract-documents</code>, <code>media_provenance</code></td><td>pypdf (tekst i metadane PDF), c2pa-python (podpisy C2PA)</td></tr>
+</table>
+
+<h4>Sygnały modelowe (<code>METHADATA_COLLECTION_MODELS=1</code>)</h4>
+<table class="method-table">
+  <tr><th>Sygnał</th><th>Model / biblioteka</th><th>Licencja i rozmiar</th></tr>
+  <tr><td>Tekst z obrazów (OCR)</td><td>RapidOCR (<code>rapidocr-onnxruntime</code>), ONNX Runtime, CPU</td><td>Apache-2.0</td></tr>
+  <tr><td>Podobna narracja</td><td>Sentence-Transformers <code>paraphrase-multilingual-MiniLM-L12-v2</code></td><td>Apache-2.0, ~470 MB</td></tr>
+  <tr><td>Podobny wygląd</td><td>OpenCLIP <code>ViT-B-32</code> (<code>laion2b_s34b_b79k</code>) + PyTorch, CPU/MPS</td><td>MIT / BSD-3, ~600 MB</td></tr>
+  <tr><td>Punkty kluczowe grafiki</td><td>ORB (OpenCV)</td><td>Apache-2.0</td></tr>
+  <tr><td>Transkrypcja mowy</td><td>Faster-Whisper <code>tiny</code> (CTranslate2)</td><td>MIT, ~75 MB</td></tr>
+  <tr><td>Głos mówcy</td><td>SpeechBrain <code>spkrec-ecapa-voxceleb</code> (192-wym. ECAPA-TDNN) + torchaudio</td><td>Apache-2.0, ~90 MB</td></tr>
+  <tr><td>Wideo i audio</td><td>FFmpeg / FFprobe, pHash klatek kluczowych, odcisk spektralny Haitsma–Kalker</td><td>LGPL / GPL, binarki wymagane w <code>PATH</code></td></tr>
+  <tr><td>Klastrowanie</td><td>scikit-learn, igraph + leidenalg</td><td>BSD / GPL-2+</td></tr>
+</table>
+
+<h4>Usługi zewnętrzne</h4>
+<table class="method-table">
+  <tr><th>Usługa</th><th>Rola</th><th>Dostęp</th></tr>
+  <tr><td>OpenAI <code>gpt-4o-mini</code></td><td>jednozdaniowe podsumowania grup (cache SHA-256, deterministyczny fallback offline)</td><td><code>OPENAI_API_KEY</code>; <strong>domyślnie wyłączone</strong></td></tr>
+  <tr><td>Meta Ad Library API</td><td>przyrostowe pobieranie rekordów reklam (<code>methadata.monitor</code>)</td><td><code>META_AD_LIBRARY_TOKEN</code>; dostępny też tryb offline na plikach JSON</td></tr>
+  <tr><td>RDAP / DNS / TLS</td><td>wzbogacanie domen: rejestrator, wiek domeny, IP, wystawca certyfikatu</td><td>bez klucza API; cache na dysku i limity zapytań</td></tr>
+</table>
+</section>
+
+<!-- ══════════════════════ PRYWATNOŚĆ ══════════════════════ -->
+<section id="prywatnosc">
+<h2>Dane wychodzące</h2>
+<p>Analiza działa lokalnie. Tylko trzy funkcje kontaktują się z zewnętrznymi usługami i każdą da się wyłączyć.</p>
+
+<table class="method-table">
+  <tr><th>Funkcja</th><th>Co opuszcza komputer</th><th>Stan domyślny i wyłączenie</th></tr>
+  <tr><td>Podsumowania grup (OpenAI)</td><td>zwarty opis grupy: tytuły i fragmenty tekstu (do 220 znaków), domeny, trackery, liczby i wyniki</td><td><span class="badge badge-green">wyłączone</span> włącza <code>METHADATA_ENABLE_LLM=1</code> razem z <code>OPENAI_API_KEY</code>; <code>METHADATA_DISABLE_LLM=1</code> wyłącza także przy ustawionym <code>ENABLE</code></td></tr>
+  <tr><td>Wzbogacanie domen (DNS, TLS, RDAP)</td><td>zapytania do publicznych nazw hostów z materiałów; połączenie TLS ujawnia adres IP analityka</td><td>włączone; <code>METHADATA_DISABLE_ENRICHMENT=1</code></td></tr>
+  <tr><td>Pobranie strony z adresu URL</td><td>zapytanie HTTP do podanego adresu (bezpieczny fetch, bez adresów prywatnych)</td><td>włączone; odznacz „Pobierz stronę”</td></tr>
+</table>
+
+<div class="callout callout-danger">
+  <strong>Materiały objęte zakazem rozpowszechniania:</strong> pracuj z <code>METHADATA_DISABLE_LLM=1</code> i <code>METHADATA_DISABLE_ENRICHMENT=1</code>. Podsumowania LLM są wyłączone domyślnie, więc bez świadomego włączenia żaden fragment materiałów nie opuszcza komputera.
+</div>
+
+<p class="muted">Wzbogacanie nie odpytuje adresów prywatnych, loopback ani link-local, więc spreparowany HAR nie posłuży do skanowania sieci wewnętrznej. Testy automatyczne mają obie usługi wyłączone na stałe (<code>tests/conftest.py</code>).</p>
+</section>
+
+<!-- ══════════════════════ ENV ══════════════════════ -->
+<section id="env">
+<h2>Zmienne środowiskowe</h2>
+<table class="method-table">
+  <tr><th>Zmienna</th><th>Domyślnie</th><th>Znaczenie</th></tr>
+  <tr><td><code>METHADATA_DATA_DIR</code></td><td><code>var/methadata-data</code></td><td>katalog danych: magazyn, przebiegi, podglądy, kolekcja</td></tr>
+  <tr><td><code>METHADATA_ANALYSIS_PROFILE</code></td><td><code>demo</code></td><td>profil analizy (<code>demo</code> / <code>jury</code>)</td></tr>
+  <tr><td><code>METHADATA_WORKERS</code></td><td><code>2</code></td><td>wątki analiz w tle</td></tr>
+  <tr><td><code>METHADATA_COLLECTION_MODELS</code></td><td><code>0</code></td><td><code>1</code> włącza ekstraktory modelowe (OCR, MiniLM, OpenCLIP, ORB)</td></tr>
+  <tr><td><code>METHADATA_COLLECTION_UPLOAD_BYTES</code></td><td><code>134217728</code></td><td>limit importu na plik (128 MiB)</td></tr>
+  <tr><td><code>METHADATA_MODEL_CACHE</code></td><td>cache Hugging Face</td><td>katalog wag modeli</td></tr>
+  <tr><td><code>METHADATA_ENABLE_LLM</code></td><td>—</td><td><code>1</code> włącza podsumowania OpenAI</td></tr>
+  <tr><td><code>METHADATA_DISABLE_LLM</code></td><td>—</td><td><code>1</code> wyłącza je bezwarunkowo</td></tr>
+  <tr><td><code>METHADATA_DISABLE_ENRICHMENT</code></td><td>—</td><td><code>1</code> wyłącza DNS / TLS / RDAP</td></tr>
+  <tr><td><code>METHADATA_MONITOR_FEED</code></td><td><code>configs/monitor/sample_feed.jsonl</code></td><td>źródło skanu reklam</td></tr>
+  <tr><td><code>METHADATA_BACKUP</code>, <code>METHADATA_JURY_DATA_DIR</code></td><td>—</td><td>korpus i magazyn profilu jury</td></tr>
+  <tr><td><code>METHADATA_REFERENCE_DIR</code></td><td><code>var/reference_figures</code></td><td>katalog zdjęć osób referencyjnych</td></tr>
+  <tr><td><code>METHADATA_EXTRAS</code>, <code>METHADATA_WITH_FFMPEG</code></td><td>lekki obraz</td><td>zakres zależności i <code>ffmpeg</code> przy budowaniu obrazu</td></tr>
+</table>
+</section>
+
+<!-- ══════════════════════ DIAGNOSTYKA ══════════════════════ -->
+<section id="diagnostyka">
+<h2>Diagnostyka</h2>
+<table class="method-table">
+  <tr><th>Objaw</th><th>Przyczyna</th><th>Co zrobić</th></tr>
+  <tr><td>404 na <code>/api/v1/collection</code></td><td>starsza wersja backendu na tym samym wolumenie danych</td><td>przebuduj i uruchom aktualny backend: <code>docker compose up --build</code></td></tr>
+  <tr><td>wideo i audio oznaczone jako „brak”</td><td>lekki obraz bez <code>ffmpeg</code> i modeli</td><td>uruchom tryb pełny (<code>METHADATA_WITH_FFMPEG=1</code>, extras <code>media,speech</code>)</td></tr>
+  <tr><td>„Za mało danych do rozstrzygnięcia”</td><td>pokrycie poniżej <code>coverage_min</code> — materiał nie ma porównywalnych cech (np. sam URL)</td><td>dodaj zapis strony lub zrzut ekranu tego materiału</td></tr>
+  <tr><td>materiał bez grupy przy widocznym podobieństwie</td><td>wsparcie poniżej <code>min_support</code> — dowód tylko z jednej rodziny</td><td>sprawdź sugerowane krawędzie i scenariusze co-jeśli; ewentualnie profil <code>szablon</code></td></tr>
+  <tr><td>brak podglądów śladów na starej migawce</td><td>migawka zapisana przed dodaniem podglądów</td><td><strong>Odśwież bazę</strong> — podglądy doliczają się raz i zapisują w migawce</td></tr>
+  <tr><td>import przerwany lub nieudany</td><td>błąd pojedynczego wpisu albo przerwanie procesu</td><td>ponów z raportu importu (<code>POST /api/v1/imports/{id}/retry</code>) — wznawia się z oryginału</td></tr>
+</table>
+
+<div class="callout callout-info" style="margin-top:32px;">
+  <strong>Dalej:</strong> metodologia, wzory i obsługa niepełnych danych — <code>docs/METHODOLOGY.md</code>; wewnętrzna referencja potoku, kontraktów i API — <code>docs/data-matching-exploration.html</code>; zgodność z wymaganiami zadania — <code>docs/ZGODNOSC_Z_WYMAGANIAMI.md</code>; uruchomienie i scenariusz jury — <code>README.md</code>.
+</div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script>
+// Podświetlenie aktywnej pozycji nawigacji przy przewijaniu
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+function updateNav() {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 60) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
+</script>
+</body>
+</html>
